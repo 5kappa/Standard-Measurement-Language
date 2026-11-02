@@ -11,7 +11,7 @@ Every token, source AST node, and lexical or syntactic diagnostic must identify 
 
 The front end retains the original UTF-8 source bytes for the duration of lexing, parsing, and diagnostic rendering. It must not normalize line endings, tabs, Unicode characters, or other source text before calculating locations.
 
-SML accepts UTF-8 source files and defines an ASCII canonical grammar. A valid UTF-8 character outside that grammar is still located according to this contract before being reported as an invalid source character. An invalid UTF-8 byte sequence is reported against the smallest byte range that identifies the decoding failure.
+SML accepts UTF-8 source files and defines an ASCII canonical grammar. A valid UTF-8 character outside that grammar is still located according to this contract before being reported as an invalid source character. At an offset where no complete well-formed UTF-8 scalar value begins, the invalid UTF-8 diagnostic covers exactly the current byte. The lexer then consumes that one byte and resumes at the following byte.
 
 ## Byte spans
 
@@ -80,6 +80,8 @@ A horizontal tab advances to the next four-column tab stop. With one-based colum
 
 A valid non-ASCII Unicode scalar value advances the display column by one before the lexer reports that the character is outside SML's canonical grammar. Its UTF-8 byte length may be greater than one, which is why byte offsets and display columns are stored separately.
 
+Each byte diagnosed as invalid UTF-8 also advances the display column by one. This bookkeeping does not decode the byte as a character or insert a replacement character. Because recovery consumes only the current byte, a following ASCII newline or well-formed UTF-8 scalar value retains its ordinary line and column behavior.
+
 ## Tokens and trivia
 
 Every emitted token records at least:
@@ -103,7 +105,7 @@ previous.span.end_byte == current.span.start_byte
 
 Consequently:
 
-```measure
+```sml
 10m          // NUMBER and IDENT are adjacent
 10 m         // separated by whitespace
 10/*note*/m  // separated by a comment
@@ -119,6 +121,8 @@ This contract does not require trivia to be represented as tokens. The later tok
 
 Every source AST node records a span covering the complete source construct represented by that node.
 
+`SourceFile` is the one deliberate whole-source case: its span is `[0, source_byte_length)`, including leading and trailing trivia. This makes an empty file's span equal to its zero-width `EOF` location. Other nodes exclude whitespace or comments that merely surround the construct.
+
 General composition rules:
 
 - a leaf node uses the span of its source token;
@@ -129,33 +133,33 @@ General composition rules:
 - a statement span includes its terminating semicolon when the grammar requires one; and
 - a block span includes its opening and closing braces when present.
 
-Operator and delimiter spans may also be retained separately when needed for precise diagnostics. The complete field requirements belong in `AST-SCHEMA.md`.
+The source AST preserves explicit grouping. Operators, delimiters, keywords, separators, statement terminators, and optional noise words required by `AST-SCHEMA.md` are retained as token references with their original spans. Noise words do not create semantic AST nodes.
 
-## Missing tokens and recovery
+## Missing-syntax diagnostic locations
 
-When parser recovery represents an expected but absent token, the missing token uses a zero-width span at the insertion point. It must not borrow the span of the following token.
+When the parser expects an absent token, its diagnostic uses a zero-width location at the position where the token was expected. It must not borrow the span of the following token.
 
 Example:
 
-```measure
+```sml
 9.8[m/s^2
 ```
 
-The missing `]` is located at EOF with `[source_byte_length, source_byte_length)`. A diagnostic may label the existing unit annotation separately, but the missing token itself remains zero-width.
+The expected `]` is located at EOF with `[source_byte_length, source_byte_length)`. A diagnostic may label the existing unit annotation separately. The zero-width location identifies an expectation; it is not a synthetic token.
 
-The parser must distinguish:
+The frontend must distinguish:
 
 - a real token with a non-empty source span;
 - a real zero-width `EOF` token; and
-- a synthetic missing token with a zero-width insertion span.
+- a zero-width diagnostic location for absent syntax.
 
-The exact recovery representation will be fixed in `RECOVERY.md` and `AST-SCHEMA.md`.
+The version 0.1 parser stops after its first syntax diagnostic and returns no AST. It does not synthesize missing tokens or construct recovered/error nodes. `AST-SCHEMA.md` therefore contains only real token references from successful parses.
 
 ## Phase ownership
 
 The lexer calculates token spans and source positions while scanning the original bytes. The parser does not recalculate token locations.
 
-The parser composes token spans into AST spans and may create zero-width insertion locations during documented recovery. Diagnostic rendering consumes the recorded locations without changing them.
+On success, the parser composes token spans into AST spans. On failure, it may calculate a zero-width expected-syntax location for its single diagnostic but does not create a token there. Diagnostic rendering consumes recorded locations without changing them.
 
 ## Conformance examples
 

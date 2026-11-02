@@ -32,7 +32,7 @@ let area: [m^2] = 10[m^2];
 
 ## Open dependent decisions
 
-Local initializer inference, mandatory initializers, one binding per declaration, and explicit function contracts are accepted by SD-028. Scope and mutation, named quantity-kind annotations, and the numeric representation remain separate decisions.
+Local initializer inference, initializer requirements, one binding per declaration, and explicit function contracts are governed by SD-028. Scope and mutation, named quantity-kind annotations, and the numeric representation remain separate decisions.
 
 ## Revisit trigger
 

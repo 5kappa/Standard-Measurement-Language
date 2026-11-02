@@ -1,0 +1,342 @@
+(*
+ * Standard Measurement Language (SML) version 0.1 grammar
+ *
+ * Status: accepted
+ * Scope: source-file, function, statement, declaration, expression,
+ *        annotation, and unit-expression syntax
+ *
+ * This grammar operates on the token stream defined by TOKEN-SPEC.md.
+ * Uppercase names are token kinds. Quoted strings are exact, case-sensitive
+ * token lexemes from that specification. Whitespace and comments are trivia
+ * and do not appear in this grammar. EOF is the zero-width end token.
+ *
+ * Rules that depend on source adjacency, token lexemes, counts, or surrounding
+ * context are listed below the productions. Ordinary EBNF cannot express them
+ * directly. Their accepted parser or later-phase ownership is stated there.
+ *)
+
+
+(* 1. Programs and functions
+ * LANGUAGE-SPECIFICATION.md, Section 9
+ *)
+
+source_file
+    = { function_definition }, EOF ;
+
+function_definition
+    = "fn", IDENT, "(", [ parameter_list ], ")",
+      [ ":", return_annotation ], block ;
+
+parameter_list
+    = parameter, { ",", parameter } ;
+
+parameter
+    = IDENT, ":", declaration_annotation ;
+
+return_annotation
+    = declaration_annotation ;
+
+
+(* 2. Blocks and statements
+ * LANGUAGE-SPECIFICATION.md, Sections 8 and 9
+ *)
+
+block
+    = "{", { statement }, "}" ;
+
+statement
+    = declaration
+    | prefix_update_statement
+    | identifier_statement
+    | print_statement
+    | if_statement
+    | while_statement
+    | for_statement
+    | return_statement
+    | break_statement
+    | continue_statement
+    | assert_statement ;
+
+(* Assignment, update, and call statements share an IDENT prefix. *)
+identifier_statement
+    = IDENT, identifier_statement_tail ;
+
+identifier_statement_tail
+    = "=", assignment_value, ";"
+    | compound_assignment_operator, expression, ";"
+    | update_operator, ";"
+    | call_suffix, ";" ;
+
+declaration
+    = let_declaration
+    | const_declaration ;
+
+let_declaration
+    = "let", IDENT, [ ":", declaration_annotation ],
+      [ "=", declaration_value ], ";" ;
+
+const_declaration
+    = "const", IDENT, [ ":", declaration_annotation ],
+      "=", declaration_value, ";" ;
+
+declaration_value
+    = expression
+    | input_expression ;
+
+assignment_value
+    = expression
+    | input_expression ;
+
+assignment_operator
+    = "=" | "+=" | "-=" | "*=" | "/=" ;
+
+compound_assignment_operator
+    = "+=" | "-=" | "*=" | "/=" ;
+
+update_operator
+    = "++" | "--" ;
+
+prefix_update_statement
+    = update_operator, IDENT, ";" ;
+
+print_statement
+    = "print", "(", expression, { ",", expression }, ")", ";" ;
+
+if_statement
+    = "if", "(", expression, ")", [ "then" ], block,
+      { "else", "if", "(", expression, ")", [ "then" ], block },
+      [ "else", block ] ;
+
+while_statement
+    = "while", "(", expression, ")", [ "do" ], block ;
+
+for_statement
+    = "for", "(", [ for_initializer ], ";",
+      [ expression ], ";", [ for_update ], ")",
+      [ "do" ], block ;
+
+for_initializer
+    = "let", IDENT, [ ":", declaration_annotation ], "=", declaration_value
+    | assignment_core ;
+
+for_update
+    = assignment_core
+    | IDENT, update_operator
+    | update_operator, IDENT ;
+
+assignment_core
+    = IDENT, "=", assignment_value
+    | IDENT, compound_assignment_operator, expression ;
+
+return_statement
+    = "return", [ expression ], ";" ;
+
+break_statement
+    = "break", ";" ;
+
+continue_statement
+    = "continue", ";" ;
+
+assert_statement
+    = "assert", expression, ";" ;
+
+
+(* 3. Declaration and function-contract annotations
+ * LANGUAGE-SPECIFICATION.md, Sections 7.2, 7.3, and 9
+ *)
+
+declaration_annotation
+    = primitive_type
+    | dimension_name
+    | exact_unit_annotation ;
+
+primitive_type
+    = "int" | "float" | "bool" | "text" ;
+
+dimension_name
+    = "Length" | "Mass" | "Time" | "Force" ;
+
+exact_unit_annotation
+    = "[", unit_expression, "]" ;
+
+
+(* 4. Expressions, from lowest to highest precedence
+ * LANGUAGE-SPECIFICATION.md, Sections 6.1 and 6.2
+ *)
+
+expression
+    = logical_or ;
+
+logical_or
+    = logical_and, { "||", logical_and } ;
+
+logical_and
+    = equality, { "&&", equality } ;
+
+(* Equality and relational operators are deliberately non-chaining. *)
+equality
+    = relational, [ equality_operator, relational ] ;
+
+equality_operator
+    = "==" | "!=" ;
+
+relational
+    = additive, [ relational_operator, additive ] ;
+
+relational_operator
+    = "<" | "<=" | ">" | ">=" ;
+
+additive
+    = multiplicative, { additive_operator, multiplicative } ;
+
+additive_operator
+    = "+" | "-" ;
+
+multiplicative
+    = unary, { multiplicative_operator, unary } ;
+
+multiplicative_operator
+    = "*" | "/" | "%" ;
+
+unary
+    = unary_operator, unary
+    | power ;
+
+unary_operator
+    = "!" | "+" | "-" ;
+
+(* A unary right operand permits negative exponents and preserves right association. *)
+power
+    = postfix, [ "^", unary ] ;
+
+postfix
+    = primary, { conversion_suffix } ;
+
+conversion_suffix
+    = "as", [ "to" ], unit_target ;
+
+unit_target
+    = IDENT
+    | exact_unit_annotation ;
+
+primary
+    = numeric_primary
+    | STRING
+    | TRUE
+    | FALSE
+    | identifier_primary
+    | "(", expression, ")" ;
+
+(* Plain numbers and both quantity forms share a NUMBER prefix. *)
+numeric_primary
+    = NUMBER, [ quantity_suffix ] ;
+
+quantity_suffix
+    = IDENT
+    | exact_unit_annotation ;
+
+(* Names and calls share an IDENT prefix. *)
+identifier_primary
+    = IDENT, [ call_suffix ] ;
+
+call_suffix
+    = "(", [ argument_list ], ")" ;
+
+argument_list
+    = expression, { ",", expression } ;
+
+input_expression
+    = "input", "(", ")" ;
+
+
+(* 5. Unit expressions
+ * LANGUAGE-SPECIFICATION.md, Section 5
+ *)
+
+unit_expression
+    = unit_product, [ "/", unit_denominator ] ;
+
+unit_product
+    = unit_power, { "*", unit_power } ;
+
+unit_denominator
+    = unit_power
+    | "(", unit_product, ")" ;
+
+unit_power
+    = IDENT, [ "^", unit_exponent ] ;
+
+(*
+ * TOKEN-SPEC.md emits a complete numeric spelling as NUMBER rather than
+ * emitting individual DIGIT tokens. The required constraint below restricts
+ * this NUMBER to the unsigned-integer lexical form used by the specification's
+ * signed_integer production.
+ *)
+unit_exponent
+    = [ "-" ], NUMBER ;
+
+
+(* 6. Constraints and context rules outside ordinary EBNF
+ * LANGUAGE-SPECIFICATION.md, Sections 2.2, 3.6, 5, 6.2, 8, and 9
+ *)
+
+(*
+ * C1. Quantity attachment
+ *     In numeric_primary, NUMBER and the first token of quantity_suffix must
+ *     be byte-adjacent according to SOURCE-LOCATIONS.md. Whitespace or a
+ *     comment between them prevents quantity attachment.
+ *
+ * C2. Unit exponent spelling and range
+ *     NUMBER in unit_exponent must have an integer lexeme: "0" or a nonzero
+ *     digit followed by zero or more digits. A decimal NUMBER is invalid in
+ *     this position. With the optional preceding minus, the mathematical value
+ *     must be in the inclusive range -16 through 16.
+ *
+ * C3. Unit-factor limit
+ *     A unit annotation may contain at most eight written unit_power
+ *     occurrences. Grouping does not reset this count.
+ *
+ * C4. Unit-annotation length
+ *     The source between the opening and closing brackets of an
+ *     exact_unit_annotation may contain at most 128 ASCII characters,
+ *     including whitespace and comments.
+ *
+ * C5. Input-expression context
+ *     input_expression occurs only as a complete declaration_value or the
+ *     assignment_value of a simple "=" statement. If a declaration_value is
+ *     input_expression, the declaration must contain an explicit primitive_type
+ *     or exact_unit_annotation; a dimension_name or omitted annotation is not
+ *     sufficient. For assignment, confirming that the target binding has a
+ *     suitable declared constraint requires later name resolution and checking.
+ *
+ * C6. Control-transfer context
+ *     The parser rejects break and continue outside a loop. It rejects a bare
+ *     return in a function with a return annotation and rejects a return with
+ *     an expression in a function without a return annotation.
+ *
+ * C7. Calls and unit-sensitive operators
+ *     A call is syntactically valid without consulting declarations. Whether its
+ *     function exists and whether its arguments match are later name-resolution
+ *     and checking tasks. Prefix and postfix updates require a dimensionless
+ *     numeric variable, and a numeric-power exponent must be dimensionless;
+ *     those facts also require later checking and are not parser decisions.
+ *
+ * C8. Proposal annotation discrepancy
+ *     The proposal table contains the example `let distance: m = 100m;`, but its
+ *     annotation categories and other examples require bracketed exact units.
+ *     The accepted canonical form is `let distance: [m] = 100m;`; bare unit
+ *     identifiers are not declaration annotations.
+ *)
+
+
+(* 7. Normative-section mapping
+ *
+ * Section 2.2  Free-field format and quantity attachment       C1
+ * Section 3.6  Quantity literals                               numeric_primary
+ * Section 4    Operators and delimiters                        quoted terminals
+ * Section 5    Unit-expression syntax and limits               unit_expression, C2-C4
+ * Section 6    Expression hierarchy and associativity          expression through primary
+ * Section 7.3  Declaration grammar and annotations             declaration, declaration_annotation
+ * Section 8    Statements, blocks, and loop clauses            statement through assert_statement, C5-C8
+ * Section 9    Functions, programs, and call statements         source_file, function_definition, C6-C7
+ *)

@@ -1,4 +1,4 @@
-# Measure Programming-Language Proposal Workspace
+# Standard Measurement Language Proposal Workspace
 
 Status: supporting design history and rationale  
 Target: course programming-language proposal  
@@ -44,7 +44,7 @@ introduction and uniqueness
 
 - Students learning programming-language design and lexical/syntactic specification.
 - Students exploring how domain-specific notation can prevent unit confusion.
-- Readers evaluating whether Measure is coherent and sufficiently distinct from its inspirations.
+- Readers evaluating whether SML is coherent and sufficiently distinct from its inspirations.
 
 ### 2.3 Success criteria
 
@@ -134,11 +134,11 @@ Compound forms such as `m^2`, `m^3`, `kN/m`, and `kg*m/s^2` are produced by unit
 
 - implementation algorithms for unit resolution or checking;
 - a runtime numeric representation and rounding/overflow specification;
-- interpretation, compilation, code generation, and implementation architecture;
+- interpretation, compilation, code generation, and language-level implementation architecture;
 - reusable beam, column, slab, material, or section objects;
 - load combinations and load propagation;
 - runtime input carrying units;
-- assertions and engineering constraints;
+- runtime assertion behavior and domain-specific engineering constraints;
 - structured reports;
 - user-defined units;
 - polymorphic unit-aware functions;
@@ -153,7 +153,7 @@ Compound forms such as `m^2`, `m^3`, `kN/m`, and `kg*m/s^2` are produced by unit
 
 ### 4.4 Not selected by this document
 
-No implementation language, parser strategy, AST representation, recovery algorithm, numeric runtime, evaluator, or backend is required by the course deliverable.
+No implementation language, parser strategy, AST representation, recovery algorithm, numeric runtime, evaluator, or backend is required by the course deliverable itself. The later documentation-hardening work nevertheless selected a Python frontend engineering baseline in decision 089; that implementation choice does not become part of SML source semantics.
 
 ## 5. Representative programs and expressions
 
@@ -263,11 +263,11 @@ The specification must not use `unit`, `dimension`, `quantity kind`, or `type` a
 
 Quantity kinds are defined terminology but their enforcement remains an SD-050 decision. The concrete canonical base units are selected by decision 030.
 
-A numeric literal without a unit is a valid dimensionless quantity. Future declarations may therefore bind ordinary numerical variables without attaching a unit, for example `let coefficient = 0.5;`. Measure requires units only when the value is intended to carry a unit-bearing quantity.
+A numeric literal without a unit is a valid dimensionless quantity. Future declarations may therefore bind ordinary numerical variables without attaching a unit, for example `let coefficient = 0.5;`. SML requires units only when the value is intended to carry a unit-bearing quantity.
 
 ### 6.2 Formal dimension representation
 
-**Accepted.** Measure has exactly three initial physical base dimensions and represents a normalized dimension as their integer exponent vector:
+**Accepted.** SML has exactly three initial physical base dimensions and represents a normalized dimension as their integer exponent vector:
 
 ```text
 Dimension = Length^L * Mass^M * Time^T
@@ -420,13 +420,13 @@ The accepted spelling is `8[kN/m] * 4m`. Resolving its boundary does not require
 
 Unicode alternatives must not require a separate semantic model. Their normalization and diagnostics would need dedicated lexer tests.
 
-## 9. Minimal lexical specification
+## 9. Historical minimal lexical sketch
 
-This specification defines the lexical core for attached simple units and bracketed compound units.
+This section records the minimal lexical core from which the accepted frontend contract was developed. It is an explanatory subset, not the complete token specification; `docs/frontend/TOKEN-SPEC.md` controls implementation.
 
 ### 9.1 Character set
 
-**Candidate for version 0.1:** canonical source uses ASCII characters.
+**Accepted for version 0.1:** source files are UTF-8, and the canonical grammar uses the ASCII characters enumerated by the normative specification.
 
 ```text
 LETTER      = "A".."Z" | "a".."z"
@@ -436,11 +436,11 @@ SYMBOL      = "." | "+" | "-" | "*" | "/" | "^"
             | "(" | ")" | "[" | "]" | "," | "_"
 ```
 
-Source encoding should be UTF-8 even if version 0.1 accepts only an ASCII lexical subset. This leaves a controlled path for Unicode unit aliases.
+Source encoding is UTF-8 even though version 0.1 accepts only an ASCII lexical subset. This leaves a controlled path for future Unicode unit aliases.
 
 ### 9.2 Token classes
 
-| Token | Candidate lexical rule | Example |
+| Core token | Accepted lexical rule | Example |
 | --- | --- | --- |
 | `NUMBER` | `DIGIT+ ("." DIGIT+)?` | `8`, `2.5`, `100` |
 | `IDENT` | `LETTER (LETTER | DIGIT | "_")*` | `m`, `kN`, `quantity` |
@@ -489,32 +489,35 @@ Unit symbols remain case-sensitive, so `N` and `n` are different lexemes. Recogn
 
 ### 9.5 Operators and delimiters
 
-All version 0.1 operators in the common core are single-character tokens, so maximal-munch conflicts do not arise among them. If comments later use `//` or `/*`, the lexer must prefer those longer prefixes over the single `/` token.
+The early expression core used single-character operators. The accepted full language also has multi-character operators and both comment prefixes, so the lexer applies the maximal-munch order in `docs/frontend/TOKEN-SPEC.md` before recognizing their one-character prefixes.
 
 ### 9.6 Whitespace, comments, and field format
 
-- **Candidate:** whitespace separates tokens where necessary and is otherwise insignificant.
+- **Established:** whitespace separates tokens where necessary and is otherwise insignificant.
 - **Established:** the language is free-field, not column-sensitive or indentation-sensitive.
-- **Open:** whether version 0.1 includes comments at all.
-- **Candidate for later:** `//` line comments and `/* ... */` block comments.
+- **Established:** version 0.1 supports `//` line comments and non-nesting `/* ... */` block comments.
 - **Established:** the optional noise words are `to`, `then`, and `do`. They are reserved syntactic tokens and do not affect semantics.
-- **Established:** the expression core recognizes `as` and its optional noise word `to`; `then` and `do` become active when the required control-flow grammar is completed.
+- **Established:** `to` may follow `as`, `then` may follow an `if` condition, and `do` may follow a loop header.
 
 ### 9.7 Lexical diagnostics
 
-The lexer should report errors at the smallest local span:
+The accepted lexer reports structured errors at the local spans fixed by `docs/frontend/DIAGNOSTICS.md`. The families include:
 
 - unknown character;
 - decimal point not followed by a digit;
-- unsupported Unicode unit spelling;
-- unterminated block comment, if block comments are adopted; and
-- invalid token boundary required by the selected quantity-literal syntax.
+- valid non-ASCII character outside the canonical grammar;
+- invalid UTF-8;
+- unsupported numeric notation;
+- unterminated string; and
+- unterminated block comment.
 
-## 10. Minimal draft grammar
+Quantity attachment is parser validation, not a lexical failure. The lexer emits separate `NUMBER` and `IDENT` or `LBRACKET` tokens; the parser rejects `100 m`, `100/*comment*/m`, and `9.8 [m/s^2]` because their spans are not adjacent.
 
-The grammar is split into the expression core, postfix conversion, and the accepted simple and compound quantity-literal productions.
+## 10. Historical grammar core and accepted extensions
 
-### 10.1 Stable expression core
+The expression subset below records the grammar core used during design. It is followed by accepted extensions in this section, but it is not a complete source-file grammar; `docs/frontend/GRAMMAR.ebnf` is the consolidated implementation contract.
+
+### 10.1 Stable expression core (historical subset)
 
 ```ebnf
 source              = expression, EOF ;
@@ -590,9 +593,9 @@ compound_quantity_literal
 
 The parser establishes syntactic structure only. It may parse `10m + 5s` as an addition without deciding whether the operation is valid. Unit-name resolution, dimension compatibility, scale conversion, and quantity-kind rules belong to later phases.
 
-### 10.5 Parser recovery goals
+### 10.5 Parser failure goals
 
-Recovery should be local around delimiters and operators. Candidate messages include:
+**Accepted by decision 086:** the version 0.1 parser is fail-fast. It runs only after lexing succeeds, reports its first syntax error, returns no AST, and does not synchronize or synthesize tokens. Precise local messages remain goals, including:
 
 - `Expected an expression after '*'.`
 - `Expected ')' to close the expression started here.`
@@ -658,119 +661,98 @@ let area: [m^2] = 10[m^2];
 
 Annotation categories cannot be combined syntactically. Forms such as `float[m]`, `Length(m)`, and `float Length` do not match the declaration grammar.
 
-### 10.8 Accepted initialized-declaration grammar
+### 10.8 Accepted declaration-initialization grammar
 
-Every declaration has exactly one initializer. Its annotation is optional:
+A declaration contains one binding and may contain one annotation. A `let` initializer is optional; a `const` initializer is required:
 
 ```ebnf
 declaration
-    = ( "let" | "const" ), IDENT,
-      [ ":", declaration_annotation ],
-      "=", expression, ";" ;
+    = "let", IDENT, [ ":", declaration_annotation ],
+      [ "=", declaration_value ], ";"
+    | "const", IDENT, [ ":", declaration_annotation ],
+      "=", declaration_value, ";" ;
 ```
 
-The parser records the optional annotation and required initializer. It performs no inference and does not check the initializer.
+The parser records the optional annotation and initializer. It requires an initializer for `const` but performs no inference, definite-assignment analysis, or initializer checking.
 
 ```text
 let count = 5;              // inferred int
+let pending: Length;        // annotated and uninitialized
+let untyped;                // later semantics must settle its constraint
 let ratio = 0.5;            // inferred float
 let span = 5m;              // inferred exact-unit constraint [m]
 let area = 6[m^2];          // inferred exact-unit constraint [m^2]
 let flexible: Length = 5m;  // explicit dimension constraint
 ```
 
-Future semantics may infer a binding constraint from an unannotated initializer. Function parameters use `name: annotation`, and a function return annotation follows its parameter list using the same colon, as in `fn speed(distance: Length, time: Time): [m/s]`. Uninitialized and multi-binding declarations are rejected by the current grammar.
+Future semantics may infer a binding constraint from an unannotated initializer and must define definite assignment for uninitialized `let` bindings. Function parameters use `name: annotation`, and a function return annotation follows its parameter list using the same colon, as in `fn speed(distance: Length, time: Time): [m/s]`. Multi-binding declarations and uninitialized `const` declarations are rejected by the current grammar.
 
 Scope, mutation, assignment, and the exact numeric promotion rules remain separate decisions.
 
 ### 10.9 Accepted increment and decrement statements
 
-`++` and `--` are postfix standalone mutation statements, not expression operators:
+`++` and `--` are prefix or postfix standalone mutation statements, not expression operators:
 
 ```ebnf
 increment_statement
-    = IDENT, ( "++" | "--" ), ";" ;
+    = IDENT, ( "++" | "--" ), ";"
+    | ( "++" | "--" ), IDENT, ";" ;
 ```
 
-The parser records the target identifier and postfix operator. The statement does not form an expression, so it cannot be nested. Mutability, numeric type, and update behavior are future semantic/runtime concerns.
+The parser records the target identifier, operator, and prefix/postfix position. The statement does not form an expression, so it cannot be nested. Mutability, numeric type, dimensionless-target enforcement, and update behavior are future semantic/runtime concerns.
 
 ```text
 let count = 5;
+++count;              // 6
 count++;              // 6
 
 let length = 5m;
-length++;             // 6m
-
-let flexible: Length = 20cm;
-flexible++;           // 21cm
+length += 1m;         // explicit unit-bearing increment
 ```
 
-Prefix and expression-valued forms are syntax errors: `++count` and `print(count++)` are invalid. `constValue++` and `flag++` are syntactically valid and could only be rejected later for constness or nonnumeric type.
+Expression-valued forms such as `print(count++)` are syntax errors. `constValue++`, `flag++`, and `length++` are syntactically valid statements but can only be rejected later for constness, nonnumeric type, or a unit-bearing target.
 
 ## 11. Initial source AST
 
-### 11.1 Expression-core AST
+Decision 085 fixes the representation principles for the complete source AST. `docs/frontend/AST-SCHEMA.md` is the implementation-facing field contract.
+
+### 11.1 Parser-only representation
+
+The lexer continues to emit token kinds, original lexemes, and source spans. It does not construct AST nodes or decide whether an `IDENT` is a declaration name, variable reference, call target, assignment target, or unit name. The parser assigns those grammatical roles and composes token spans into source AST spans.
+
+The AST contains source syntax only. It does not contain resolved declarations, registered units, normalized dimensions, inferred types, converted magnitudes, evaluated values, or runtime objects.
+
+### 11.2 Source preservation
+
+- `SourceFile.span` covers `[0, source_byte_length)`, including leading and trailing trivia.
+- Other node spans cover exactly their source constructs and exclude unrelated surrounding trivia.
+- Parentheses produce explicit `GroupExpr` nodes.
+- Literal nodes retain original token references rather than computed runtime values.
+- Operators, delimiters, keywords, separators, semicolons, and optional noise words needed for diagnostics retain their original token references.
+- `to`, `then`, and `do` do not become semantic nodes; their optional token references live on the containing nodes.
+
+### 11.3 Repeated syntax
+
+The AST uses a hybrid representation that maps directly from EBNF:
 
 ```text
-SourceFile
-    expression: Expr
-    span: SourceSpan
-
-Expr
-    NumberLiteral
-        lexeme
-        span
-
-    QuantityLiteral
-        magnitude: NumberLiteral
-        unit: UnitExpr
-        span
-
-    UnaryExpr
-        operator
-        operand
-        operator_span
-        span
-
-    BinaryExpr
-        left
-        operator
-        right
-        operator_span
-        span
-
-    GroupExpr
-        inner
-        open_span
-        close_span
-        span
-
-UnitExpr
-    UnitName
-        name
-        span
-
-    UnitMultiply
-        left
-        right
-        span
-
-    UnitDivide
-        numerator
-        denominator
-        span
-
-    UnitPower
-        base
-        integer_exponent
-        span
+{ item }       -> ordered collection
+[ item ]       -> optional field
+A | B          -> tagged variant
+associativity  -> nested expression nodes
 ```
 
-`GroupExpr` could be erased because parentheses do not change semantics, but preserving it initially improves diagnostics and source reconstruction.
+An `if` statement contains its required first branch, an ordered collection of zero or more `else if` branches, and an optional final `else`, rather than representing source-written `else if` as nested `IfStmt` nodes. `for` headers use dedicated initializer and update variants instead of statement nodes with synthetic semicolons.
 
-### 11.2 Statement AST extension
+A written unit product contains its first `UnitPower` followed by ordered star-and-factor parts. A unit expression contains one numerator product and at most one slash-and-denominator part. Parameters, arguments, and print arguments use ordered separator-and-item parts so comma locations remain available.
 
-The final parser AST must add nodes for the accepted declaration, assignment, input/output, conditional, iterative, block, function, and return forms. Their exact fields follow the final EBNF and are still to be completed. No checked or lowered AST belongs to the current project.
+Unary, binary, power, and conversion expressions remain nested. Their tree shapes preserve precedence and associativity for later consumers.
+
+### 11.4 Recovery boundary
+
+The accepted AST schema covers successful parses only. A syntax failure produces one diagnostic and no AST. Version 0.1 has no missing-token references or explicit error or recovered-node variants. Any future recovery proposal must preserve successful AST node shapes.
+
+The representation requires only records, tagged variants, optional values, and a basic ordered collection. It does not depend on a parser generator, reflection framework, visitor library, or specialized AST package.
 
 ## 12. Lexer/parser pipeline
 
@@ -801,7 +783,7 @@ The lexer and parser must not need structural-engineering knowledge or a unit re
 
 ### 13.1 Required diagnostic information
 
-The current implementation reports only lexical and syntactic failures. Where practical, a diagnostic should identify the unexpected character or token, the expected token family or delimiter, the narrowest relevant source span, and a concise correction or recovery point.
+The current implementation reports only lexical and syntactic failures. Every diagnostic has severity `error`, one primary source span, and a stable code and category. It may include secondary labels, notes, or correction guidance. Exact English wording may evolve. A diagnostic should identify the unexpected character or token, the expected token family or delimiter, the narrowest relevant source span, and a concise correction point.
 
 ### 13.2 Example syntax diagnostic
 
@@ -818,8 +800,8 @@ Expected `]` to close the unit annotation.
 - Unit AST nodes retain the spelling the user wrote.
 - Grouping information should remain available until diagnostics are produced.
 - Unknown identifiers and unknown unit spellings are not lexer or parser errors.
-- Recovery must not manufacture cascades of unrelated syntax errors.
-- Exact wording may evolve, but diagnostic categories, spans, and recovery boundaries must be testable.
+- The parser reports only its first syntax error, so it cannot manufacture a syntax cascade.
+- Exact wording may evolve, but diagnostic codes, categories, spans, phase gating, and lexical continuation boundaries must be testable.
 
 ## 14. Test strategy
 
@@ -876,14 +858,14 @@ Use snapshot or golden tests for:
 - message wording;
 - source labels and carets;
 - error ordering; and
-- suppression of cascaded lexical and syntax errors.
+- source-ordered independent lexical errors and exactly one syntax error after lexically successful input.
 
 ### 14.6 Test layers
 
 1. Unit tests for lexer states and grammar productions.
 2. Phase-boundary tests from source to tokens and from tokens to AST.
 3. End-to-end fixtures from source to AST or lexical/syntax diagnostic.
-4. Recovery tests at delimiters, semicolons, and closing braces once statement grammar is present.
+4. Failure-policy tests for lexical continuation, parser phase gating, and first-error parser termination.
 5. Regression tests for every corrected lexer or parser bug.
 
 ### 14.7 Accepted shared core fixture set
@@ -969,9 +951,9 @@ Add unary operators, the selected binary operators, precedence, grouping, conver
 
 Add declarations, assignment, input/output, conditionals, loops, blocks, functions, and returns in dependency-sized slices. Produce AST nodes without executing statements.
 
-### Milestone 5: syntax diagnostics and recovery
+### Milestone 5: diagnostics and failure handling
 
-Add malformed numbers, missing operands, delimiters, semicolons, and braces. Recover only at documented boundaries and verify that error cascades remain bounded.
+Add malformed numbers, missing operands, delimiters, semicolons, and braces. Continue lexing at documented malformed-candidate boundaries, gate parsing on lexical success, and verify that the parser stops after one syntax diagnostic without producing an AST.
 
 ### Milestone 6: lexer/parser conformance run
 
@@ -1011,13 +993,11 @@ Every accepted syntax proposal must document:
 - malformed-input behavior; and
 - domain value relative to implementation cost.
 
-## 17. Major unresolved design questions
+## 17. Deferred design questions
 
-### Syntax and lexical analysis
+### Future syntax and lexical growth
 
-- Are comments needed in version 0.1?
-- Should integer unit exponents have a distinct token or be validated by the parser?
-- Which Unicode aliases, if any, are accepted?
+- Which Unicode aliases, if any, should a future version accept?
 - What notation should future collections use now that square brackets delimit compound unit annotations?
 
 ### Future semantic model—not required by this project
@@ -1045,11 +1025,10 @@ Explicit `as` syntax is settled. Its numeric lowering, precision, and result-dis
 
 ### Later language growth
 
-- How are units written in variable and function signatures?
 - Does inference cross function boundaries?
 - How are user-defined units declared safely?
 - How do runtime inputs carry units?
-- Which structural object first justifies records, functions, or collections?
+- Which future use case first justifies records or collections?
 - How are domain constraints distinguished from general assertions?
 
 ## 18. Professor documentation-outline crosswalk
@@ -1061,21 +1040,21 @@ Explicit `as` syntax is settled. Its numeric lowering, precision, and result-dis
 | Identifiers and regular expression | Sections 9.2 and 9.4; general variables deferred |
 | Literals (added proposal section) | Numeric, string, Boolean, and quantity-literal forms follow Identifiers; detailed unit-expression grammar remains under Expressions. See decision 082. |
 | Arithmetic operations and machines | Sections 9.5 and 10 |
-| Boolean relational/logical operations | Required if used by the selected conditional and iterative grammar; exact syntax remains to be completed |
+| Boolean relational/logical operations | Complete token inventory, precedence, and grammar in `LANGUAGE-SPECIFICATION.md` and `docs/frontend/GRAMMAR.ebnf` |
 | Keywords and reserved words | Complete inventory is normative in `LANGUAGE-SPECIFICATION.md`; `as` is required for explicit conversion, and `to`, `then`, and `do` are reserved noise words. `rate`, `Money`, and `Temperature` are deferred. |
 | Noise words | Optional `to`, `then`, and `do`, matching the teammate proposal; Section 9.6 |
-| Comments and machine | Open; candidate forms in Section 9.6 |
+| Comments and machine | `//` line comments and non-nesting `/* ... */` block comments; Sections 9.6 and `docs/frontend/TOKEN-SPEC.md` |
 | Blanks/spaces | Section 9.6 |
 | Delimiters/brackets and machines | Sections 9.5 and 10 |
 | Free- or fixed-field format | Free-field; Section 9.6 |
 | Expression rules and precedence | Section 10.1 |
-| Declaration statement | Required in the final proposal and parser grammar; annotation and inference syntax already bounded |
-| Input/output statements | Required in the final proposal and parser grammar; exact productions remain open |
-| Assignment statement | Required in the final proposal and parser grammar |
-| Conditional statements | Required in the final proposal and parser grammar with mandatory braces |
-| Iterative statements | Required in the final proposal and parser grammar with mandatory braces |
+| Declaration statement | Complete productions and AST forms in the normative specification and frontend contracts |
+| Input/output statements | Complete `print` and context-sensitive `input()` productions in the normative specification and frontend contracts |
+| Assignment statement | Complete simple and compound-assignment productions in the normative specification and frontend contracts |
+| Conditional statements | Complete `if`/`else if`/`else` grammar with mandatory braces |
+| Iterative statements | Complete `while` and optional-clause `for` grammar with mandatory braces |
 
-The final course proposal may need state-machine diagrams for every required token family. Those diagrams should be generated only after the corresponding syntax is selected; drawing machines for undecided tokens would present candidates as commitments.
+The final course proposal may need state-machine diagrams for every required token family. They can now be rendered from the accepted transition definitions without changing the language design.
 
 ## 19. Teammate draft to decision-log mapping
 
@@ -1093,26 +1072,26 @@ The teammate draft is valuable because it supplies concrete syntax, semantic exa
 
 | Teammate-draft specification | Decision-log mapping | Current project treatment |
 | --- | --- | --- |
-| The language is named `Measure` and follows the principle "Meaning Before Math." | SD-001, SD-002 | **Candidate.** The name and slogan may be adopted separately from the technical design. Terms such as unit, dimension, type, and meaning must first be normalized under SD-002. |
+| The language is named `Measure` and follows the principle "Meaning Before Math." | SD-001, SD-002 | **Accepted with a later rename.** The principle remains part of the design, while the current language name is **Standard Measurement Language (SML)**. `Measure` is retained here as the teammate draft's historical wording. Terms such as unit, dimension, type, and meaning are normalized under SD-002. |
 | Units participate in static checking; multiplication and division derive result units; incompatible dimensions are rejected before execution. | SD-001, SD-003, SD-030, SD-031 | **Accepted and formalized.** The LMT vector model, derived `Force`, normalization rules, bounds, and initial conformance cases are recorded. |
 | The target audience includes students and beginner programmers. | SD-001 | **Aligned.** These users fit the educational charter. |
 | Small businesses, currencies, and engineers prototyping real calculations are initial targets. | SD-001; decision 078 | **Conflict / Deferred.** Currency is excluded from the current proposal, and professional engineering use remains subject to the educational-use disclaimer. |
-| Source characters are an ASCII-style set; identifiers begin with a letter and then contain letters, digits, or underscores; names are case-sensitive. | SD-010, SD-013 | **Candidate.** This is evidence for UTF-8 source with canonical ASCII syntax and the existing identifier machine. Whether unit names share `IDENT` and whether keywords are reserved require separate decisions. |
+| Source characters are an ASCII-style set; identifiers begin with a letter and then contain letters, digits, or underscores; names are case-sensitive. | SD-010, SD-013 | **Accepted with refinement.** Source files are UTF-8 with canonical ASCII syntax; unit names share `IDENT`, and exact lowercase reserved spellings are recognized case-sensitively. |
 | Integer syntax includes an optional leading minus. | SD-012, SD-020, SD-021 | **Accepted with revision.** Signs are parser-level unary operators, so `-5` is `MINUS NUMBER`, not one numeric token. |
 | Simple quantities use attached spelling such as `100m`; the draft describes the number and unit as one value token. | SD-012, SD-013, SD-014, SD-024 | **Accepted with revision.** The spelling is adopted, but the token stream is `NUMBER IDENT`; adjacency is checked from token metadata and unit lookup remains post-parse. |
 | Compound quantity literals use brackets, such as `9.8[m/s^2]`. | SD-014, SD-015, SD-022 | **Accepted.** Brackets provide the compound-unit boundary. Square brackets are therefore committed to unit annotations in the current language design. |
-| Units must touch numbers; ordinary whitespace is otherwise optional or separating; the language is free-field. | SD-011, SD-014, SD-023 | **Partly aligned, partly candidate.** Free-field format and required quantity attachment are established. Statement/newline behavior must be completed for the current parser grammar. |
+| Units must touch numbers; ordinary whitespace is otherwise optional or separating; the language is free-field. | SD-011, SD-014, SD-023 | **Accepted.** Simple quantity parts must be byte-adjacent; line breaks otherwise behave as whitespace, semicolons terminate simple statements, and braces delimit blocks. |
 | Both `//` line comments and `/* ... */` block comments are supported. | SD-011, decision 076 | **Accepted with refinement.** Block comments do not nest, unterminated block comments are lexical errors, and comments cannot interrupt quantity attachment. |
-| Arithmetic includes `+`, `-`, `*`, `/`, `%`, and numeric `^`; unary operators include prefix/postfix `++` and `--`. | SD-020, SD-021, SD-026, SD-029 | **Accepted as a staged design.** Version 0.1 contains unary signs and `+`, `-`, `*`, `/`. Numeric `^` is accepted for a later layer. Postfix `++` and `--` are accepted only as standalone mutation statements. `%` remains open. |
-| Boolean, relational, logical, and assignment operators are part of the language. | SD-020, SD-021; required statement surface | **Required where used by the selected parser grammar.** Exact token inventory, precedence, and productions remain to be completed; their semantics are outside this project. |
+| Arithmetic includes `+`, `-`, `*`, `/`, `%`, and numeric `^`; unary operators include prefix/postfix `++` and `--`. | SD-020, SD-021, SD-026, SD-029 | **Accepted as a staged design.** Numeric `^`, including negative exponents, is accepted in the expression grammar. Prefix and postfix `++` and `--` are accepted only as standalone mutation statements. Unit-sensitive restrictions are later semantic checks. |
+| Boolean, relational, logical, and assignment operators are part of the language. | SD-020, SD-021; required statement surface | **Accepted syntax.** The token inventory, precedence, associativity, and statement productions are complete; runtime and type semantics remain outside this project. |
 | `as` performs explicit conversion, and differently scaled compatible units cannot be added or compared without it. | SD-020, SD-021, SD-043, SD-044 | **Accepted.** Compatible-unit conversion is explicit. Postfix `as` binds more tightly than arithmetic; numeric lowering and display policy remain separate decisions. |
 | Unit products, quotients, and integer powers form derived units; division of a unit by itself yields a scalar. | SD-015, SD-022, SD-031, SD-033, SD-034 | **Accepted with bounded syntax.** Dimension algebra, grouping, signed integer powers, resource limits, normalization, and named-versus-expanded equality are fixed. Preferred display remains separate. |
 | User declarations may define `dimension`, `unit`, and currency `rate` bindings. | SD-032, SD-035, SD-043; decision 078 | **Deferred.** User-defined dimensions and units, currency, and `rate` declarations are outside the current proposal. |
 | Temperature points and differences are separate types. | SD-050 through SD-053; decision 078 | **Deferred.** The distinction remains useful future design input but is not part of the current proposal. |
 | Functions carry dimension contracts such as `fn speed(distance: Length, time: Time): [m/s]`. | SD-023, SD-027, decision 084; future SD-050 through SD-053 | **Accepted syntax.** A colon introduces the explicit return annotation; contract checking, conversion at boundaries, and polymorphism are outside this project. |
-| Declarations, mutable assignment, input/output, conditionals, loops, assertions, strings, functions, and a required `main` entry point are included. | SD-001, SD-023, SD-027; required statement surface | **Partly accepted for the current parser target.** The professor-required statement categories must receive grammar and AST nodes. Additional assertions and entry-point conventions remain subject to syntax decisions; `main` is not reserved. Runtime behavior is excluded. |
+| Declarations, mutable assignment, input/output, conditionals, loops, assertions, strings, functions, and a required `main` entry point are included. | SD-001, SD-023, SD-027; required statement surface | **Accepted with revision.** All listed constructs have grammar and AST forms, but `main` is not reserved or syntactically required. Runtime behavior is excluded. |
 | Every statement ends with `;`, blocks use braces, and square brackets are reserved for compound units. | SD-014, SD-023; required statement surface | **Accepted for the current parser grammar.** Simple statements require semicolons and control-flow bodies require braces. |
-| Diagnostics identify incompatible dimensions or units and sometimes suggest an explicit conversion. | SD-035, SD-060 through SD-064 | **Aligned direction.** The examples are candidate diagnostic fixtures. They do not yet define span labels, taxonomy, cascade control, or stable wording. |
+| Diagnostics identify incompatible dimensions or units and sometimes suggest an explicit conversion. | SD-035, SD-060 through SD-064 | **Split by phase.** Dimension/unit compatibility messages remain future semantic diagnostics. The current lexical and syntactic taxonomy, labels, ordering, 20-diagnostic lexer cap, phase gate, and fail-fast parser behavior are complete in the frontend contracts. |
 | The compiler pipeline is lexer -> parser -> unit checker -> Python code generator. | SD-024, IM-073, IM-074, decision 075 | **Narrowed to the course boundary.** The current pipeline is source -> lexer -> parser -> source-located AST. Checking and generation are outside the project. |
 | Unit labels are erased and generated Python uses ordinary floating-point arithmetic with zero runtime cost. | SD-041, SD-042, SD-045, IM-074 | **Outside the current project.** No numeric runtime or generated Python exists in the lexer/parser deliverable. |
 
@@ -1123,8 +1102,8 @@ The draft should be cited as an input when preparing these decision records:
 1. **SD-014 and SD-015:** attached simple literals plus bracketed compound literals are accepted, using `NUMBER IDENT` tokenization for the simple form.
 2. **SD-020 and SD-021:** the minimal version 0.1 operator set is accepted; the broader operators are staged behind their semantic dependencies.
 3. **SD-043:** explicit-only `as` conversion is accepted and binds more tightly than arithmetic.
-4. **Required statement surface:** use the draft's declarations, I/O, assignment, control-flow, and function forms as design input for lexer/parser decisions.
-5. **SD-060 through SD-064:** define lexical/syntax diagnostics and recovery; retain the draft's semantic messages only as future examples.
+4. **Required statement surface:** the draft's declarations, I/O, assignment, control-flow, and function forms informed the accepted lexer/parser grammar.
+5. **SD-060 through SD-064:** the accepted diagnostic and failure contracts define lexical continuation and fail-fast parsing; the draft's semantic messages remain future examples.
 6. **Decision 076:** the deliverable is proposal-only, and `LANGUAGE-SPECIFICATION.md` is normative; no implementation or backend is required.
 7. **Decision 078:** money and affine temperature are deliberately deferred from the current proposal.
 
@@ -1136,12 +1115,13 @@ The proposal documents declarations, mutation, control flow, functions, and inpu
 
 Decision record index: [`decisions/README.md`](decisions/README.md)
 
-- `Outline - Documentation-for-PL-Proposal-2024.pdf`: professor-provided checklist for proposal documentation.
+- `proposal files/Outline - Documentation-for-PL-Proposal-2024.pdf`: professor-provided checklist for proposal documentation.
 - `PPL_Mini-Programming-Language-Proposal.pdf`: professor-provided sample showing one prior proposal's presentation depth and use of lexical machines, regular expressions, precedence tables, and statement examples.
-- `Measure_A_Unit-Safe_Programming_Language_PL_Proposal.md`: teammate-authored working draft containing proposed surface syntax, unit semantics, statement forms, diagnostics, and a Python code-generation sketch; mapped in Section 19 and treated as non-normative.
+- `proposal files/Teammate_made_Draft.md`: teammate-authored working draft containing proposed surface syntax, unit semantics, statement forms, diagnostics, and a Python code-generation sketch; mapped in Section 19 and treated as non-normative.
+- `proposal files/ppl-v1-with-diagrams-v1.4.md` and its PDF rendering: team proposal used as a non-normative comparison source during hardening.
 
 These references inform document coverage only. They are not specifications for this project.
 
-## 21. Next planning step
+## 21. Documentation-hardening completion
 
-The next design activity should complete the remaining lexical details around the accepted literal syntax—comment policy, numeric forms, identifier rules, malformed adjacency diagnostics, and Unicode policy—then finish the expression and statement EBNF, AST shapes, and bounded parser recovery. Numeric representation, semantic checking, conversion lowering, result display, and execution are not decisions required by this project.
+The machine-readable fixture representation and completed 93-case suite are accepted by decision 087 and `docs/frontend/fixtures/README.md`, the Python 3.11.9 frontend engineering baseline is accepted by decision 089, and the completed rule registry is recorded in `docs/frontend/TRACEABILITY.md`. The repository-wide documentation consistency and coverage audit is complete. The hardened contracts are ready for review and commit before lexer implementation begins. Numeric representation, semantic checking, conversion lowering, result display, and execution are not decisions required by this project.

@@ -1,0 +1,14 @@
+{
+  "format_version": 1,
+  "language_version": "0.1",
+  "fixture_files": [
+    "lexer/pilot.json",
+    "lexer/tokens.json",
+    "lexer/lexical-failures.json",
+    "locations/source-locations.json",
+    "frontend/pilot.json",
+    "parser/ast-success.json",
+    "parser/control-units.json",
+    "parser/syntax-failures.json"
+  ]
+}

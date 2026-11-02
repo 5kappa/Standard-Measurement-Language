@@ -7,19 +7,20 @@ Informed by: teammate proposal's prefix and postfix `++` and `--` operators
 
 ## Decision
 
-The current parser enforces only the standalone postfix statement form. Mutability, numeric type, stored unit representation, and the effect of the update belong to a future semantic/runtime project.
+The current parser accepts standalone prefix and postfix statement forms. Mutability, numeric type, unit information, and the effect of the update belong to a future semantic/runtime project.
 
-Measure supports postfix `++` and `--` only as standalone mutation statements. They add or subtract one in the target's current unit representation and do not produce a value.
-
-```text
-count++;
-length--;
-```
-
-Prefix forms and expression use are rejected:
+SML supports prefix and postfix `++` and `--` as standalone mutation statements. They do not produce expression values.
 
 ```text
 ++count;
+--count;
+count++;
+count--;
+```
+
+Expression use is rejected:
+
+```text
 let old = count++;
 print(count++);
 ```
@@ -28,12 +29,12 @@ Constants and nonnumeric bindings cannot be incremented or decremented.
 
 ## Unit behavior
 
-`5m++` is not syntax because the target must be a mutable identifier. If `length` currently stores `5m`, `length++` produces `6m`; if a dimension-constrained binding currently stores `20cm`, it produces `21cm`.
+The target must be a mutable, dimensionless numeric identifier. A unit-bearing variable cannot use either update form; it must state the increment with a compatible unit, such as `length += 1m;`. The parser records the identifier target but does not determine whether it carries a unit.
 
 ## Reason
 
-The current representation gives increment an unambiguous unit-aware meaning. Restricting it to a statement avoids old-versus-new return values, expression side effects, and extra precedence rules.
+Supporting both positions follows the proposal surface. Restricting updates to standalone statements avoids old-versus-new expression values, expression side effects, and extra precedence rules. Restricting them semantically to dimensionless targets avoids inventing an implicit unit for the literal one.
 
 ## Validation
 
-Fixtures must cover dimensionless and unit-bearing targets, dimension-constrained targets whose current representations differ, constants, nonnumeric values, prefix syntax, and attempted expression use.
+Parser fixtures must cover prefix and postfix statements plus attempted expression use. Later checking fixtures must cover dimensionless targets, rejected unit-bearing targets, constants, and nonnumeric values.

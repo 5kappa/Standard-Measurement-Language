@@ -1,0 +1,3009 @@
+{
+  "format_version": 1,
+  "language_version": "0.1",
+  "fixtures": [
+    {
+      "id": "lex-leading-zero",
+      "description": "LEX003 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "0123x"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 5
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX003",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 4
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "0123"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX003"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.malformed-decimals",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-malformed-leading-decimal",
+      "description": "LEX004 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": ".5x"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 2,
+                "end_byte": 3
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 3
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX004",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 2
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": ".5"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX004"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.malformed-decimals",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-malformed-trailing-decimal",
+      "description": "LEX004 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "5.x"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 2,
+                "end_byte": 3
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 3
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX004",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 2
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "5."
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX004"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.malformed-decimals",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-malformed-repeated-decimal",
+      "description": "LEX004 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "5..2x"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 5
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX004",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 4
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "5..2"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX004"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.malformed-decimals",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-numeric-separator",
+      "description": "LEX005 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "1__0x"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 5
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX005",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 4
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "1__0"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX005"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.malformed-decimals",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-numeric-separator-exact-boundary",
+      "description": "LEX005 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "1__0"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 4
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX005",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 4
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "1__0"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX005"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.malformed-decimals",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-scientific-boundary",
+      "description": "LEX006 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "2.5e3foo"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "foo",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 8
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 8
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX006",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 5
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "2.5e3"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX006"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.unsupported-number-notation",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-scientific-notation",
+      "description": "LEX006 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "2.5e3"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 5
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX006",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 5
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "2.5e3"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX006"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.unsupported-number-notation",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-scientific-incomplete-sign",
+      "description": "LEX006 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "3e+"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 3
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX006",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 3
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "3e+"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX006"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.unsupported-number-notation",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-alternate-base-empty",
+      "description": "LEX007 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "0x"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 2,
+                "end_byte": 2
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX007",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 2
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "0x"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX007"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.unsupported-number-notation",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-hex-notation",
+      "description": "LEX007 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "0x10"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 4
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX007",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 4
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "0x10"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX007"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.unsupported-number-notation",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-hex-boundary",
+      "description": "LEX007 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "0xGz"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "z",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 4
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX007",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 3
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "0xG"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX007"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.unsupported-number-notation",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-hex-invalid-digit-exact-boundary",
+      "description": "LEX007 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "0xG"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 3
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX007",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 3
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "0xG"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX007"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.unsupported-number-notation",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-binary-notation",
+      "description": "LEX007 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "0b1010"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 6
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX007",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 6
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "0b1010"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX007"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.unsupported-number-notation",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-repeated-decimal-exact-boundary",
+      "description": "LEX004 consumes the specified malformed numeric candidate.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "5..2"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 4
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX004",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 4
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "candidate_lexeme": "5..2"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX004"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.malformed-decimals",
+          "DIAGNOSTICS.malformed-numeric-boundaries",
+          "RECOVERY.numeric-failures"
+        ]
+      }
+    },
+    {
+      "id": "lex-invalid-leading-underscore",
+      "description": "A leading underscore is consumed and the identifier remainder survives.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "_name"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "name",
+              "span": {
+                "start_byte": 1,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 5
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 1
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "RECOVERY.invalid-source-character",
+          "DIAGNOSTICS.data-model",
+          "DIAGNOSTICS.stable-data",
+          "DIAGNOSTICS.unexpected-source-labels",
+          "IMPLEMENTATION.result-records",
+          "IMPLEMENTATION.failure-classification"
+        ]
+      }
+    },
+    {
+      "id": "lex-invalid-character-closed-string",
+      "description": "An invalid character suppresses the closed STRING token.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "\"x\\y\""
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 5
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 2,
+                  "end_byte": 3
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5c"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.strings",
+          "RECOVERY.invalid-source-character"
+        ]
+      }
+    },
+    {
+      "id": "lex-invalid-character-unclosed-string",
+      "description": "An invalid character and the independently unclosed string are both diagnosed in source order.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "\"x\\"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 3
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX008",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 3
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "termination": "EOF"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 2,
+                  "end_byte": 3
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5c"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX008",
+          "LEX002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.strings",
+          "RECOVERY.invalid-source-character",
+          "RECOVERY.unclosed-string"
+        ]
+      }
+    },
+    {
+      "id": "lex-invalid-character-line-comment",
+      "description": "An invalid canonical character is diagnosed without leaving comment state.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "//\u00e9\nx"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 5,
+                  "line": 2,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 6,
+                  "line": 2,
+                  "column": 2
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 6
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 6,
+                  "line": 2,
+                  "column": 2
+                },
+                "end": {
+                  "byte_offset": 6,
+                  "line": 2,
+                  "column": 2
+                }
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 2,
+                  "end_byte": 4
+                },
+                "positions": {
+                  "start": {
+                    "byte_offset": 2,
+                    "line": 1,
+                    "column": 3
+                  },
+                  "end": {
+                    "byte_offset": 4,
+                    "line": 1,
+                    "column": 5
+                  }
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "c3a9"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.trivia-comments",
+          "RECOVERY.invalid-source-character"
+        ]
+      }
+    },
+    {
+      "id": "lex-invalid-character-block-comment",
+      "description": "An invalid canonical character is diagnosed without leaving comment state.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "/*\u00e9*/x"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 6,
+                  "line": 1,
+                  "column": 7
+                },
+                "end": {
+                  "byte_offset": 7,
+                  "line": 1,
+                  "column": 8
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 7,
+                "end_byte": 7
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 7,
+                  "line": 1,
+                  "column": 8
+                },
+                "end": {
+                  "byte_offset": 7,
+                  "line": 1,
+                  "column": 8
+                }
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 2,
+                  "end_byte": 4
+                },
+                "positions": {
+                  "start": {
+                    "byte_offset": 2,
+                    "line": 1,
+                    "column": 3
+                  },
+                  "end": {
+                    "byte_offset": 4,
+                    "line": 1,
+                    "column": 5
+                  }
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "c3a9"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.trivia-comments",
+          "RECOVERY.invalid-source-character"
+        ]
+      }
+    },
+    {
+      "id": "lex-malformed-gap-preserves-spans",
+      "description": "Malformed bytes remain a physical gap between valid partial tokens.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "10\\m"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 4
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 2,
+                  "end_byte": 3
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5c"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "NUMBER",
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "RECOVERY.invalid-source-character",
+          "RECOVERY.partial-token-adjacency"
+        ]
+      }
+    },
+    {
+      "id": "lex-unclosed-string-lf",
+      "description": "An unclosed string stops before LF and scanning resumes afterward.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "\"x\nname"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "name",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 7
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 3,
+                  "line": 2,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 7,
+                  "line": 2,
+                  "column": 5
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 7,
+                "end_byte": 7
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 7,
+                  "line": 2,
+                  "column": 5
+                },
+                "end": {
+                  "byte_offset": 7,
+                  "line": 2,
+                  "column": 5
+                }
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX008",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 2
+                },
+                "positions": {
+                  "start": {
+                    "byte_offset": 0,
+                    "line": 1,
+                    "column": 1
+                  },
+                  "end": {
+                    "byte_offset": 2,
+                    "line": 1,
+                    "column": 3
+                  }
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "termination": "LF"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX008"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.strings",
+          "RECOVERY.unclosed-string"
+        ]
+      }
+    },
+    {
+      "id": "lex-unclosed-string-cr",
+      "description": "An unclosed string stops before CR and scanning resumes afterward.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "\"x\rname"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "name",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 7
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 3,
+                  "line": 2,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 7,
+                  "line": 2,
+                  "column": 5
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 7,
+                "end_byte": 7
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 7,
+                  "line": 2,
+                  "column": 5
+                },
+                "end": {
+                  "byte_offset": 7,
+                  "line": 2,
+                  "column": 5
+                }
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX008",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 2
+                },
+                "positions": {
+                  "start": {
+                    "byte_offset": 0,
+                    "line": 1,
+                    "column": 1
+                  },
+                  "end": {
+                    "byte_offset": 2,
+                    "line": 1,
+                    "column": 3
+                  }
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "termination": "CR"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX008"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.strings",
+          "RECOVERY.unclosed-string"
+        ]
+      }
+    },
+    {
+      "id": "lex-unclosed-string-crlf",
+      "description": "An unclosed string stops before CRLF and scanning resumes afterward.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "\"x\r\nname"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "name",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 8
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 4,
+                  "line": 2,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 8,
+                  "line": 2,
+                  "column": 5
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 8
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 8,
+                  "line": 2,
+                  "column": 5
+                },
+                "end": {
+                  "byte_offset": 8,
+                  "line": 2,
+                  "column": 5
+                }
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX008",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 2
+                },
+                "positions": {
+                  "start": {
+                    "byte_offset": 0,
+                    "line": 1,
+                    "column": 1
+                  },
+                  "end": {
+                    "byte_offset": 2,
+                    "line": 1,
+                    "column": 3
+                  }
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "termination": "CRLF"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX008"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.strings",
+          "RECOVERY.unclosed-string"
+        ]
+      }
+    },
+    {
+      "id": "lex-unclosed-string-eof",
+      "description": "An unclosed string at EOF owns all remaining bytes.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "\"x"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 2,
+                "end_byte": 2
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX008",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 2
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "termination": "EOF"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX008"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.strings",
+          "RECOVERY.unclosed-string"
+        ]
+      }
+    },
+    {
+      "id": "lex-unterminated-block-comment",
+      "description": "An unterminated block comment labels its opener and physical EOF.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "/* x"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 4
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX009",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 2
+                }
+              },
+              "secondary": [
+                {
+                  "role": "reached_eof",
+                  "span": {
+                    "start_byte": 4,
+                    "end_byte": 4
+                  },
+                  "positions": {
+                    "start": {
+                      "byte_offset": 4,
+                      "line": 1,
+                      "column": 5
+                    },
+                    "end": {
+                      "byte_offset": 4,
+                      "line": 1,
+                      "column": 5
+                    }
+                  }
+                }
+              ],
+              "notes": [],
+              "data": {}
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX009"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.trivia-comments",
+          "RECOVERY.unterminated-block-comment"
+        ]
+      }
+    },
+    {
+      "id": "lex-incomplete-logical-operators",
+      "description": "Lone logical-operator prefixes are independent failures with later identifiers preserved.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "&x |y"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 1,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "y",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 5
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX010",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 1
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "operator_lexeme": "&"
+              }
+            },
+            {
+              "code": "LEX010",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 3,
+                  "end_byte": 4
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "operator_lexeme": "|"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX010"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "TOKEN-SPEC.operators-maximal-munch",
+          "RECOVERY.incomplete-logical-operator"
+        ]
+      }
+    },
+    {
+      "id": "lex-diagnostic-limit-exactly-twenty",
+      "description": "Exactly twenty lexical failures are not truncated.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 39,
+                "end_byte": 39
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 1
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 2,
+                  "end_byte": 3
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 4,
+                  "end_byte": 5
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 6,
+                  "end_byte": 7
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 8,
+                  "end_byte": 9
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 10,
+                  "end_byte": 11
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 12,
+                  "end_byte": 13
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 14,
+                  "end_byte": 15
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 16,
+                  "end_byte": 17
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 18,
+                  "end_byte": 19
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 20,
+                  "end_byte": 21
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 22,
+                  "end_byte": 23
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 24,
+                  "end_byte": 25
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 26,
+                  "end_byte": 27
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 28,
+                  "end_byte": 29
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 30,
+                  "end_byte": 31
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 32,
+                  "end_byte": 33
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 34,
+                  "end_byte": 35
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 36,
+                  "end_byte": 37
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 38,
+                  "end_byte": 39
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "DIAGNOSTICS.ordering-limit",
+          "RECOVERY.diagnostic-limit"
+        ]
+      }
+    },
+    {
+      "id": "lex-diagnostic-limit-truncated-continues",
+      "description": "The twenty-first diagnostic is suppressed while later valid tokens still survive.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ok"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "ok",
+              "span": {
+                "start_byte": 42,
+                "end_byte": 44
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 44,
+                "end_byte": 44
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 1
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 2,
+                  "end_byte": 3
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 4,
+                  "end_byte": 5
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 6,
+                  "end_byte": 7
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 8,
+                  "end_byte": 9
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 10,
+                  "end_byte": 11
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 12,
+                  "end_byte": 13
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 14,
+                  "end_byte": 15
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 16,
+                  "end_byte": 17
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 18,
+                  "end_byte": 19
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 20,
+                  "end_byte": 21
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 22,
+                  "end_byte": 23
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 24,
+                  "end_byte": 25
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 26,
+                  "end_byte": 27
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 28,
+                  "end_byte": 29
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 30,
+                  "end_byte": 31
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 32,
+                  "end_byte": 33
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 34,
+                  "end_byte": 35
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 36,
+                  "end_byte": 37
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            },
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 38,
+                  "end_byte": 39
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "5f"
+              }
+            }
+          ],
+          "diagnostics_truncated": true
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "DIAGNOSTICS.ordering-limit",
+          "RECOVERY.diagnostic-limit"
+        ]
+      }
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 # Standard Measurement Language Project Handoff
 
-Handoff date: 2026-11-01  
+Handoff date: 2026-11-02
 Project name: Standard Measurement Language (SML)  
-Current phase: front-end documentation hardening  
+Current phase: documentation hardening complete; ready for lexer implementation
 Implementation status: not started
 
 ## Resume here
@@ -24,12 +24,19 @@ Read these documents in order:
 1. [Front-end development charter](docs/frontend/README.md)
 2. [Accepted source-location contract](docs/frontend/SOURCE-LOCATIONS.md)
 3. [Accepted token specification](docs/frontend/TOKEN-SPEC.md)
-4. [Normative language specification](LANGUAGE-SPECIFICATION.md)
-5. [Specification roadmap](SPECIFICATION-ROADMAP.md)
-6. [Project rationale and historical design](PROJECT.md)
-7. [Decision index](decisions/README.md)
+4. [Accepted grammar](docs/frontend/GRAMMAR.ebnf)
+5. [Accepted source AST schema](docs/frontend/AST-SCHEMA.md)
+6. [Accepted diagnostic contract](docs/frontend/DIAGNOSTICS.md)
+7. [Accepted lexical continuation and parser failure contract](docs/frontend/RECOVERY.md)
+8. [Accepted machine-readable fixture format](docs/frontend/fixtures/README.md)
+9. [Accepted traceability registry](docs/frontend/TRACEABILITY.md)
+10. [Accepted frontend implementation plan](docs/frontend/IMPLEMENTATION.md)
+11. [Normative language specification](LANGUAGE-SPECIFICATION.md)
+12. [Specification roadmap](SPECIFICATION-ROADMAP.md)
+13. [Project rationale and historical design](PROJECT.md)
+14. [Decision index](decisions/README.md)
 
-The first three files are the new implementation-facing hardening layer. `LANGUAGE-SPECIFICATION.md` remains the normative authority for the language surface until it is deliberately amended.
+The accepted files under `docs/frontend/` are the implementation-facing hardening layer. `LANGUAGE-SPECIFICATION.md` remains the normative authority for the language surface until it is deliberately amended.
 
 ## Finalized project boundary
 
@@ -49,7 +56,7 @@ The parser owns:
 - quantity-attachment validation;
 - structural unit-expression limits;
 - source-located AST construction; and
-- syntactic diagnostics and documented recovery.
+- one fail-fast syntactic diagnostic after lexically successful input.
 
 The lexer and parser do not determine:
 
@@ -93,7 +100,7 @@ If asked why `10foo` parses:
 - `CR`, `LF`, and `CRLF` newline behavior;
 - original-source preservation;
 - adjacency derived from byte spans;
-- zero-width `EOF` and missing-token locations; and
+- zero-width `EOF` and absent-syntax diagnostic locations; and
 - AST span-composition principles.
 
 ### Token specification
@@ -120,56 +127,141 @@ The following numeric ambiguity was deliberately resolved:
 
 Recognizable exponent, hexadecimal, and binary notations are malformed numeric candidates. They are not reinterpreted as quantities. The narrower `5e` spelling remains a quantity boundary because it lacks the digit or sign that makes an exponent continuation recognizable.
 
-## Next hardening task
+### Grammar
 
-Create `docs/frontend/GRAMMAR.ebnf` by extracting the complete version 0.1 grammar from `LANGUAGE-SPECIFICATION.md`.
+[`docs/frontend/GRAMMAR.ebnf`](docs/frontend/GRAMMAR.ebnf) is accepted. It consolidates the complete token-level grammar and fixes:
 
-Before marking it accepted:
+- source files, functions, blocks, and every statement form;
+- optional `let` initialization and mandatory immediate `const` initialization;
+- prefix and postfix `++` and `--` as standalone statements;
+- optional `for` clauses, including `for (;;) {}`;
+- direct-only `input()` initializer and simple-assignment placement;
+- the complete precedence hierarchy, including right-associative negative numeric exponents;
+- bounded unit-expression syntax and parser-enforced structural limits;
+- parser-visible context checks for `return`, `break`, and `continue`; and
+- the boundary between syntactic call recognition and later function/argument resolution.
 
-1. Include the complete source-file, function, statement, declaration, expression, and unit-expression grammar.
-2. Remove historical alternatives and explanatory pseudogrammars.
-3. Preserve the accepted precedence and associativity.
-4. Check shared-prefix productions such as `NUMBER` versus quantity literals, `IDENT` versus calls, and assignment/update statements.
-5. Check every terminal against `TOKEN-SPEC.md`.
-6. Surface genuine ambiguities for discussion rather than silently choosing a parse.
-7. Add a short mapping from grammar sections to the normative specification.
+The grammar records that the proposal example `let distance: m = 100m;` conflicts with the accepted bracketed exact-unit category. The canonical spelling is `let distance: [m] = 100m;`.
 
-After the grammar, the planned order is:
+### Source AST schema
 
-1. `AST-SCHEMA.md`
-2. `DIAGNOSTICS.md`
-3. `RECOVERY.md`
-4. machine-readable `fixtures/`
-5. `TRACEABILITY.md`
-6. implementation-language, parser-strategy, and repository-tooling decisions
+[`docs/frontend/AST-SCHEMA.md`](docs/frontend/AST-SCHEMA.md) is accepted for successful parses. It fixes:
+
+- a source-faithful hybrid AST without changing the lexer contract;
+- explicit `GroupExpr` nodes and retained source tokens needed for diagnostics;
+- ordered collections for repetitions, optional fields for EBNF options, tagged variants for alternatives, and nested nodes for expression associativity;
+- first-branch plus ordered `else if` representation and an optional final `else`;
+- dedicated `for` initializer and update variants without synthetic semicolons;
+- first-factor plus star-and-factor unit products and one optional quotient;
+- complete-file and per-node source-span composition; and
+- a successful-parse-only boundary; syntax failure returns no AST and creates no missing tokens or error nodes.
+
+The representation requires only ordinary records, tagged variants, optional values, and basic ordered collections. It does not require a parser generator or specialized AST library.
+
+### Diagnostic and failure policy
+
+[`decisions/086-diagnostic-and-failure-policy.md`](decisions/086-diagnostic-and-failure-policy.md) fixes the phase-level policy:
+
+- all current frontend diagnostics have severity `error`;
+- codes, categories, and source labels are stable while exact English wording may evolve;
+- every diagnostic has one primary span and may have secondary labels, notes, or corrections;
+- detached quantities and misplaced noise words receive specialized local diagnostics;
+- the lexer continues after lexical failures, may collect multiple independent errors in source order, and still emits physical-end `EOF`;
+- the parser runs only after lexing succeeds;
+- the parser stops at its first syntax error and returns no AST; and
+- version 0.1 has no parser synchronization, token synthesis, skipped-token representation, or recovered AST.
+
+Parser recovery starting points previously discussed are deferred guidance only. `DIAGNOSTICS.md` later fixed the maximum at twenty lexical diagnostic records with an explicit truncation flag.
+
+### Diagnostic contract
+
+[`docs/frontend/DIAGNOSTICS.md`](docs/frontend/DIAGNOSTICS.md) is accepted. It fixes:
+
+- the complete `LEX`, `SYN`, and internal-failure code inventory;
+- `error` as the only current severity;
+- stable primary and secondary label roles plus code-specific diagnostic data;
+- non-normative English rendering;
+- source-order and same-position tie-breaking;
+- a maximum of twenty lexical diagnostic records and an explicit truncation flag;
+- deterministic malformed-number spans;
+- parser phase gating after lexical failure; and
+- exactly one syntax diagnostic and no AST after parser failure.
+
+### Lexical continuation and parser failure contract
+
+[`docs/frontend/RECOVERY.md`](docs/frontend/RECOVERY.md) is accepted. It fixes:
+
+- a tagged lexer result with complete tokens on success and valid partial tokens on failure;
+- one real physical-end `EOF` in either token collection;
+- nonempty malformed-range consumption and the continuation point for every lexical diagnostic family;
+- unchanged scanning after the twenty-diagnostic reporting cap is reached;
+- the rule that failed lexical results never reach the parser; and
+- the parser's first-error, no-recovery, no-AST failure behavior.
+
+[Decision 088](decisions/088-bytewise-invalid-utf8.md) resolves the remaining invalid-UTF-8 boundary and position question with the simpler bytewise policy: each invalid byte produces one `LEX001`, consumes one byte, advances one display column, emits no token, and leaves every following valid byte for ordinary scanning.
+
+### Machine-readable fixture format
+
+[`docs/frontend/fixtures/README.md`](docs/frontend/fixtures/README.md) and [decision 087](decisions/087-machine-readable-fixture-format.md) are accepted. They fix:
+
+- strict JSON format version 1, separate from SML language version 0.1;
+- categorized files listed in a deterministic `index.json`;
+- globally unique descriptive fixture IDs;
+- tagged UTF-8 text or lowercase hexadecimal source bytes;
+- explicit `lexer` and `frontend` entry points and tagged phase results;
+- complete token arrays and zero-based AST token indices;
+- explicit AST variants, null optionals, ordered arrays, and node spans;
+- structured diagnostics without normative English rendering;
+- required byte spans and location-sensitive line/column assertions;
+- non-behavioral coverage metadata; and
+- strict fixture-loader validation without requiring a JSON Schema library.
+
+### Implementation technologies
+
+[`docs/frontend/IMPLEMENTATION.md`](docs/frontend/IMPLEMENTATION.md) and [decision 089](decisions/089-python-frontend-implementation.md) are accepted. The initial frontend uses Python 3.11.9 as its exact reference interpreter, no runtime dependencies, a handwritten deterministic lexer over original bytes, immutable returned records, standard-library JSON and `unittest`, and a small `argparse` CLI. The later parser will use handwritten recursive descent without a parser generator or external parsing library.
+
+`LexFailure` is one failed-scan result rather than a hierarchy of error subclasses. Its ordered structured diagnostics, each carrying a code from `LEX001` through `LEX010`, identify the possibly heterogeneous source-failure causes. File I/O errors remain outside the lexer; internal defects are not lexical source failures.
+
+### Traceability registry
+
+[`docs/frontend/TRACEABILITY.md`](docs/frontend/TRACEABILITY.md) is complete. It assigns 112 unique stable rule IDs across the token, source-location, grammar, AST, diagnostic, recovery, fixture-format, and implementation contracts. Every fixture-required row links to evidence, every process-only row has an explicit `N/A` rationale, and all 93 indexed fixtures appear in the reverse index.
+
+The mechanical coverage audit found no pending rule rows or reciprocal-link failures.
+
+### Pilot fixtures
+
+[`docs/frontend/fixtures/index.json`](docs/frontend/fixtures/index.json) indexes four structurally validated pilot cases across `lexer/pilot.json` and `frontend/pilot.json`. Together they demonstrate lexer success, lexical failure with valid partial tokens, bytewise invalid UTF-8 and exact positions, parser phase gating, successful source AST serialization, and first-error parser failure without an AST. They are specification data; execution remains pending until frontend code exists.
+
+### Complete fixture suite
+
+The completed suite contains 93 fixtures across eight indexed JSON files. Static validation covers all 62 token kinds, all 53 AST node kinds, all ten lexical codes, all 28 active syntax codes, source positions, continuation boundaries, diagnostic limits, phase gating, token references, node spans, strict JSON, unique IDs, and traceability metadata. `SYN001` is intentionally unused; `ICE001` remains process-level. Runtime execution of these fixtures begins with frontend implementation.
+
+## Hardening completion
+
+The final repository-wide documentation consistency audit, fixture population, traceability completion, and mechanical coverage audit are complete. The hardened contracts are ready for review and commit before lexer implementation begins.
 
 No implementation should begin until the contracts required by the relevant readiness gate are accepted.
 
 ## Language-name migration
 
-The current name is **Standard Measurement Language (SML)**. The newly hardened front-end documents use this name.
+Status: completed after handoff
 
-The older proposal, roadmap, and decision records still contain the former name **Measure**. This is intentional at handoff time: a broad search-and-replace was not performed while pausing work.
+The current name is **Standard Measurement Language (SML)**. Current normative, planning, and implementation-facing documents use this name.
 
-On resumption, perform a controlled terminology migration:
+The teammate draft, legacy proposal, filenames derived from them, and historical decision records may retain the former name **Measure**. These occurrences preserve provenance rather than naming the current language. The decision index records this naming history.
 
-1. Rename the title and current-language references in `LANGUAGE-SPECIFICATION.md`.
-2. Update active references in `PROJECT.md` and `SPECIFICATION-ROADMAP.md`.
-3. Decide whether historical decision records should preserve the former name as history or receive a note explaining the rename.
-4. Search case-sensitively for the proper noun `Measure`; do not replace ordinary uses of the verb or noun “measure.”
-5. Recheck headings, examples, repository description, and future implementation package names.
+The migration was deliberately case-sensitive; ordinary uses of the verb or noun “measure” were not changed.
 
 Because “SML” is also widely associated with Standard ML, the GitHub repository description should spell out **Standard Measurement Language** and identify it as a unit-aware educational language.
 
-## GitHub repository setup
+## Repository status
 
-This folder is not currently a Git repository. No commits have been created.
+This folder is a Git repository on branch `main`, with an existing documentation-baseline commit and an `origin` remote for `5kappa/Standard-Measurement-Language`.
 
-A suitable repository name is `standard-measurement-language`. Before the first commit:
+Before committing the hardened documentation:
 
-1. Create a root `README.md` that introduces Standard Measurement Language and links to this handoff and the normative specification.
-2. Add a `.gitignore` appropriate for the eventual implementation language.
-3. At minimum, ignore generated working material:
+1. Review the complete diff and confirm that the user-added proposal source and PDF should be included.
+2. Confirm that generated working material remains excluded by `.gitignore`, including:
 
    ~~~gitignore
    graphify-out/
@@ -179,23 +271,15 @@ A suitable repository name is `standard-measurement-language`. Before the first 
    .venv/
    ~~~
 
-4. Review whether `test.py` should be removed or retained; it is currently empty.
-5. Keep the professor-provided PDF and proposal source documents unless the team intentionally relocates them.
-6. Initialize Git only after reviewing the initial file set so generated caches are not committed accidentally.
-7. Make the first commit a documentation-baseline commit; do not imply that lexer or parser implementation exists.
+3. Keep the professor-provided PDF and proposal source documents unless the team intentionally relocates them.
+4. Make the hardening commit describe documentation and fixtures only; do not imply that lexer or parser implementation exists.
 
-No remote repository, branch, commit, or GitHub configuration was created during this handoff.
+No commit or push is performed merely by completing this audit; those remain explicit follow-up actions.
 
 ## Known unfinished work
 
-- The complete grammar has not been consolidated into `GRAMMAR.ebnf`.
-- The full statement and function AST schema is not defined.
-- Diagnostic codes and message requirements are not frozen.
-- Parser recovery and cascade control are not frozen.
-- Fixtures exist mainly as prose rather than machine-readable data.
-- No implementation language, lexer approach, parser approach, testing framework, or directory structure has been selected.
-- The normative specification still uses the former language name.
-- `test.py` is empty.
+- The fixture suite and traceability registry are complete but have not yet been executed against an implementation.
+- The implementation baseline is accepted, but no lexer or parser code exists yet.
 
 ## Safe continuation rule
 

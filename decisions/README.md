@@ -2,6 +2,8 @@
 
 This directory records accepted and provisional language decisions. `PROJECT.md` contains the consolidated design; `SPECIFICATION-ROADMAP.md` retains dependency order and unresolved work.
 
+The current language name is **Standard Measurement Language (SML)**. Individual records may retain **Measure** when describing the former name, the legacy proposal, or the historical context in which a decision was made.
+
 The teammate-authored *Measure: A Unit-Safe Programming Language* proposal is a major design input. A record marked **adopted** preserves its choice, **revised** preserves the intent while changing the technical rule, and **rejected for version 0.1** records a deliberate departure.
 
 | Record | Status | Relationship to teammate proposal |
@@ -15,10 +17,10 @@ The teammate-authored *Measure: A Unit-Safe Programming Language* proposal is a 
 | [020: Staged operators](020-staged-operator-set.md) | Accepted | **Revised.** Adopts the operator direction, stages the broader set, and makes `as` a tight postfix operator. |
 | [022: Bounded unit-expression grammar](022-bounded-unit-expression-grammar.md) | Accepted | **Revised.** Preserves the proposal's `*`, `/`, and integer `^` notation while imposing one-division and resource limits. |
 | [023: Statements and blocks](023-statement-and-block-syntax.md) | Accepted for current parser grammar | **Revised.** Keeps semicolons and braces, requires braces for all control flow, and does not reserve `main`. |
-| [026: Dimensionless numbers and powers](026-dimensionless-numbers-and-powers.md) | Accepted for staged parser grammar | **Adopted and refined.** Keeps numeric `^`; dimension-based exponent restrictions are future semantic checks. |
+| [026: Dimensionless numbers and powers](026-dimensionless-numbers-and-powers.md) | Accepted for staged parser grammar | **Adopted and refined.** Keeps numeric `^`, including negative exponents; dimension-based exponent restrictions are future semantic checks. |
 | [027: Declaration annotations](027-declaration-annotations.md) | Accepted for current parser grammar | **Revised.** Replaces mixed forms such as `Length(m)` with one primitive, dimension, or exact-unit annotation category. |
-| [028: Local initializer inference](028-local-initializer-inference.md) | Accepted declaration grammar; inference deferred | **Adopted and bounded.** Keeps one initialized binding per declaration; actual inference is outside the parser. |
-| [029: Increment/decrement statements](029-increment-decrement-statements.md) | Accepted for current parser grammar | **Revised.** Keeps postfix `++` and `--` as standalone statements; mutation checks are deferred. |
+| [028: Local initializer inference](028-local-initializer-inference.md) | Accepted declaration grammar; inference deferred | **Adopted and bounded.** Keeps one binding per declaration, permits uninitialized `let`, and requires immediate `const` initialization; inference is outside the parser. |
+| [029: Increment/decrement statements](029-increment-decrement-statements.md) | Accepted for current parser grammar | **Revised.** Supports prefix and postfix standalone updates for dimensionless targets; target checking is deferred. |
 | [030: Formal dimension and unit model](030-formal-dimension-and-unit-model.md) | Accepted | **Adopted and narrowed.** Uses physical LMT bases, derives `Force`, and limits the initial named dimensions and unit registry to the draft's required surface. |
 | [033: Unit-expression semantics](033-unit-expression-semantics.md) | Accepted | **Adopted and bounded.** Uses complete registered symbols, exact normalization and cancellation, source-spelling preservation, and local limit diagnostics. |
 | [043: Explicit conversion](043-explicit-unit-conversion.md) | Accepted | **Adopted.** Preserves the No Silent Conversion principle and `as`. |
@@ -33,6 +35,11 @@ The teammate-authored *Measure: A Unit-Safe Programming Language* proposal is a 
 | [082: Dedicated Literals section](082-dedicated-literals-section.md) | Accepted | **Documentation structure.** Adds Literals after Identifiers, keeps quantity boundaries there, and leaves detailed unit-expression grammar under Expressions. |
 | [083: Disallow leading zeros](083-disallow-leading-zeros.md) | Accepted | **Canonical numeric syntax.** Restricts an integer part to `0` or a nonzero-leading digit sequence and updates the combined number pattern. |
 | [084: Use colon for function returns](084-colon-function-return-annotation.md) | Accepted | **Simplified function syntax.** Reuses `:` for function return annotations and removes the `->` delimiter and `ARROW` token. |
+| [085: Source AST representation](085-source-ast-representation.md) | Accepted for current parser contract | **Parser representation.** Uses a source-faithful hybrid AST, list-based grammar repetitions, explicit grouping, retained diagnostic token references, and a successful-parse-only AST boundary. |
+| [086: Diagnostic and failure policy](086-diagnostic-and-failure-policy.md) | Accepted for current front-end contract | **Middle-ground failure handling.** Continues lexing to collect lexical errors, gates parsing on lexical success, and stops the parser at its first syntax error without returning an AST. |
+| [087: Machine-readable fixture format](087-machine-readable-fixture-format.md) | Accepted for current front-end conformance suite | **Conformance representation.** Uses strict versioned JSON, tagged source and phase results, indexed AST token references, structured diagnostics, and machine-auditable coverage metadata. |
+| [088: Bytewise invalid UTF-8 handling](088-bytewise-invalid-utf8.md) | Accepted for current lexer contract | **Simplified malformed-byte policy.** Reports and consumes one invalid byte per `LEX001`, advances one display column, and preserves every following valid byte. |
+| [089: Python frontend implementation technologies](089-python-frontend-implementation.md) | Accepted for initial frontend implementation | **Engineering baseline.** Selects Python, a handwritten byte scanner, standard-library JSON and tests, explicit result records, and a later handwritten recursive-descent parser. |
 
 ## Proposal choices not yet accepted
 

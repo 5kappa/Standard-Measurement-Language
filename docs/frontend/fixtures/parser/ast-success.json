@@ -1,0 +1,3998 @@
+{
+  "format_version": 1,
+  "language_version": "0.1",
+  "fixtures": [
+    {
+      "id": "parse-empty-source-ast",
+      "description": "An empty source has an empty function array and EOF-backed source span.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": ""
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 0
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "success",
+          "ast": {
+            "kind": "SourceFile",
+            "functions": [],
+            "eof_token": {
+              "token_index": 0
+            },
+            "span": {
+              "start_byte": 0,
+              "end_byte": 0
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [
+          "SourceFile"
+        ],
+        "diagnostic_codes": [],
+        "rules": [
+          "GRAMMAR.program-functions",
+          "GRAMMAR.blocks-statements",
+          "AST-SCHEMA.source-references",
+          "AST-SCHEMA.source-file-functions",
+          "AST-SCHEMA.blocks-statements",
+          "AST-SCHEMA.span-composition",
+          "AST-SCHEMA.success-invariants",
+          "SOURCE-LOCATIONS.ast-spans",
+          "FIXTURES.parse-expectations",
+          "FIXTURES.ast-mapping"
+        ]
+      }
+    },
+    {
+      "id": "parse-functions-parameters-declarations",
+      "description": "Multiple functions cover parameters, return contracts, annotations, declarations, input, and returns.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn measure(x: float, distance: Length, u: [m]): int { let a; let b: int = 1; const c: Length = \"ok\"; let d: [m] = input(); return b; } fn empty() { return; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "measure",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 10
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 10,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 11,
+                "end_byte": 12
+              }
+            },
+            {
+              "kind": "COLON",
+              "lexeme": ":",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "FLOAT",
+              "lexeme": "float",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "COMMA",
+              "lexeme": ",",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "distance",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 29
+              }
+            },
+            {
+              "kind": "COLON",
+              "lexeme": ":",
+              "span": {
+                "start_byte": 29,
+                "end_byte": 30
+              }
+            },
+            {
+              "kind": "LENGTH",
+              "lexeme": "Length",
+              "span": {
+                "start_byte": 31,
+                "end_byte": 37
+              }
+            },
+            {
+              "kind": "COMMA",
+              "lexeme": ",",
+              "span": {
+                "start_byte": 37,
+                "end_byte": 38
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "u",
+              "span": {
+                "start_byte": 39,
+                "end_byte": 40
+              }
+            },
+            {
+              "kind": "COLON",
+              "lexeme": ":",
+              "span": {
+                "start_byte": 40,
+                "end_byte": 41
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 42,
+                "end_byte": 43
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 43,
+                "end_byte": 44
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 44,
+                "end_byte": 45
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 45,
+                "end_byte": 46
+              }
+            },
+            {
+              "kind": "COLON",
+              "lexeme": ":",
+              "span": {
+                "start_byte": 46,
+                "end_byte": 47
+              }
+            },
+            {
+              "kind": "INT",
+              "lexeme": "int",
+              "span": {
+                "start_byte": 48,
+                "end_byte": 51
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 52,
+                "end_byte": 53
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 54,
+                "end_byte": 57
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "a",
+              "span": {
+                "start_byte": 58,
+                "end_byte": 59
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 59,
+                "end_byte": 60
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 61,
+                "end_byte": 64
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "b",
+              "span": {
+                "start_byte": 65,
+                "end_byte": 66
+              }
+            },
+            {
+              "kind": "COLON",
+              "lexeme": ":",
+              "span": {
+                "start_byte": 66,
+                "end_byte": 67
+              }
+            },
+            {
+              "kind": "INT",
+              "lexeme": "int",
+              "span": {
+                "start_byte": 68,
+                "end_byte": 71
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 72,
+                "end_byte": 73
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 74,
+                "end_byte": 75
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 75,
+                "end_byte": 76
+              }
+            },
+            {
+              "kind": "CONST",
+              "lexeme": "const",
+              "span": {
+                "start_byte": 77,
+                "end_byte": 82
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "c",
+              "span": {
+                "start_byte": 83,
+                "end_byte": 84
+              }
+            },
+            {
+              "kind": "COLON",
+              "lexeme": ":",
+              "span": {
+                "start_byte": 84,
+                "end_byte": 85
+              }
+            },
+            {
+              "kind": "LENGTH",
+              "lexeme": "Length",
+              "span": {
+                "start_byte": 86,
+                "end_byte": 92
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 93,
+                "end_byte": 94
+              }
+            },
+            {
+              "kind": "STRING",
+              "lexeme": "\"ok\"",
+              "span": {
+                "start_byte": 95,
+                "end_byte": 99
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 99,
+                "end_byte": 100
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 101,
+                "end_byte": 104
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "d",
+              "span": {
+                "start_byte": 105,
+                "end_byte": 106
+              }
+            },
+            {
+              "kind": "COLON",
+              "lexeme": ":",
+              "span": {
+                "start_byte": 106,
+                "end_byte": 107
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 108,
+                "end_byte": 109
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 109,
+                "end_byte": 110
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 110,
+                "end_byte": 111
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 112,
+                "end_byte": 113
+              }
+            },
+            {
+              "kind": "INPUT",
+              "lexeme": "input",
+              "span": {
+                "start_byte": 114,
+                "end_byte": 119
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 119,
+                "end_byte": 120
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 120,
+                "end_byte": 121
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 121,
+                "end_byte": 122
+              }
+            },
+            {
+              "kind": "RETURN",
+              "lexeme": "return",
+              "span": {
+                "start_byte": 123,
+                "end_byte": 129
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "b",
+              "span": {
+                "start_byte": 130,
+                "end_byte": 131
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 131,
+                "end_byte": 132
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 133,
+                "end_byte": 134
+              }
+            },
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 135,
+                "end_byte": 137
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "empty",
+              "span": {
+                "start_byte": 138,
+                "end_byte": 143
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 143,
+                "end_byte": 144
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 144,
+                "end_byte": 145
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 146,
+                "end_byte": 147
+              }
+            },
+            {
+              "kind": "RETURN",
+              "lexeme": "return",
+              "span": {
+                "start_byte": 148,
+                "end_byte": 154
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 154,
+                "end_byte": 155
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 156,
+                "end_byte": 157
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 157,
+                "end_byte": 157
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "success",
+          "ast": {
+            "kind": "SourceFile",
+            "functions": [
+              {
+                "kind": "FunctionDef",
+                "fn_keyword": {
+                  "token_index": 0
+                },
+                "name": {
+                  "token_index": 1
+                },
+                "left_paren": {
+                  "token_index": 2
+                },
+                "parameters": {
+                  "first": {
+                    "kind": "Parameter",
+                    "name": {
+                      "token_index": 3
+                    },
+                    "annotation_clause": {
+                      "kind": "AnnotationClause",
+                      "colon": {
+                        "token_index": 4
+                      },
+                      "annotation": {
+                        "kind": "PrimitiveTypeAnnotation",
+                        "keyword": {
+                          "token_index": 5
+                        },
+                        "span": {
+                          "start_byte": 14,
+                          "end_byte": 19
+                        }
+                      },
+                      "span": {
+                        "start_byte": 12,
+                        "end_byte": 19
+                      }
+                    },
+                    "span": {
+                      "start_byte": 11,
+                      "end_byte": 19
+                    }
+                  },
+                  "rest": [
+                    {
+                      "separator": {
+                        "token_index": 6
+                      },
+                      "item": {
+                        "kind": "Parameter",
+                        "name": {
+                          "token_index": 7
+                        },
+                        "annotation_clause": {
+                          "kind": "AnnotationClause",
+                          "colon": {
+                            "token_index": 8
+                          },
+                          "annotation": {
+                            "kind": "DimensionAnnotation",
+                            "keyword": {
+                              "token_index": 9
+                            },
+                            "span": {
+                              "start_byte": 31,
+                              "end_byte": 37
+                            }
+                          },
+                          "span": {
+                            "start_byte": 29,
+                            "end_byte": 37
+                          }
+                        },
+                        "span": {
+                          "start_byte": 21,
+                          "end_byte": 37
+                        }
+                      }
+                    },
+                    {
+                      "separator": {
+                        "token_index": 10
+                      },
+                      "item": {
+                        "kind": "Parameter",
+                        "name": {
+                          "token_index": 11
+                        },
+                        "annotation_clause": {
+                          "kind": "AnnotationClause",
+                          "colon": {
+                            "token_index": 12
+                          },
+                          "annotation": {
+                            "kind": "ExactUnitAnnotation",
+                            "left_bracket": {
+                              "token_index": 13
+                            },
+                            "unit": {
+                              "kind": "UnitExpr",
+                              "numerator": {
+                                "kind": "UnitProduct",
+                                "first": {
+                                  "kind": "UnitPower",
+                                  "base": {
+                                    "kind": "UnitName",
+                                    "token": {
+                                      "token_index": 14
+                                    },
+                                    "span": {
+                                      "start_byte": 43,
+                                      "end_byte": 44
+                                    }
+                                  },
+                                  "exponent": null,
+                                  "span": {
+                                    "start_byte": 43,
+                                    "end_byte": 44
+                                  }
+                                },
+                                "rest": [],
+                                "span": {
+                                  "start_byte": 43,
+                                  "end_byte": 44
+                                }
+                              },
+                              "quotient": null,
+                              "span": {
+                                "start_byte": 43,
+                                "end_byte": 44
+                              }
+                            },
+                            "right_bracket": {
+                              "token_index": 15
+                            },
+                            "span": {
+                              "start_byte": 42,
+                              "end_byte": 45
+                            }
+                          },
+                          "span": {
+                            "start_byte": 40,
+                            "end_byte": 45
+                          }
+                        },
+                        "span": {
+                          "start_byte": 39,
+                          "end_byte": 45
+                        }
+                      }
+                    }
+                  ]
+                },
+                "right_paren": {
+                  "token_index": 16
+                },
+                "return_contract": {
+                  "kind": "ReturnContract",
+                  "colon": {
+                    "token_index": 17
+                  },
+                  "annotation": {
+                    "kind": "PrimitiveTypeAnnotation",
+                    "keyword": {
+                      "token_index": 18
+                    },
+                    "span": {
+                      "start_byte": 48,
+                      "end_byte": 51
+                    }
+                  },
+                  "span": {
+                    "start_byte": 46,
+                    "end_byte": 51
+                  }
+                },
+                "body": {
+                  "kind": "Block",
+                  "left_brace": {
+                    "token_index": 19
+                  },
+                  "statements": [
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 20
+                      },
+                      "name": {
+                        "token_index": 21
+                      },
+                      "annotation_clause": null,
+                      "initializer": null,
+                      "semicolon": {
+                        "token_index": 22
+                      },
+                      "span": {
+                        "start_byte": 54,
+                        "end_byte": 60
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 23
+                      },
+                      "name": {
+                        "token_index": 24
+                      },
+                      "annotation_clause": {
+                        "kind": "AnnotationClause",
+                        "colon": {
+                          "token_index": 25
+                        },
+                        "annotation": {
+                          "kind": "PrimitiveTypeAnnotation",
+                          "keyword": {
+                            "token_index": 26
+                          },
+                          "span": {
+                            "start_byte": 68,
+                            "end_byte": 71
+                          }
+                        },
+                        "span": {
+                          "start_byte": 66,
+                          "end_byte": 71
+                        }
+                      },
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 27
+                        },
+                        "value": {
+                          "kind": "NumberLiteral",
+                          "token": {
+                            "token_index": 28
+                          },
+                          "span": {
+                            "start_byte": 74,
+                            "end_byte": 75
+                          }
+                        },
+                        "span": {
+                          "start_byte": 72,
+                          "end_byte": 75
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 29
+                      },
+                      "span": {
+                        "start_byte": 61,
+                        "end_byte": 76
+                      }
+                    },
+                    {
+                      "kind": "ConstDecl",
+                      "const_keyword": {
+                        "token_index": 30
+                      },
+                      "name": {
+                        "token_index": 31
+                      },
+                      "annotation_clause": {
+                        "kind": "AnnotationClause",
+                        "colon": {
+                          "token_index": 32
+                        },
+                        "annotation": {
+                          "kind": "DimensionAnnotation",
+                          "keyword": {
+                            "token_index": 33
+                          },
+                          "span": {
+                            "start_byte": 86,
+                            "end_byte": 92
+                          }
+                        },
+                        "span": {
+                          "start_byte": 84,
+                          "end_byte": 92
+                        }
+                      },
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 34
+                        },
+                        "value": {
+                          "kind": "StringLiteral",
+                          "token": {
+                            "token_index": 35
+                          },
+                          "span": {
+                            "start_byte": 95,
+                            "end_byte": 99
+                          }
+                        },
+                        "span": {
+                          "start_byte": 93,
+                          "end_byte": 99
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 36
+                      },
+                      "span": {
+                        "start_byte": 77,
+                        "end_byte": 100
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 37
+                      },
+                      "name": {
+                        "token_index": 38
+                      },
+                      "annotation_clause": {
+                        "kind": "AnnotationClause",
+                        "colon": {
+                          "token_index": 39
+                        },
+                        "annotation": {
+                          "kind": "ExactUnitAnnotation",
+                          "left_bracket": {
+                            "token_index": 40
+                          },
+                          "unit": {
+                            "kind": "UnitExpr",
+                            "numerator": {
+                              "kind": "UnitProduct",
+                              "first": {
+                                "kind": "UnitPower",
+                                "base": {
+                                  "kind": "UnitName",
+                                  "token": {
+                                    "token_index": 41
+                                  },
+                                  "span": {
+                                    "start_byte": 109,
+                                    "end_byte": 110
+                                  }
+                                },
+                                "exponent": null,
+                                "span": {
+                                  "start_byte": 109,
+                                  "end_byte": 110
+                                }
+                              },
+                              "rest": [],
+                              "span": {
+                                "start_byte": 109,
+                                "end_byte": 110
+                              }
+                            },
+                            "quotient": null,
+                            "span": {
+                              "start_byte": 109,
+                              "end_byte": 110
+                            }
+                          },
+                          "right_bracket": {
+                            "token_index": 42
+                          },
+                          "span": {
+                            "start_byte": 108,
+                            "end_byte": 111
+                          }
+                        },
+                        "span": {
+                          "start_byte": 106,
+                          "end_byte": 111
+                        }
+                      },
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 43
+                        },
+                        "value": {
+                          "kind": "InputExpr",
+                          "input_keyword": {
+                            "token_index": 44
+                          },
+                          "left_paren": {
+                            "token_index": 45
+                          },
+                          "right_paren": {
+                            "token_index": 46
+                          },
+                          "span": {
+                            "start_byte": 114,
+                            "end_byte": 121
+                          }
+                        },
+                        "span": {
+                          "start_byte": 112,
+                          "end_byte": 121
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 47
+                      },
+                      "span": {
+                        "start_byte": 101,
+                        "end_byte": 122
+                      }
+                    },
+                    {
+                      "kind": "ReturnStmt",
+                      "return_keyword": {
+                        "token_index": 48
+                      },
+                      "value": {
+                        "kind": "IdentifierExpr",
+                        "name": {
+                          "token_index": 49
+                        },
+                        "span": {
+                          "start_byte": 130,
+                          "end_byte": 131
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 50
+                      },
+                      "span": {
+                        "start_byte": 123,
+                        "end_byte": 132
+                      }
+                    }
+                  ],
+                  "right_brace": {
+                    "token_index": 51
+                  },
+                  "span": {
+                    "start_byte": 52,
+                    "end_byte": 134
+                  }
+                },
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 134
+                }
+              },
+              {
+                "kind": "FunctionDef",
+                "fn_keyword": {
+                  "token_index": 52
+                },
+                "name": {
+                  "token_index": 53
+                },
+                "left_paren": {
+                  "token_index": 54
+                },
+                "parameters": null,
+                "right_paren": {
+                  "token_index": 55
+                },
+                "return_contract": null,
+                "body": {
+                  "kind": "Block",
+                  "left_brace": {
+                    "token_index": 56
+                  },
+                  "statements": [
+                    {
+                      "kind": "ReturnStmt",
+                      "return_keyword": {
+                        "token_index": 57
+                      },
+                      "value": null,
+                      "semicolon": {
+                        "token_index": 58
+                      },
+                      "span": {
+                        "start_byte": 148,
+                        "end_byte": 155
+                      }
+                    }
+                  ],
+                  "right_brace": {
+                    "token_index": 59
+                  },
+                  "span": {
+                    "start_byte": 146,
+                    "end_byte": 157
+                  }
+                },
+                "span": {
+                  "start_byte": 135,
+                  "end_byte": 157
+                }
+              }
+            ],
+            "eof_token": {
+              "token_index": 60
+            },
+            "span": {
+              "start_byte": 0,
+              "end_byte": 157
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "COLON",
+          "FLOAT",
+          "COMMA",
+          "LENGTH",
+          "LBRACKET",
+          "RBRACKET",
+          "RPAREN",
+          "INT",
+          "LBRACE",
+          "LET",
+          "SEMICOLON",
+          "ASSIGN",
+          "NUMBER",
+          "CONST",
+          "STRING",
+          "INPUT",
+          "RETURN",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [
+          "SourceFile",
+          "FunctionDef",
+          "Parameter",
+          "AnnotationClause",
+          "PrimitiveTypeAnnotation",
+          "DimensionAnnotation",
+          "ExactUnitAnnotation",
+          "UnitExpr",
+          "UnitProduct",
+          "UnitPower",
+          "UnitName",
+          "ReturnContract",
+          "Block",
+          "LetDecl",
+          "InitializerClause",
+          "NumberLiteral",
+          "ConstDecl",
+          "StringLiteral",
+          "InputExpr",
+          "ReturnStmt",
+          "IdentifierExpr"
+        ],
+        "diagnostic_codes": [],
+        "rules": [
+          "GRAMMAR.program-functions",
+          "GRAMMAR.blocks-statements",
+          "AST-SCHEMA.source-references",
+          "AST-SCHEMA.source-file-functions",
+          "AST-SCHEMA.blocks-statements",
+          "AST-SCHEMA.span-composition",
+          "AST-SCHEMA.success-invariants",
+          "SOURCE-LOCATIONS.ast-spans",
+          "FIXTURES.parse-expectations",
+          "FIXTURES.ast-mapping",
+          "AST-SCHEMA.separated-collections",
+          "GRAMMAR.declarations",
+          "AST-SCHEMA.declarations",
+          "GRAMMAR.transfer-assertion",
+          "GRAMMAR.control-transfer-context",
+          "AST-SCHEMA.transfer-assertion",
+          "GRAMMAR.annotations",
+          "GRAMMAR.annotation-consistency",
+          "AST-SCHEMA.annotations",
+          "GRAMMAR.expression-precedence",
+          "AST-SCHEMA.expressions",
+          "GRAMMAR.input-syntax",
+          "GRAMMAR.unit-expressions",
+          "GRAMMAR.unit-exponents",
+          "GRAMMAR.unit-limits",
+          "AST-SCHEMA.unit-expressions"
+        ]
+      }
+    },
+    {
+      "id": "parse-assignment-update-call-io-statements",
+      "description": "Assignments, updates, calls, input, output, and assertion retain all source tokens.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn statements() { x = 1; x += 1m; x = input(); ++x; x--; foo(1, \"x\"); print(x, true); assert true; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "statements",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "PLUS_ASSIGN",
+              "lexeme": "+=",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 29
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 30,
+                "end_byte": 31
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 31,
+                "end_byte": 32
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 32,
+                "end_byte": 33
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 34,
+                "end_byte": 35
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 36,
+                "end_byte": 37
+              }
+            },
+            {
+              "kind": "INPUT",
+              "lexeme": "input",
+              "span": {
+                "start_byte": 38,
+                "end_byte": 43
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 43,
+                "end_byte": 44
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 44,
+                "end_byte": 45
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 45,
+                "end_byte": 46
+              }
+            },
+            {
+              "kind": "PLUS_PLUS",
+              "lexeme": "++",
+              "span": {
+                "start_byte": 47,
+                "end_byte": 49
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 49,
+                "end_byte": 50
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 50,
+                "end_byte": 51
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 52,
+                "end_byte": 53
+              }
+            },
+            {
+              "kind": "MINUS_MINUS",
+              "lexeme": "--",
+              "span": {
+                "start_byte": 53,
+                "end_byte": 55
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 55,
+                "end_byte": 56
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "foo",
+              "span": {
+                "start_byte": 57,
+                "end_byte": 60
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 60,
+                "end_byte": 61
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 61,
+                "end_byte": 62
+              }
+            },
+            {
+              "kind": "COMMA",
+              "lexeme": ",",
+              "span": {
+                "start_byte": 62,
+                "end_byte": 63
+              }
+            },
+            {
+              "kind": "STRING",
+              "lexeme": "\"x\"",
+              "span": {
+                "start_byte": 64,
+                "end_byte": 67
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 67,
+                "end_byte": 68
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 68,
+                "end_byte": 69
+              }
+            },
+            {
+              "kind": "PRINT",
+              "lexeme": "print",
+              "span": {
+                "start_byte": 70,
+                "end_byte": 75
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 75,
+                "end_byte": 76
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 76,
+                "end_byte": 77
+              }
+            },
+            {
+              "kind": "COMMA",
+              "lexeme": ",",
+              "span": {
+                "start_byte": 77,
+                "end_byte": 78
+              }
+            },
+            {
+              "kind": "TRUE",
+              "lexeme": "true",
+              "span": {
+                "start_byte": 79,
+                "end_byte": 83
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 83,
+                "end_byte": 84
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 84,
+                "end_byte": 85
+              }
+            },
+            {
+              "kind": "ASSERT",
+              "lexeme": "assert",
+              "span": {
+                "start_byte": 86,
+                "end_byte": 92
+              }
+            },
+            {
+              "kind": "TRUE",
+              "lexeme": "true",
+              "span": {
+                "start_byte": 93,
+                "end_byte": 97
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 97,
+                "end_byte": 98
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 99,
+                "end_byte": 100
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 100,
+                "end_byte": 100
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "success",
+          "ast": {
+            "kind": "SourceFile",
+            "functions": [
+              {
+                "kind": "FunctionDef",
+                "fn_keyword": {
+                  "token_index": 0
+                },
+                "name": {
+                  "token_index": 1
+                },
+                "left_paren": {
+                  "token_index": 2
+                },
+                "parameters": null,
+                "right_paren": {
+                  "token_index": 3
+                },
+                "return_contract": null,
+                "body": {
+                  "kind": "Block",
+                  "left_brace": {
+                    "token_index": 4
+                  },
+                  "statements": [
+                    {
+                      "kind": "AssignmentStmt",
+                      "assignment": {
+                        "kind": "AssignmentCore",
+                        "target": {
+                          "token_index": 5
+                        },
+                        "operation": {
+                          "kind": "SimpleAssignment",
+                          "operator": {
+                            "token_index": 6
+                          },
+                          "value": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 7
+                            },
+                            "span": {
+                              "start_byte": 22,
+                              "end_byte": 23
+                            }
+                          },
+                          "span": {
+                            "start_byte": 20,
+                            "end_byte": 23
+                          }
+                        },
+                        "span": {
+                          "start_byte": 18,
+                          "end_byte": 23
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 8
+                      },
+                      "span": {
+                        "start_byte": 18,
+                        "end_byte": 24
+                      }
+                    },
+                    {
+                      "kind": "AssignmentStmt",
+                      "assignment": {
+                        "kind": "AssignmentCore",
+                        "target": {
+                          "token_index": 9
+                        },
+                        "operation": {
+                          "kind": "CompoundAssignment",
+                          "operator": {
+                            "token_index": 10
+                          },
+                          "value": {
+                            "kind": "SimpleQuantityLiteral",
+                            "magnitude": {
+                              "kind": "NumberLiteral",
+                              "token": {
+                                "token_index": 11
+                              },
+                              "span": {
+                                "start_byte": 30,
+                                "end_byte": 31
+                              }
+                            },
+                            "unit_name": {
+                              "kind": "UnitName",
+                              "token": {
+                                "token_index": 12
+                              },
+                              "span": {
+                                "start_byte": 31,
+                                "end_byte": 32
+                              }
+                            },
+                            "span": {
+                              "start_byte": 30,
+                              "end_byte": 32
+                            }
+                          },
+                          "span": {
+                            "start_byte": 27,
+                            "end_byte": 32
+                          }
+                        },
+                        "span": {
+                          "start_byte": 25,
+                          "end_byte": 32
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 13
+                      },
+                      "span": {
+                        "start_byte": 25,
+                        "end_byte": 33
+                      }
+                    },
+                    {
+                      "kind": "AssignmentStmt",
+                      "assignment": {
+                        "kind": "AssignmentCore",
+                        "target": {
+                          "token_index": 14
+                        },
+                        "operation": {
+                          "kind": "SimpleAssignment",
+                          "operator": {
+                            "token_index": 15
+                          },
+                          "value": {
+                            "kind": "InputExpr",
+                            "input_keyword": {
+                              "token_index": 16
+                            },
+                            "left_paren": {
+                              "token_index": 17
+                            },
+                            "right_paren": {
+                              "token_index": 18
+                            },
+                            "span": {
+                              "start_byte": 38,
+                              "end_byte": 45
+                            }
+                          },
+                          "span": {
+                            "start_byte": 36,
+                            "end_byte": 45
+                          }
+                        },
+                        "span": {
+                          "start_byte": 34,
+                          "end_byte": 45
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 19
+                      },
+                      "span": {
+                        "start_byte": 34,
+                        "end_byte": 46
+                      }
+                    },
+                    {
+                      "kind": "UpdateStmt",
+                      "update": {
+                        "kind": "UpdateCore",
+                        "target": {
+                          "token_index": 21
+                        },
+                        "operator": {
+                          "token_index": 20
+                        },
+                        "position": "PREFIX",
+                        "span": {
+                          "start_byte": 47,
+                          "end_byte": 50
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 22
+                      },
+                      "span": {
+                        "start_byte": 47,
+                        "end_byte": 51
+                      }
+                    },
+                    {
+                      "kind": "UpdateStmt",
+                      "update": {
+                        "kind": "UpdateCore",
+                        "target": {
+                          "token_index": 23
+                        },
+                        "operator": {
+                          "token_index": 24
+                        },
+                        "position": "POSTFIX",
+                        "span": {
+                          "start_byte": 52,
+                          "end_byte": 55
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 25
+                      },
+                      "span": {
+                        "start_byte": 52,
+                        "end_byte": 56
+                      }
+                    },
+                    {
+                      "kind": "CallStmt",
+                      "call": {
+                        "kind": "CallExpr",
+                        "callee": {
+                          "token_index": 26
+                        },
+                        "left_paren": {
+                          "token_index": 27
+                        },
+                        "arguments": {
+                          "first": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 28
+                            },
+                            "span": {
+                              "start_byte": 61,
+                              "end_byte": 62
+                            }
+                          },
+                          "rest": [
+                            {
+                              "separator": {
+                                "token_index": 29
+                              },
+                              "item": {
+                                "kind": "StringLiteral",
+                                "token": {
+                                  "token_index": 30
+                                },
+                                "span": {
+                                  "start_byte": 64,
+                                  "end_byte": 67
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "right_paren": {
+                          "token_index": 31
+                        },
+                        "span": {
+                          "start_byte": 57,
+                          "end_byte": 68
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 32
+                      },
+                      "span": {
+                        "start_byte": 57,
+                        "end_byte": 69
+                      }
+                    },
+                    {
+                      "kind": "PrintStmt",
+                      "print_keyword": {
+                        "token_index": 33
+                      },
+                      "left_paren": {
+                        "token_index": 34
+                      },
+                      "arguments": {
+                        "first": {
+                          "kind": "IdentifierExpr",
+                          "name": {
+                            "token_index": 35
+                          },
+                          "span": {
+                            "start_byte": 76,
+                            "end_byte": 77
+                          }
+                        },
+                        "rest": [
+                          {
+                            "separator": {
+                              "token_index": 36
+                            },
+                            "item": {
+                              "kind": "BoolLiteral",
+                              "token": {
+                                "token_index": 37
+                              },
+                              "span": {
+                                "start_byte": 79,
+                                "end_byte": 83
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "right_paren": {
+                        "token_index": 38
+                      },
+                      "semicolon": {
+                        "token_index": 39
+                      },
+                      "span": {
+                        "start_byte": 70,
+                        "end_byte": 85
+                      }
+                    },
+                    {
+                      "kind": "AssertStmt",
+                      "assert_keyword": {
+                        "token_index": 40
+                      },
+                      "condition": {
+                        "kind": "BoolLiteral",
+                        "token": {
+                          "token_index": 41
+                        },
+                        "span": {
+                          "start_byte": 93,
+                          "end_byte": 97
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 42
+                      },
+                      "span": {
+                        "start_byte": 86,
+                        "end_byte": 98
+                      }
+                    }
+                  ],
+                  "right_brace": {
+                    "token_index": 43
+                  },
+                  "span": {
+                    "start_byte": 16,
+                    "end_byte": 100
+                  }
+                },
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 100
+                }
+              }
+            ],
+            "eof_token": {
+              "token_index": 44
+            },
+            "span": {
+              "start_byte": 0,
+              "end_byte": 100
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "ASSIGN",
+          "NUMBER",
+          "SEMICOLON",
+          "PLUS_ASSIGN",
+          "INPUT",
+          "PLUS_PLUS",
+          "MINUS_MINUS",
+          "COMMA",
+          "STRING",
+          "PRINT",
+          "TRUE",
+          "ASSERT",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [
+          "SourceFile",
+          "FunctionDef",
+          "Block",
+          "AssignmentStmt",
+          "AssignmentCore",
+          "SimpleAssignment",
+          "NumberLiteral",
+          "CompoundAssignment",
+          "SimpleQuantityLiteral",
+          "UnitName",
+          "InputExpr",
+          "UpdateStmt",
+          "UpdateCore",
+          "CallStmt",
+          "CallExpr",
+          "StringLiteral",
+          "PrintStmt",
+          "IdentifierExpr",
+          "BoolLiteral",
+          "AssertStmt"
+        ],
+        "diagnostic_codes": [],
+        "rules": [
+          "GRAMMAR.program-functions",
+          "GRAMMAR.blocks-statements",
+          "AST-SCHEMA.source-references",
+          "AST-SCHEMA.source-file-functions",
+          "AST-SCHEMA.blocks-statements",
+          "AST-SCHEMA.span-composition",
+          "AST-SCHEMA.success-invariants",
+          "SOURCE-LOCATIONS.ast-spans",
+          "FIXTURES.parse-expectations",
+          "FIXTURES.ast-mapping",
+          "AST-SCHEMA.separated-collections",
+          "GRAMMAR.assignments-updates",
+          "AST-SCHEMA.assignments-updates",
+          "GRAMMAR.output-calls",
+          "AST-SCHEMA.output-calls",
+          "GRAMMAR.transfer-assertion",
+          "GRAMMAR.control-transfer-context",
+          "AST-SCHEMA.transfer-assertion",
+          "GRAMMAR.expression-precedence",
+          "AST-SCHEMA.expressions",
+          "GRAMMAR.calls",
+          "AST-SCHEMA.grouping-calls",
+          "GRAMMAR.quantities",
+          "GRAMMAR.quantity-attachment",
+          "GRAMMAR.input-syntax",
+          "GRAMMAR.unit-expressions",
+          "GRAMMAR.unit-exponents",
+          "GRAMMAR.unit-limits",
+          "AST-SCHEMA.unit-expressions",
+          "GRAMMAR.semantic-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-expression-and-quantity-forms",
+      "description": "Every expression leaf and structural expression form is represented with explicit associativity.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn expressions() { let n = 2; let s = \"s\"; let q = 10m; let cq = 1[kg/m^2]; let g = (1 + 2); let c = foo(1, n); let u = !false; let p = 2^3^-2; let bin = 1 + 2 * 3; let left = 9 - 3 - 1; let logic = true || false && 1 < 2 == true; let conv = 1m as to cm as [m]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "expressions",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "n",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 28,
+                "end_byte": 29
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 30,
+                "end_byte": 33
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "s",
+              "span": {
+                "start_byte": 34,
+                "end_byte": 35
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 36,
+                "end_byte": 37
+              }
+            },
+            {
+              "kind": "STRING",
+              "lexeme": "\"s\"",
+              "span": {
+                "start_byte": 38,
+                "end_byte": 41
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 41,
+                "end_byte": 42
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 43,
+                "end_byte": 46
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "q",
+              "span": {
+                "start_byte": 47,
+                "end_byte": 48
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 49,
+                "end_byte": 50
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 51,
+                "end_byte": 53
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 53,
+                "end_byte": 54
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 54,
+                "end_byte": 55
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 56,
+                "end_byte": 59
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "cq",
+              "span": {
+                "start_byte": 60,
+                "end_byte": 62
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 63,
+                "end_byte": 64
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 65,
+                "end_byte": 66
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 66,
+                "end_byte": 67
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "kg",
+              "span": {
+                "start_byte": 67,
+                "end_byte": 69
+              }
+            },
+            {
+              "kind": "SLASH",
+              "lexeme": "/",
+              "span": {
+                "start_byte": 69,
+                "end_byte": 70
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 70,
+                "end_byte": 71
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 71,
+                "end_byte": 72
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 72,
+                "end_byte": 73
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 73,
+                "end_byte": 74
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 74,
+                "end_byte": 75
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 76,
+                "end_byte": 79
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "g",
+              "span": {
+                "start_byte": 80,
+                "end_byte": 81
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 82,
+                "end_byte": 83
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 84,
+                "end_byte": 85
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 85,
+                "end_byte": 86
+              }
+            },
+            {
+              "kind": "PLUS",
+              "lexeme": "+",
+              "span": {
+                "start_byte": 87,
+                "end_byte": 88
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 89,
+                "end_byte": 90
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 90,
+                "end_byte": 91
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 91,
+                "end_byte": 92
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 93,
+                "end_byte": 96
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "c",
+              "span": {
+                "start_byte": 97,
+                "end_byte": 98
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 99,
+                "end_byte": 100
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "foo",
+              "span": {
+                "start_byte": 101,
+                "end_byte": 104
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 104,
+                "end_byte": 105
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 105,
+                "end_byte": 106
+              }
+            },
+            {
+              "kind": "COMMA",
+              "lexeme": ",",
+              "span": {
+                "start_byte": 106,
+                "end_byte": 107
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "n",
+              "span": {
+                "start_byte": 108,
+                "end_byte": 109
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 109,
+                "end_byte": 110
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 110,
+                "end_byte": 111
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 112,
+                "end_byte": 115
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "u",
+              "span": {
+                "start_byte": 116,
+                "end_byte": 117
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 118,
+                "end_byte": 119
+              }
+            },
+            {
+              "kind": "BANG",
+              "lexeme": "!",
+              "span": {
+                "start_byte": 120,
+                "end_byte": 121
+              }
+            },
+            {
+              "kind": "FALSE",
+              "lexeme": "false",
+              "span": {
+                "start_byte": 121,
+                "end_byte": 126
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 126,
+                "end_byte": 127
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 128,
+                "end_byte": 131
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "p",
+              "span": {
+                "start_byte": 132,
+                "end_byte": 133
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 134,
+                "end_byte": 135
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 136,
+                "end_byte": 137
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 137,
+                "end_byte": 138
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "3",
+              "span": {
+                "start_byte": 138,
+                "end_byte": 139
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 139,
+                "end_byte": 140
+              }
+            },
+            {
+              "kind": "MINUS",
+              "lexeme": "-",
+              "span": {
+                "start_byte": 140,
+                "end_byte": 141
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 141,
+                "end_byte": 142
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 142,
+                "end_byte": 143
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 144,
+                "end_byte": 147
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "bin",
+              "span": {
+                "start_byte": 148,
+                "end_byte": 151
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 152,
+                "end_byte": 153
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 154,
+                "end_byte": 155
+              }
+            },
+            {
+              "kind": "PLUS",
+              "lexeme": "+",
+              "span": {
+                "start_byte": 156,
+                "end_byte": 157
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 158,
+                "end_byte": 159
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 160,
+                "end_byte": 161
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "3",
+              "span": {
+                "start_byte": 162,
+                "end_byte": 163
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 163,
+                "end_byte": 164
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 165,
+                "end_byte": 168
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "left",
+              "span": {
+                "start_byte": 169,
+                "end_byte": 173
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 174,
+                "end_byte": 175
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "9",
+              "span": {
+                "start_byte": 176,
+                "end_byte": 177
+              }
+            },
+            {
+              "kind": "MINUS",
+              "lexeme": "-",
+              "span": {
+                "start_byte": 178,
+                "end_byte": 179
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "3",
+              "span": {
+                "start_byte": 180,
+                "end_byte": 181
+              }
+            },
+            {
+              "kind": "MINUS",
+              "lexeme": "-",
+              "span": {
+                "start_byte": 182,
+                "end_byte": 183
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 184,
+                "end_byte": 185
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 185,
+                "end_byte": 186
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 187,
+                "end_byte": 190
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "logic",
+              "span": {
+                "start_byte": 191,
+                "end_byte": 196
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 197,
+                "end_byte": 198
+              }
+            },
+            {
+              "kind": "TRUE",
+              "lexeme": "true",
+              "span": {
+                "start_byte": 199,
+                "end_byte": 203
+              }
+            },
+            {
+              "kind": "OR_OR",
+              "lexeme": "||",
+              "span": {
+                "start_byte": 204,
+                "end_byte": 206
+              }
+            },
+            {
+              "kind": "FALSE",
+              "lexeme": "false",
+              "span": {
+                "start_byte": 207,
+                "end_byte": 212
+              }
+            },
+            {
+              "kind": "AND_AND",
+              "lexeme": "&&",
+              "span": {
+                "start_byte": 213,
+                "end_byte": 215
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 216,
+                "end_byte": 217
+              }
+            },
+            {
+              "kind": "LESS",
+              "lexeme": "<",
+              "span": {
+                "start_byte": 218,
+                "end_byte": 219
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 220,
+                "end_byte": 221
+              }
+            },
+            {
+              "kind": "EQUAL_EQUAL",
+              "lexeme": "==",
+              "span": {
+                "start_byte": 222,
+                "end_byte": 224
+              }
+            },
+            {
+              "kind": "TRUE",
+              "lexeme": "true",
+              "span": {
+                "start_byte": 225,
+                "end_byte": 229
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 229,
+                "end_byte": 230
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 231,
+                "end_byte": 234
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "conv",
+              "span": {
+                "start_byte": 235,
+                "end_byte": 239
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 240,
+                "end_byte": 241
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 242,
+                "end_byte": 243
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 243,
+                "end_byte": 244
+              }
+            },
+            {
+              "kind": "AS",
+              "lexeme": "as",
+              "span": {
+                "start_byte": 245,
+                "end_byte": 247
+              }
+            },
+            {
+              "kind": "TO",
+              "lexeme": "to",
+              "span": {
+                "start_byte": 248,
+                "end_byte": 250
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "cm",
+              "span": {
+                "start_byte": 251,
+                "end_byte": 253
+              }
+            },
+            {
+              "kind": "AS",
+              "lexeme": "as",
+              "span": {
+                "start_byte": 254,
+                "end_byte": 256
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 257,
+                "end_byte": 258
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 258,
+                "end_byte": 259
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 259,
+                "end_byte": 260
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 260,
+                "end_byte": 261
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 262,
+                "end_byte": 263
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 263,
+                "end_byte": 263
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "success",
+          "ast": {
+            "kind": "SourceFile",
+            "functions": [
+              {
+                "kind": "FunctionDef",
+                "fn_keyword": {
+                  "token_index": 0
+                },
+                "name": {
+                  "token_index": 1
+                },
+                "left_paren": {
+                  "token_index": 2
+                },
+                "parameters": null,
+                "right_paren": {
+                  "token_index": 3
+                },
+                "return_contract": null,
+                "body": {
+                  "kind": "Block",
+                  "left_brace": {
+                    "token_index": 4
+                  },
+                  "statements": [
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 5
+                      },
+                      "name": {
+                        "token_index": 6
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 7
+                        },
+                        "value": {
+                          "kind": "NumberLiteral",
+                          "token": {
+                            "token_index": 8
+                          },
+                          "span": {
+                            "start_byte": 27,
+                            "end_byte": 28
+                          }
+                        },
+                        "span": {
+                          "start_byte": 25,
+                          "end_byte": 28
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 9
+                      },
+                      "span": {
+                        "start_byte": 19,
+                        "end_byte": 29
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 10
+                      },
+                      "name": {
+                        "token_index": 11
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 12
+                        },
+                        "value": {
+                          "kind": "StringLiteral",
+                          "token": {
+                            "token_index": 13
+                          },
+                          "span": {
+                            "start_byte": 38,
+                            "end_byte": 41
+                          }
+                        },
+                        "span": {
+                          "start_byte": 36,
+                          "end_byte": 41
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 14
+                      },
+                      "span": {
+                        "start_byte": 30,
+                        "end_byte": 42
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 15
+                      },
+                      "name": {
+                        "token_index": 16
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 17
+                        },
+                        "value": {
+                          "kind": "SimpleQuantityLiteral",
+                          "magnitude": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 18
+                            },
+                            "span": {
+                              "start_byte": 51,
+                              "end_byte": 53
+                            }
+                          },
+                          "unit_name": {
+                            "kind": "UnitName",
+                            "token": {
+                              "token_index": 19
+                            },
+                            "span": {
+                              "start_byte": 53,
+                              "end_byte": 54
+                            }
+                          },
+                          "span": {
+                            "start_byte": 51,
+                            "end_byte": 54
+                          }
+                        },
+                        "span": {
+                          "start_byte": 49,
+                          "end_byte": 54
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 20
+                      },
+                      "span": {
+                        "start_byte": 43,
+                        "end_byte": 55
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 21
+                      },
+                      "name": {
+                        "token_index": 22
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 23
+                        },
+                        "value": {
+                          "kind": "CompoundQuantityLiteral",
+                          "magnitude": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 24
+                            },
+                            "span": {
+                              "start_byte": 65,
+                              "end_byte": 66
+                            }
+                          },
+                          "unit_annotation": {
+                            "kind": "ExactUnitAnnotation",
+                            "left_bracket": {
+                              "token_index": 25
+                            },
+                            "unit": {
+                              "kind": "UnitExpr",
+                              "numerator": {
+                                "kind": "UnitProduct",
+                                "first": {
+                                  "kind": "UnitPower",
+                                  "base": {
+                                    "kind": "UnitName",
+                                    "token": {
+                                      "token_index": 26
+                                    },
+                                    "span": {
+                                      "start_byte": 67,
+                                      "end_byte": 69
+                                    }
+                                  },
+                                  "exponent": null,
+                                  "span": {
+                                    "start_byte": 67,
+                                    "end_byte": 69
+                                  }
+                                },
+                                "rest": [],
+                                "span": {
+                                  "start_byte": 67,
+                                  "end_byte": 69
+                                }
+                              },
+                              "quotient": {
+                                "kind": "UnitQuotient",
+                                "slash": {
+                                  "token_index": 27
+                                },
+                                "denominator": {
+                                  "kind": "UnitPower",
+                                  "base": {
+                                    "kind": "UnitName",
+                                    "token": {
+                                      "token_index": 28
+                                    },
+                                    "span": {
+                                      "start_byte": 70,
+                                      "end_byte": 71
+                                    }
+                                  },
+                                  "exponent": {
+                                    "kind": "UnitExponent",
+                                    "caret": {
+                                      "token_index": 29
+                                    },
+                                    "minus": null,
+                                    "magnitude": {
+                                      "token_index": 30
+                                    },
+                                    "span": {
+                                      "start_byte": 71,
+                                      "end_byte": 73
+                                    }
+                                  },
+                                  "span": {
+                                    "start_byte": 70,
+                                    "end_byte": 73
+                                  }
+                                },
+                                "span": {
+                                  "start_byte": 69,
+                                  "end_byte": 73
+                                }
+                              },
+                              "span": {
+                                "start_byte": 67,
+                                "end_byte": 73
+                              }
+                            },
+                            "right_bracket": {
+                              "token_index": 31
+                            },
+                            "span": {
+                              "start_byte": 66,
+                              "end_byte": 74
+                            }
+                          },
+                          "span": {
+                            "start_byte": 65,
+                            "end_byte": 74
+                          }
+                        },
+                        "span": {
+                          "start_byte": 63,
+                          "end_byte": 74
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 32
+                      },
+                      "span": {
+                        "start_byte": 56,
+                        "end_byte": 75
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 33
+                      },
+                      "name": {
+                        "token_index": 34
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 35
+                        },
+                        "value": {
+                          "kind": "GroupExpr",
+                          "left_paren": {
+                            "token_index": 36
+                          },
+                          "inner": {
+                            "kind": "BinaryExpr",
+                            "left": {
+                              "kind": "NumberLiteral",
+                              "token": {
+                                "token_index": 37
+                              },
+                              "span": {
+                                "start_byte": 85,
+                                "end_byte": 86
+                              }
+                            },
+                            "operator": {
+                              "token_index": 38
+                            },
+                            "right": {
+                              "kind": "NumberLiteral",
+                              "token": {
+                                "token_index": 39
+                              },
+                              "span": {
+                                "start_byte": 89,
+                                "end_byte": 90
+                              }
+                            },
+                            "span": {
+                              "start_byte": 85,
+                              "end_byte": 90
+                            }
+                          },
+                          "right_paren": {
+                            "token_index": 40
+                          },
+                          "span": {
+                            "start_byte": 84,
+                            "end_byte": 91
+                          }
+                        },
+                        "span": {
+                          "start_byte": 82,
+                          "end_byte": 91
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 41
+                      },
+                      "span": {
+                        "start_byte": 76,
+                        "end_byte": 92
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 42
+                      },
+                      "name": {
+                        "token_index": 43
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 44
+                        },
+                        "value": {
+                          "kind": "CallExpr",
+                          "callee": {
+                            "token_index": 45
+                          },
+                          "left_paren": {
+                            "token_index": 46
+                          },
+                          "arguments": {
+                            "first": {
+                              "kind": "NumberLiteral",
+                              "token": {
+                                "token_index": 47
+                              },
+                              "span": {
+                                "start_byte": 105,
+                                "end_byte": 106
+                              }
+                            },
+                            "rest": [
+                              {
+                                "separator": {
+                                  "token_index": 48
+                                },
+                                "item": {
+                                  "kind": "IdentifierExpr",
+                                  "name": {
+                                    "token_index": 49
+                                  },
+                                  "span": {
+                                    "start_byte": 108,
+                                    "end_byte": 109
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          "right_paren": {
+                            "token_index": 50
+                          },
+                          "span": {
+                            "start_byte": 101,
+                            "end_byte": 110
+                          }
+                        },
+                        "span": {
+                          "start_byte": 99,
+                          "end_byte": 110
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 51
+                      },
+                      "span": {
+                        "start_byte": 93,
+                        "end_byte": 111
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 52
+                      },
+                      "name": {
+                        "token_index": 53
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 54
+                        },
+                        "value": {
+                          "kind": "UnaryExpr",
+                          "operator": {
+                            "token_index": 55
+                          },
+                          "operand": {
+                            "kind": "BoolLiteral",
+                            "token": {
+                              "token_index": 56
+                            },
+                            "span": {
+                              "start_byte": 121,
+                              "end_byte": 126
+                            }
+                          },
+                          "span": {
+                            "start_byte": 120,
+                            "end_byte": 126
+                          }
+                        },
+                        "span": {
+                          "start_byte": 118,
+                          "end_byte": 126
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 57
+                      },
+                      "span": {
+                        "start_byte": 112,
+                        "end_byte": 127
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 58
+                      },
+                      "name": {
+                        "token_index": 59
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 60
+                        },
+                        "value": {
+                          "kind": "PowerExpr",
+                          "base": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 61
+                            },
+                            "span": {
+                              "start_byte": 136,
+                              "end_byte": 137
+                            }
+                          },
+                          "caret": {
+                            "token_index": 62
+                          },
+                          "exponent": {
+                            "kind": "PowerExpr",
+                            "base": {
+                              "kind": "NumberLiteral",
+                              "token": {
+                                "token_index": 63
+                              },
+                              "span": {
+                                "start_byte": 138,
+                                "end_byte": 139
+                              }
+                            },
+                            "caret": {
+                              "token_index": 64
+                            },
+                            "exponent": {
+                              "kind": "UnaryExpr",
+                              "operator": {
+                                "token_index": 65
+                              },
+                              "operand": {
+                                "kind": "NumberLiteral",
+                                "token": {
+                                  "token_index": 66
+                                },
+                                "span": {
+                                  "start_byte": 141,
+                                  "end_byte": 142
+                                }
+                              },
+                              "span": {
+                                "start_byte": 140,
+                                "end_byte": 142
+                              }
+                            },
+                            "span": {
+                              "start_byte": 138,
+                              "end_byte": 142
+                            }
+                          },
+                          "span": {
+                            "start_byte": 136,
+                            "end_byte": 142
+                          }
+                        },
+                        "span": {
+                          "start_byte": 134,
+                          "end_byte": 142
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 67
+                      },
+                      "span": {
+                        "start_byte": 128,
+                        "end_byte": 143
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 68
+                      },
+                      "name": {
+                        "token_index": 69
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 70
+                        },
+                        "value": {
+                          "kind": "BinaryExpr",
+                          "left": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 71
+                            },
+                            "span": {
+                              "start_byte": 154,
+                              "end_byte": 155
+                            }
+                          },
+                          "operator": {
+                            "token_index": 72
+                          },
+                          "right": {
+                            "kind": "BinaryExpr",
+                            "left": {
+                              "kind": "NumberLiteral",
+                              "token": {
+                                "token_index": 73
+                              },
+                              "span": {
+                                "start_byte": 158,
+                                "end_byte": 159
+                              }
+                            },
+                            "operator": {
+                              "token_index": 74
+                            },
+                            "right": {
+                              "kind": "NumberLiteral",
+                              "token": {
+                                "token_index": 75
+                              },
+                              "span": {
+                                "start_byte": 162,
+                                "end_byte": 163
+                              }
+                            },
+                            "span": {
+                              "start_byte": 158,
+                              "end_byte": 163
+                            }
+                          },
+                          "span": {
+                            "start_byte": 154,
+                            "end_byte": 163
+                          }
+                        },
+                        "span": {
+                          "start_byte": 152,
+                          "end_byte": 163
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 76
+                      },
+                      "span": {
+                        "start_byte": 144,
+                        "end_byte": 164
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 77
+                      },
+                      "name": {
+                        "token_index": 78
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 79
+                        },
+                        "value": {
+                          "kind": "BinaryExpr",
+                          "left": {
+                            "kind": "BinaryExpr",
+                            "left": {
+                              "kind": "NumberLiteral",
+                              "token": {
+                                "token_index": 80
+                              },
+                              "span": {
+                                "start_byte": 176,
+                                "end_byte": 177
+                              }
+                            },
+                            "operator": {
+                              "token_index": 81
+                            },
+                            "right": {
+                              "kind": "NumberLiteral",
+                              "token": {
+                                "token_index": 82
+                              },
+                              "span": {
+                                "start_byte": 180,
+                                "end_byte": 181
+                              }
+                            },
+                            "span": {
+                              "start_byte": 176,
+                              "end_byte": 181
+                            }
+                          },
+                          "operator": {
+                            "token_index": 83
+                          },
+                          "right": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 84
+                            },
+                            "span": {
+                              "start_byte": 184,
+                              "end_byte": 185
+                            }
+                          },
+                          "span": {
+                            "start_byte": 176,
+                            "end_byte": 185
+                          }
+                        },
+                        "span": {
+                          "start_byte": 174,
+                          "end_byte": 185
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 85
+                      },
+                      "span": {
+                        "start_byte": 165,
+                        "end_byte": 186
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 86
+                      },
+                      "name": {
+                        "token_index": 87
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 88
+                        },
+                        "value": {
+                          "kind": "BinaryExpr",
+                          "left": {
+                            "kind": "BoolLiteral",
+                            "token": {
+                              "token_index": 89
+                            },
+                            "span": {
+                              "start_byte": 199,
+                              "end_byte": 203
+                            }
+                          },
+                          "operator": {
+                            "token_index": 90
+                          },
+                          "right": {
+                            "kind": "BinaryExpr",
+                            "left": {
+                              "kind": "BoolLiteral",
+                              "token": {
+                                "token_index": 91
+                              },
+                              "span": {
+                                "start_byte": 207,
+                                "end_byte": 212
+                              }
+                            },
+                            "operator": {
+                              "token_index": 92
+                            },
+                            "right": {
+                              "kind": "BinaryExpr",
+                              "left": {
+                                "kind": "BinaryExpr",
+                                "left": {
+                                  "kind": "NumberLiteral",
+                                  "token": {
+                                    "token_index": 93
+                                  },
+                                  "span": {
+                                    "start_byte": 216,
+                                    "end_byte": 217
+                                  }
+                                },
+                                "operator": {
+                                  "token_index": 94
+                                },
+                                "right": {
+                                  "kind": "NumberLiteral",
+                                  "token": {
+                                    "token_index": 95
+                                  },
+                                  "span": {
+                                    "start_byte": 220,
+                                    "end_byte": 221
+                                  }
+                                },
+                                "span": {
+                                  "start_byte": 216,
+                                  "end_byte": 221
+                                }
+                              },
+                              "operator": {
+                                "token_index": 96
+                              },
+                              "right": {
+                                "kind": "BoolLiteral",
+                                "token": {
+                                  "token_index": 97
+                                },
+                                "span": {
+                                  "start_byte": 225,
+                                  "end_byte": 229
+                                }
+                              },
+                              "span": {
+                                "start_byte": 216,
+                                "end_byte": 229
+                              }
+                            },
+                            "span": {
+                              "start_byte": 207,
+                              "end_byte": 229
+                            }
+                          },
+                          "span": {
+                            "start_byte": 199,
+                            "end_byte": 229
+                          }
+                        },
+                        "span": {
+                          "start_byte": 197,
+                          "end_byte": 229
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 98
+                      },
+                      "span": {
+                        "start_byte": 187,
+                        "end_byte": 230
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 99
+                      },
+                      "name": {
+                        "token_index": 100
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 101
+                        },
+                        "value": {
+                          "kind": "ConversionExpr",
+                          "operand": {
+                            "kind": "ConversionExpr",
+                            "operand": {
+                              "kind": "SimpleQuantityLiteral",
+                              "magnitude": {
+                                "kind": "NumberLiteral",
+                                "token": {
+                                  "token_index": 102
+                                },
+                                "span": {
+                                  "start_byte": 242,
+                                  "end_byte": 243
+                                }
+                              },
+                              "unit_name": {
+                                "kind": "UnitName",
+                                "token": {
+                                  "token_index": 103
+                                },
+                                "span": {
+                                  "start_byte": 243,
+                                  "end_byte": 244
+                                }
+                              },
+                              "span": {
+                                "start_byte": 242,
+                                "end_byte": 244
+                              }
+                            },
+                            "as_keyword": {
+                              "token_index": 104
+                            },
+                            "to_keyword": {
+                              "token_index": 105
+                            },
+                            "target": {
+                              "kind": "SimpleUnitTarget",
+                              "name": {
+                                "kind": "UnitName",
+                                "token": {
+                                  "token_index": 106
+                                },
+                                "span": {
+                                  "start_byte": 251,
+                                  "end_byte": 253
+                                }
+                              },
+                              "span": {
+                                "start_byte": 251,
+                                "end_byte": 253
+                              }
+                            },
+                            "span": {
+                              "start_byte": 242,
+                              "end_byte": 253
+                            }
+                          },
+                          "as_keyword": {
+                            "token_index": 107
+                          },
+                          "to_keyword": null,
+                          "target": {
+                            "kind": "ExactUnitAnnotation",
+                            "left_bracket": {
+                              "token_index": 108
+                            },
+                            "unit": {
+                              "kind": "UnitExpr",
+                              "numerator": {
+                                "kind": "UnitProduct",
+                                "first": {
+                                  "kind": "UnitPower",
+                                  "base": {
+                                    "kind": "UnitName",
+                                    "token": {
+                                      "token_index": 109
+                                    },
+                                    "span": {
+                                      "start_byte": 258,
+                                      "end_byte": 259
+                                    }
+                                  },
+                                  "exponent": null,
+                                  "span": {
+                                    "start_byte": 258,
+                                    "end_byte": 259
+                                  }
+                                },
+                                "rest": [],
+                                "span": {
+                                  "start_byte": 258,
+                                  "end_byte": 259
+                                }
+                              },
+                              "quotient": null,
+                              "span": {
+                                "start_byte": 258,
+                                "end_byte": 259
+                              }
+                            },
+                            "right_bracket": {
+                              "token_index": 110
+                            },
+                            "span": {
+                              "start_byte": 257,
+                              "end_byte": 260
+                            }
+                          },
+                          "span": {
+                            "start_byte": 242,
+                            "end_byte": 260
+                          }
+                        },
+                        "span": {
+                          "start_byte": 240,
+                          "end_byte": 260
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 111
+                      },
+                      "span": {
+                        "start_byte": 231,
+                        "end_byte": 261
+                      }
+                    }
+                  ],
+                  "right_brace": {
+                    "token_index": 112
+                  },
+                  "span": {
+                    "start_byte": 17,
+                    "end_byte": 263
+                  }
+                },
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 263
+                }
+              }
+            ],
+            "eof_token": {
+              "token_index": 113
+            },
+            "span": {
+              "start_byte": 0,
+              "end_byte": 263
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "SEMICOLON",
+          "STRING",
+          "LBRACKET",
+          "SLASH",
+          "CARET",
+          "RBRACKET",
+          "PLUS",
+          "COMMA",
+          "BANG",
+          "FALSE",
+          "MINUS",
+          "STAR",
+          "TRUE",
+          "OR_OR",
+          "AND_AND",
+          "LESS",
+          "EQUAL_EQUAL",
+          "AS",
+          "TO",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [
+          "SourceFile",
+          "FunctionDef",
+          "Block",
+          "LetDecl",
+          "InitializerClause",
+          "NumberLiteral",
+          "StringLiteral",
+          "SimpleQuantityLiteral",
+          "UnitName",
+          "CompoundQuantityLiteral",
+          "ExactUnitAnnotation",
+          "UnitExpr",
+          "UnitProduct",
+          "UnitPower",
+          "UnitQuotient",
+          "UnitExponent",
+          "GroupExpr",
+          "BinaryExpr",
+          "CallExpr",
+          "IdentifierExpr",
+          "UnaryExpr",
+          "BoolLiteral",
+          "PowerExpr",
+          "ConversionExpr",
+          "SimpleUnitTarget"
+        ],
+        "diagnostic_codes": [],
+        "rules": [
+          "GRAMMAR.program-functions",
+          "GRAMMAR.blocks-statements",
+          "AST-SCHEMA.source-references",
+          "AST-SCHEMA.source-file-functions",
+          "AST-SCHEMA.blocks-statements",
+          "AST-SCHEMA.span-composition",
+          "AST-SCHEMA.success-invariants",
+          "SOURCE-LOCATIONS.ast-spans",
+          "FIXTURES.parse-expectations",
+          "FIXTURES.ast-mapping",
+          "AST-SCHEMA.separated-collections",
+          "GRAMMAR.declarations",
+          "AST-SCHEMA.declarations",
+          "GRAMMAR.annotations",
+          "GRAMMAR.annotation-consistency",
+          "AST-SCHEMA.annotations",
+          "GRAMMAR.expression-precedence",
+          "AST-SCHEMA.expressions",
+          "GRAMMAR.calls",
+          "AST-SCHEMA.grouping-calls",
+          "AST-SCHEMA.operators-conversions",
+          "GRAMMAR.quantities",
+          "GRAMMAR.quantity-attachment",
+          "GRAMMAR.unit-expressions",
+          "GRAMMAR.unit-exponents",
+          "GRAMMAR.unit-limits",
+          "AST-SCHEMA.unit-expressions"
+        ]
+      }
+    }
+  ]
+}
