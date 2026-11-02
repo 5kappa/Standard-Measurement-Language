@@ -566,8 +566,8 @@
             "primary": {
               "role": "PRIMARY",
               "span": {
-                "start_byte": 5,
-                "end_byte": 6
+                "start_byte": 15,
+                "end_byte": 16
               }
             },
             "secondary": [],
@@ -4572,10 +4572,30 @@
               "role": "PRIMARY",
               "span": {
                 "start_byte": 20,
-                "end_byte": 21
+                "end_byte": 20
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 20,
+                  "line": 1,
+                  "column": 21
+                },
+                "end": {
+                  "byte_offset": 20,
+                  "line": 1,
+                  "column": 21
+                }
               }
             },
-            "secondary": [],
+            "secondary": [
+              {
+                "role": "encountered_instead",
+                "span": {
+                  "start_byte": 20,
+                  "end_byte": 21
+                }
+              }
+            ],
             "notes": [],
             "data": {}
           }
@@ -5655,8 +5675,8 @@
             "primary": {
               "role": "PRIMARY",
               "span": {
-                "start_byte": 4,
-                "end_byte": 5
+                "start_byte": 18,
+                "end_byte": 19
               }
             },
             "secondary": [],
