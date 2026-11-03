@@ -10,37 +10,35 @@ from .source import SourceSpan
 from .token import Token, TokenKind
 
 
-_RESERVED_IDENTIFIER_SPELLINGS = frozenset(
-    {
-        b"let",
-        b"const",
-        b"fn",
-        b"return",
-        b"if",
-        b"else",
-        b"for",
-        b"while",
-        b"break",
-        b"continue",
-        b"print",
-        b"input",
-        b"assert",
-        b"as",
-        b"int",
-        b"float",
-        b"bool",
-        b"text",
-        b"Length",
-        b"Mass",
-        b"Time",
-        b"Force",
-        b"to",
-        b"then",
-        b"do",
-        b"true",
-        b"false",
-    }
-)
+_RESERVED_IDENTIFIER_KINDS = {
+    b"let": TokenKind.LET,
+    b"const": TokenKind.CONST,
+    b"fn": TokenKind.FN,
+    b"return": TokenKind.RETURN,
+    b"if": TokenKind.IF,
+    b"else": TokenKind.ELSE,
+    b"for": TokenKind.FOR,
+    b"while": TokenKind.WHILE,
+    b"break": TokenKind.BREAK,
+    b"continue": TokenKind.CONTINUE,
+    b"print": TokenKind.PRINT,
+    b"input": TokenKind.INPUT,
+    b"assert": TokenKind.ASSERT,
+    b"as": TokenKind.AS,
+    b"int": TokenKind.INT,
+    b"float": TokenKind.FLOAT,
+    b"bool": TokenKind.BOOL,
+    b"text": TokenKind.TEXT,
+    b"Length": TokenKind.LENGTH,
+    b"Mass": TokenKind.MASS,
+    b"Time": TokenKind.TIME,
+    b"Force": TokenKind.FORCE,
+    b"to": TokenKind.TO,
+    b"then": TokenKind.THEN,
+    b"do": TokenKind.DO,
+    b"true": TokenKind.TRUE,
+    b"false": TokenKind.FALSE,
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -81,7 +79,7 @@ def _validate_token_collection(tokens: tuple[Token, ...]) -> None:
 
 @dataclass(slots=True)
 class _Scanner:
-    """Mutable scan state for the R2 NUMBER/IDENT/EOF pilot subset."""
+    """Mutable scan state for the implemented lexer subset."""
 
     source: bytes
     cursor: SourceCursor = field(init=False)
@@ -96,12 +94,16 @@ class _Scanner:
         while not self.cursor.at_end:
             byte = self.cursor.peek_byte()
             if byte is not None and _is_ascii_digit(byte):
-                self._scan_decimal_integer()
+                self._scan_decimal_number()
             elif byte is not None and _is_ascii_letter(byte):
                 self._scan_identifier()
+            elif byte is not None and byte in b"+-":
+                self._scan_sign()
+            elif byte == 0x20:
+                self._skip_ascii_spaces()
             else:
                 raise NotImplementedError(
-                    "R2 recognizes only decimal integers and ASCII identifiers"
+                    "the current lexer subset does not recognize this source byte"
                 )
 
         eof_offset = self.cursor.offset
@@ -110,10 +112,19 @@ class _Scanner:
         )
         return LexSuccess(tuple(self.tokens))
 
-    def _scan_decimal_integer(self) -> None:
+    def _scan_decimal_number(self) -> None:
         start = self.cursor.offset
         while (byte := self.cursor.peek_byte()) is not None and _is_ascii_digit(byte):
             self.advance_one()
+        if self.cursor.peek_byte() == 0x2E and (
+            (following_byte := self.cursor.peek_byte(1)) is not None
+            and _is_ascii_digit(following_byte)
+        ):
+            self.advance_one()
+            while (byte := self.cursor.peek_byte()) is not None and _is_ascii_digit(
+                byte
+            ):
+                self.advance_one()
         self._reject_deferred_numeric_candidate(start)
         self._emit_ascii_token(TokenKind.NUMBER, start)
 
@@ -124,15 +135,31 @@ class _Scanner:
             _is_ascii_letter(byte) or _is_ascii_digit(byte) or byte == 0x5F
         ):
             self.advance_one()
-        if self.source[start : self.cursor.offset] in _RESERVED_IDENTIFIER_SPELLINGS:
-            raise NotImplementedError("reserved-word classification begins in R3/R4")
-        self._emit_ascii_token(TokenKind.IDENT, start)
+        spelling = self.source[start : self.cursor.offset]
+        kind = _RESERVED_IDENTIFIER_KINDS.get(spelling, TokenKind.IDENT)
+        self._emit_ascii_token(kind, start)
+
+    def _scan_sign(self) -> None:
+        start = self.cursor.offset
+        byte = self.cursor.peek_byte()
+        if self.cursor.peek_byte(1) in (byte, 0x3D):
+            raise NotImplementedError("multi-byte operators begin in R4")
+        self.advance_one()
+        kind = TokenKind.PLUS if byte == 0x2B else TokenKind.MINUS
+        self._emit_ascii_token(kind, start)
+
+    def _skip_ascii_spaces(self) -> None:
+        while self.cursor.peek_byte() == 0x20:
+            self.advance_one()
 
     def _reject_deferred_numeric_candidate(self, start: int) -> None:
         spelling = self.source[start : self.cursor.offset]
+        integer_spelling = spelling.split(b".", 1)[0]
         next_byte = self.cursor.peek_byte()
         following_byte = self.cursor.peek_byte(1)
-        has_leading_zero = len(spelling) > 1 and spelling.startswith(b"0")
+        has_leading_zero = len(integer_spelling) > 1 and integer_spelling.startswith(
+            b"0"
+        )
         has_base_prefix = (
             spelling == b"0" and next_byte is not None and next_byte in b"xXbB"
         )

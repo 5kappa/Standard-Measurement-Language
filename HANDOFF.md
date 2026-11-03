@@ -2,8 +2,8 @@
 
 Handoff date: 2026-11-03
 Project name: Standard Measurement Language (SML)  
-Current phase: lexer implementation; preparing roadmap milestone R3
-Implementation status: lexer R0 through R2 complete; parser not started
+Current phase: lexer implementation; R3 complete, R4 not started
+Implementation status: lexer R0 through R3 complete; parser not started
 
 ## Resume here
 
