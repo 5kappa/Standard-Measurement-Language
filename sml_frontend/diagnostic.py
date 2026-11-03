@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 from .source import PositionRange, SourceSpan
@@ -34,11 +34,7 @@ class LabelRole(Enum):
     REACHED_EOF = "reached_eof"
 
 
-class StringTermination(Enum):
-    CR = "CR"
-    LF = "LF"
-    CRLF = "CRLF"
-    EOF = "EOF"
+DiagnosticValue = str | int | bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -53,52 +49,12 @@ class DiagnosticLabel:
 
 
 @dataclass(frozen=True, slots=True)
-class EmptyDiagnosticData:
-    pass
-
-
-@dataclass(frozen=True, slots=True)
-class InvalidBytesData:
-    invalid_bytes: str
-
-
-@dataclass(frozen=True, slots=True)
-class CharacterBytesData:
-    character_bytes: str
-
-
-@dataclass(frozen=True, slots=True)
-class CandidateLexemeData:
-    candidate_lexeme: str
-
-
-@dataclass(frozen=True, slots=True)
-class StringTerminationData:
-    termination: StringTermination
-
-
-@dataclass(frozen=True, slots=True)
-class OperatorLexemeData:
-    operator_lexeme: str
-
-
-DiagnosticData = (
-    EmptyDiagnosticData
-    | InvalidBytesData
-    | CharacterBytesData
-    | CandidateLexemeData
-    | StringTerminationData
-    | OperatorLexemeData
-)
-
-
-@dataclass(frozen=True, slots=True)
 class Diagnostic:
     code: DiagnosticCode
     primary: DiagnosticLabel
     secondary: tuple[DiagnosticLabel, ...] = ()
     notes: tuple[()] = ()
-    data: DiagnosticData = EmptyDiagnosticData()
+    data: dict[str, DiagnosticValue] = field(default_factory=dict)
     phase: DiagnosticPhase = DiagnosticPhase.LEXER
     severity: Severity = Severity.ERROR
 

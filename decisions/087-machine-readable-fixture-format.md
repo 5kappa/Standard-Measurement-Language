@@ -23,7 +23,7 @@ Byte spans are mandatory wherever the accepted contracts require a source span. 
 
 Every fixture contains non-behavioral `covers` metadata for token kinds, AST kinds, diagnostic codes, and named specification rules. This metadata supports coverage and traceability audits but does not replace the expected result.
 
-Loaders are strict: they reject unsupported versions, unknown fields, invalid tagged-variant combinations, duplicate IDs, invalid token indices, invalid spans, missing physical `EOF`, parsing after lexical failure, and ASTs after syntax failure. JSON object-member order is not significant; array order is significant.
+Fixtures are trusted, version-controlled conformance data. A test loader validates only enough structure to decode and execute the indexed fixture cases required by the current implementation milestone. Exhaustive rejection of hostile or deliberately corrupted fixture data is not an implementation requirement. JSON object-member order is not significant; array order is significant.
 
 The complete format is defined in `docs/frontend/fixtures/README.md`.
 

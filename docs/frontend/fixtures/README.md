@@ -10,7 +10,7 @@ Depends on: [`TOKEN-SPEC.md`](../TOKEN-SPEC.md), [`SOURCE-LOCATIONS.md`](../SOUR
 
 This document defines the JSON data exchanged between the version 0.1 frontend specification and conforming test harnesses. It does not change SML source syntax or require the SML frontend itself to parse JSON.
 
-The format is designed for independent implementations. A harness must reject malformed fixture data rather than silently ignoring fields or inferring an unstated expectation.
+The format is designed for independent implementations. The version-controlled files define explicit expectations so a harness does not need to infer missing behavior.
 
 ## Suite layout
 
@@ -79,7 +79,8 @@ Only format version `1` and language version `0.1` are currently accepted. The f
 - Numeric format fields, byte offsets, counts, and token indices are nonnegative JSON integers unless a field explicitly permits a signed value.
 - Unknown fields are errors.
 - Duplicate JSON object keys are errors.
-- A loader must validate the complete fixture before using it as a conformance case.
+
+These are authoring rules for the version-controlled conformance data. Repository review and the completed static fixture audit maintain them; the runtime test loader is not required to revalidate every rule.
 
 Descriptions and source-control formatting are non-normative. IDs, source bytes, expected results, array order, and coverage identifiers are normative fixture data.
 
@@ -429,29 +430,13 @@ Values within each array are unique. Token kinds, AST kinds, and diagnostic code
 
 Coverage metadata supports completeness checks and fixture selection. It does not replace or modify the expected result.
 
-## Strict validation
+## Trusted fixture loading
 
-Before running a fixture, a loader must reject:
+Fixtures are trusted, version-controlled conformance data. The test loader validates only enough structure to decode and execute the indexed fixture cases. Exhaustive validation of the fixture format is not part of the lexer implementation.
 
-- invalid JSON, duplicate object keys, or an unsupported format or language version;
-- an unindexed file, missing indexed file, duplicate path, absolute path, or path escaping the fixture directory;
-- an unknown or missing field;
-- a duplicate or malformed fixture ID;
-- an invalid source variant or malformed hexadecimal bytes;
-- an entry-point/result mismatch;
-- an invalid lexical/parse result combination;
-- an invalid span or position range;
-- a missing, misplaced, or duplicated physical `EOF`;
-- diagnostics with wrong phase, ordering, count, or truncation shape;
-- a parse result other than `not_run` after lexical failure;
-- `not_run` after lexical success;
-- an AST after any failure;
-- an out-of-range or schema-invalid AST token index;
-- an omitted AST optional or repeated field;
-- an unknown token, AST, diagnostic, or coverage identifier; or
-- duplicate values inside a coverage array.
+The fixture files remain the conformance oracle. A test helper may check the supported format and language versions, then directly decode the source and expected result fields needed by the current milestone. It need not defend against hostile paths, duplicate JSON keys, unknown fields, corrupted spans, or other deliberately malformed repository data.
 
-Strict fixture validation is test-harness work, not lexer or parser behavior. A conforming implementation may use ordinary code rather than a JSON Schema validator.
+Loader support grows with implementation scope. Lexer-success decoding is sufficient for the first pilot; lexical-failure decoding begins with the corresponding lexer milestone, and parser/AST decoding begins only when parser implementation starts.
 
 ## Optional JSON Schema
 
@@ -497,7 +482,7 @@ The documentation-hardening suite contains 93 fixtures across eight files listed
 - every required source-location boundary; and
 - all 112 traceability rules through fixture evidence or an explicit process-level `N/A` rationale.
 
-Static validation does not claim that an implementation already passes. Once the frontend exists, its fixture loader and conformance tests must execute these same expectations without weakening them.
+Static validation does not claim that an implementation already passes. Once the relevant frontend phase exists, its test-only fixture decoder and conformance tests execute these same expectations without changing them.
 
 ## Acceptance rule
 

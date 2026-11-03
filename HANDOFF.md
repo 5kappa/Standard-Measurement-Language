@@ -1,9 +1,9 @@
 # Standard Measurement Language Project Handoff
 
-Handoff date: 2026-11-02
+Handoff date: 2026-11-03
 Project name: Standard Measurement Language (SML)  
-Current phase: documentation hardening complete; ready for lexer implementation
-Implementation status: not started
+Current phase: lexer implementation; preparing roadmap milestone R3
+Implementation status: lexer R0 through R2 complete; parser not started
 
 ## Resume here
 
@@ -214,13 +214,13 @@ Parser recovery starting points previously discussed are deferred guidance only.
 - structured diagnostics without normative English rendering;
 - required byte spans and location-sensitive line/column assertions;
 - non-behavioral coverage metadata; and
-- strict fixture-loader validation without requiring a JSON Schema library.
+- trusted, version-controlled fixture data decoded by small test-only helpers as each implementation milestone begins.
 
 ### Implementation technologies
 
 [`docs/frontend/IMPLEMENTATION.md`](docs/frontend/IMPLEMENTATION.md) and [decision 089](decisions/089-python-frontend-implementation.md) are accepted. The initial frontend uses Python 3.11.9 as its exact reference interpreter, no runtime dependencies, a handwritten deterministic lexer over original bytes, immutable returned records, standard-library JSON and `unittest`, and a small `argparse` CLI. The later parser will use handwritten recursive descent without a parser generator or external parsing library.
 
-`LexFailure` is one failed-scan result rather than a hierarchy of error subclasses. Its ordered structured diagnostics, each carrying a code from `LEX001` through `LEX010`, identify the possibly heterogeneous source-failure causes. File I/O errors remain outside the lexer; internal defects are not lexical source failures.
+`LexFailure` is one failed-scan result rather than a hierarchy of error subclasses. Its ordered structured diagnostics, each carrying a code from `LEX001` through `LEX010`, identify the possibly heterogeneous source-failure causes. In Python, each diagnostic stores its code-specific stable data in a small dictionary whose required keys are determined by the diagnostic code. File I/O errors remain outside the lexer; internal defects are not lexical source failures.
 
 ### Traceability registry
 
@@ -230,17 +230,17 @@ The mechanical coverage audit found no pending rule rows or reciprocal-link fail
 
 ### Pilot fixtures
 
-[`docs/frontend/fixtures/index.json`](docs/frontend/fixtures/index.json) indexes four structurally validated pilot cases across `lexer/pilot.json` and `frontend/pilot.json`. Together they demonstrate lexer success, lexical failure with valid partial tokens, bytewise invalid UTF-8 and exact positions, parser phase gating, successful source AST serialization, and first-error parser failure without an AST. They are specification data; execution remains pending until frontend code exists.
+[`docs/frontend/fixtures/index.json`](docs/frontend/fixtures/index.json) indexes four structurally validated pilot cases across `lexer/pilot.json` and `frontend/pilot.json`. Together they demonstrate lexer success, lexical failure with valid partial tokens, bytewise invalid UTF-8 and exact positions, parser phase gating, successful source AST serialization, and first-error parser failure without an AST. The `10m` lexer pilot now passes; frontend/parser pilots remain pending until their implementation phases begin.
 
 ### Complete fixture suite
 
-The completed suite contains 93 fixtures across eight indexed JSON files. Static validation covers all 62 token kinds, all 53 AST node kinds, all ten lexical codes, all 28 active syntax codes, source positions, continuation boundaries, diagnostic limits, phase gating, token references, node spans, strict JSON, unique IDs, and traceability metadata. `SYN001` is intentionally unused; `ICE001` remains process-level. Runtime execution of these fixtures begins with frontend implementation.
+The completed suite contains 93 fixtures across eight indexed JSON files. Static validation covers all 62 token kinds, all 53 AST node kinds, all ten lexical codes, all 28 active syntax codes, source positions, continuation boundaries, diagnostic limits, phase gating, token references, node spans, strict JSON, unique IDs, and traceability metadata. `SYN001` is intentionally unused; `ICE001` remains process-level. Runtime execution proceeds milestone by milestone using small test-only decoders for the trusted fixture variants currently needed.
 
 ## Hardening completion
 
-The final repository-wide documentation consistency audit, fixture population, traceability completion, and mechanical coverage audit are complete. The hardened contracts are ready for review and commit before lexer implementation begins.
+The final repository-wide documentation consistency audit, fixture population, traceability completion, and mechanical coverage audit are complete. The hardened contracts now govern the active lexer implementation.
 
-No implementation should begin until the contracts required by the relevant readiness gate are accepted.
+Continue implementation only through the active lexer-roadmap milestone and its accepted readiness gate. Parser implementation remains deferred.
 
 ## Language-name migration
 
