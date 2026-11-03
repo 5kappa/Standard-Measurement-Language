@@ -1,6 +1,6 @@
 # Standard Measurement Language Front-End Development Charter
 
-Status: documentation hardening in progress  
+Status: documentation hardening complete; ready for implementation
 Target: Standard Measurement Language (SML) version 0.1 lexer and parser
 
 ## Purpose
@@ -26,7 +26,7 @@ The following documents provide rationale and history but do not override the no
 - [`PROJECT.md`](../../PROJECT.md)
 - [`SPECIFICATION-ROADMAP.md`](../../SPECIFICATION-ROADMAP.md)
 - [`decisions/`](../../decisions/)
-- [`Teammate_made_Draft.md`](../../Teammate_made_Draft.md)
+- [`Teammate_made_Draft.md`](<../../proposal files/Teammate_made_Draft.md>)
 
 If an implementation-facing document conflicts with `LANGUAGE-SPECIFICATION.md`, development stops at the conflict. The specification is either followed or deliberately amended before implementation continues; the implementation must not silently choose a different language.
 
@@ -40,8 +40,9 @@ The front end owns:
 - grammar recognition, precedence, associativity, and grouping;
 - structural limits of unit expressions;
 - construction of a source-located AST;
-- lexical and syntactic diagnostics; and
-- bounded parser recovery once its contract is documented.
+- lexical and syntactic diagnostics;
+- lexical continuation after malformed candidates; and
+- fail-fast parser behavior after the first syntax diagnostic.
 
 The front end does not own:
 
@@ -86,16 +87,20 @@ The parser preserves unit names, products, quotients, powers, grouping required 
 
 ## Hardening artifacts
 
-The implementation contract will be completed in small, reviewable documents:
+The implementation contract is divided into these accepted, reviewable documents:
 
 1. [`TOKEN-SPEC.md`](TOKEN-SPEC.md) — accepted token kinds, recognition rules, maximal munch, trivia, adjacency, and required token fields.
-2. `GRAMMAR.ebnf` — the complete version 0.1 grammar without historical alternatives.
+2. [`GRAMMAR.ebnf`](GRAMMAR.ebnf) — the complete version 0.1 grammar without historical alternatives.
 3. [`SOURCE-LOCATIONS.md`](SOURCE-LOCATIONS.md) — accepted offsets, line and column conventions, newline handling, tabs, and zero-width locations.
-4. `AST-SCHEMA.md` — complete source AST node kinds, fields, and spans.
-5. `DIAGNOSTICS.md` — stable lexical and syntactic diagnostic categories and labels.
-6. `RECOVERY.md` — bounded recovery and cascade-control rules.
-7. `fixtures/` — machine-readable token, AST, diagnostic, and recovery expectations.
-8. `TRACEABILITY.md` — links from each implementation rule to the normative specification and its fixtures.
+4. [`AST-SCHEMA.md`](AST-SCHEMA.md) — accepted source AST node kinds, fields, retained token references, repeated structures, and spans.
+5. [`DIAGNOSTICS.md`](DIAGNOSTICS.md) — accepted lexical and syntactic codes, labels, stable data, ordering, limits, and phase behavior.
+6. [`RECOVERY.md`](RECOVERY.md) — accepted lexical continuation boundaries, partial-token failure results, phase gating, and fail-fast parser policy.
+7. [`fixtures/README.md`](fixtures/README.md) — accepted version 1 JSON format and complete 93-case token, AST, diagnostic, and recovery conformance suite.
+8. [`TRACEABILITY.md`](TRACEABILITY.md) — completed rule registry and reverse indexes linking all 112 implementation-facing requirements to fixture evidence or an explicit process-level rationale.
+
+[`MALFORMED-INPUT-AUDIT.md`](MALFORMED-INPUT-AUDIT.md) is the non-normative historical inventory that led to the accepted diagnostic and recovery contracts.
+
+[`IMPLEMENTATION.md`](IMPLEMENTATION.md) records the accepted Python engineering baseline. It is subordinate to the language-independent contracts above and cannot change their observable behavior.
 
 An artifact becomes authoritative for implementation only after it is marked accepted and agrees with `LANGUAGE-SPECIFICATION.md`.
 
@@ -105,13 +110,13 @@ Implementation begins only after the relevant contract is frozen:
 
 - Lexer work requires an accepted token specification and source-location policy.
 - Parser work requires the lexer contracts, consolidated grammar, and AST schema.
-- Diagnostic and recovery work requires accepted diagnostic and recovery documents.
+- Diagnostic and failure-handling work requires the accepted diagnostic and lexical-continuation documents.
 - Full conformance testing requires machine-readable fixtures covering all accepted grammar surfaces.
 
-The first implementation slice will remain deliberately small:
+The first lexer implementation slice will remain deliberately small:
 
-```measure
-8[kN/m] * 4m
+```sml
+10m
 ```
 
-That slice must demonstrate the exact token stream, adjacency behavior, precedence, unit-expression structure, AST shape, and source spans without consulting a unit registry or performing semantic analysis.
+That slice must demonstrate the exact `NUMBER`, `IDENT`, and physical `EOF` token stream, byte spans, source positions, and quantity adjacency without consulting a unit registry or performing parsing or semantic analysis. Expression precedence, unit-expression structure, and AST construction belong to later parser slices.

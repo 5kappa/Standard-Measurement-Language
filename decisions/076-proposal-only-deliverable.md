@@ -36,9 +36,9 @@ Where no earlier decision conflicted, the consolidated specification adopts the 
 - Signs are parser-level operators.
 - A simple quantity is `NUMBER IDENT`, not one combined token.
 - `as` is a tight postfix conversion form.
-- Prefix and expression-valued increment/decrement are removed.
+- Expression-valued increment/decrement is removed; prefix and postfix standalone statements are retained.
 - Assignment is a statement rather than an expression.
-- Declarations contain one initialized binding.
+- Declarations contain one binding; `let` may be uninitialized, while `const` requires immediate initialization.
 - Annotation categories cannot be combined.
 - Every conditional and loop body uses braces.
 - `main` is not reserved.

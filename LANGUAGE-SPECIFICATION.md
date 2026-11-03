@@ -1,22 +1,22 @@
-# Measure Language Specification
+# Standard Measurement Language Specification
 
 Status: consolidated proposal specification  
 Scope: programming-language proposal; no implementation is required  
 Canonical source form: UTF-8 files using the ASCII syntax defined below
 
-This file is the normative source for the Measure proposal. `PROJECT.md` records design history and rationale, `SPECIFICATION-ROADMAP.md` records how decisions were reached, and `decisions/` preserves individual decision records. If those documents conflict with this specification, this file governs the proposal.
+This file is the normative source for the Standard Measurement Language (SML) proposal. `PROJECT.md` records design history and rationale, `SPECIFICATION-ROADMAP.md` records how decisions were reached, and `decisions/` preserves individual decision records. If those documents conflict with this specification, this file governs the proposal.
 
 ## 1. Introduction
 
 ### 1.1 Description
 
-Measure is a small procedural language for calculations whose numerical values may carry physical units. It is designed first for educational structural-engineering calculations. A quantity such as `100m` contains a magnitude and a unit, while a plain value such as `0.5` remains a valid dimensionless number.
+Standard Measurement Language (SML) is a small procedural language for calculations whose numerical values may carry physical units. It is designed first for educational structural-engineering calculations. A quantity such as `100m` contains a magnitude and a unit, while a plain value such as `0.5` remains a valid dimensionless number.
 
-Measure's intended static semantics prevent incompatible operations such as adding length to time. Multiplication, division, and integer powers derive compound dimensions. Conversions between compatible units are written explicitly with `as` rather than occurring silently.
+SML's intended static semantics prevent incompatible operations such as adding length to time. Multiplication, division, and integer powers derive compound dimensions. Conversions between compatible units are written explicitly with `as` rather than occurring silently.
 
 Examples:
 
-```measure
+```sml
 let distance = 100m;
 let time = 9.58s;
 let speed = distance / time;
@@ -24,17 +24,17 @@ let speed = distance / time;
 let trip = 5km + (3mi as km);
 ```
 
-Measure is an educational proposal. It does not claim suitability for professional engineering design, code compliance, certification, or construction-safety decisions.
+SML is an educational proposal. It does not claim suitability for professional engineering design, code compliance, certification, or construction-safety decisions.
 
 ### 1.2 Inspiration
 
-Mainstream languages usually represent measurements as ordinary numbers. Their units survive only in variable names, comments, or programmer memory. Measure applies the discipline of dimensional analysis directly to language design so that unit intent is visible in source code.
+Mainstream languages usually represent measurements as ordinary numbers. Their units survive only in variable names, comments, or programmer memory. SML applies the discipline of dimensional analysis directly to language design so that unit intent is visible in source code.
 
-The Mars Climate Orbiter loss is a motivating example of why numerically valid values with incompatible unit conventions should not be silently interchangeable. Measure therefore makes quantity syntax and conversion decisions explicit.
+The Mars Climate Orbiter loss is a motivating example of why numerically valid values with incompatible unit conventions should not be silently interchangeable. SML therefore makes quantity syntax and conversion decisions explicit.
 
 ### 1.3 New principle: Meaning Before Math
 
-Measure's uniqueness principle is **Meaning Before Math**: a numerical operation is acceptable only when the meanings represented by its operands are compatible.
+SML's uniqueness principle is **Meaning Before Math**: a numerical operation is acceptable only when the meanings represented by its operands are compatible.
 
 The principle appears in three language features:
 
@@ -68,11 +68,11 @@ Non-ASCII source characters are outside the canonical grammar. Unicode aliases m
 
 ### 2.2 Free-field format
 
-Measure is free-field. A statement is not tied to a line or column. Line breaks ordinarily behave like other whitespace. Semicolons terminate simple statements, and braces delimit blocks.
+SML is free-field. A statement is not tied to a line or column. Line breaks ordinarily behave like other whitespace. Semicolons terminate simple statements, and braces delimit blocks.
 
 The attachment rules for quantity literals are exceptions to ordinary whitespace freedom:
 
-```measure
+```sml
 100m          // valid simple quantity
 100 m         // invalid: the unit is detached
 9.8[m/s^2]    // valid compound quantity
@@ -108,7 +108,9 @@ Identifier machine:
 
 ### 3.2 Numeric literals
 
-Measure accepts decimal integers and fixed-point decimal literals. The integer part is either `0` or begins with a nonzero digit; leading zeros are not permitted.
+SML accepts decimal integers and fixed-point decimal literals. The integer part is either `0` or begins with a nonzero digit; leading zeros are not permitted.
+
+Numeric literals contain digits and, for fixed-point values, one decimal point followed by at least one digit. They do not admit underscore or comma separators. Scientific notation and alternate number systems such as hexadecimal and binary are outside version 0.1. Thus `1_000`, `1,000`, `2.5e3`, `0x10`, and `0b1010` are not numeric literals.
 
 ```regex
 (0|[1-9][0-9]*)(\.[0-9]+)?
@@ -149,7 +151,7 @@ Ending in `DecimalPoint` is a lexical error because a digit must follow `.`.
 
 Text literals use double quotes. They may contain canonical ASCII characters other than a double quote, carriage return, or line feed. Escape sequences and multiline strings are not part of this proposal.
 
-```measure
+```sml
 "Speed: "
 "Within the limit"
 ```
@@ -158,9 +160,9 @@ An unclosed string before the end of the line is a lexical error.
 
 ### 3.4 Comments
 
-Measure supports line comments and non-nesting block comments:
+SML supports line comments and non-nesting block comments:
 
-```measure
+```sml
 // continues through the end of the line
 
 /* may cross line boundaries */
@@ -208,7 +210,7 @@ to then do
 
 Noise words are reserved but semantically inert. They are valid only in these positions:
 
-```measure
+```sml
 distance as to km
 if (condition) then { ... }
 while (condition) do { ... }
@@ -237,7 +239,7 @@ compound_quantity = NUMBER "[" unit_expression "]"
 
 Examples:
 
-```measure
+```sml
 100m
 12kN
 9.8[m/s^2]
@@ -259,7 +261,7 @@ Examples:
 | Equality | `==`, `!=` |
 | Logical | `&&`, `||` |
 | Assignment statements | `=`, `+=`, `-=`, `*=`, `/=` |
-| Postfix update statements | `++`, `--` |
+| Prefix and postfix update statements | `++`, `--` |
 
 The scanner uses maximal munch. For example, `++`, `+=`, `<=`, `==`, `!=`, `&&`, and `||` are recognized before their one-character prefixes.
 
@@ -327,7 +329,7 @@ Rules:
 
 Accepted:
 
-```measure
+```sml
 9.8[m/s^2]
 1[kg*m/s^2]
 1[kg/(m*s^2)]
@@ -335,7 +337,7 @@ Accepted:
 
 Rejected:
 
-```measure
+```sml
 1[kg/m/s^2]
 1[m/(kg/s)]
 1[(m/s)^2]
@@ -362,11 +364,11 @@ Highest precedence appears first:
 | 9 | `&&` | Left-to-right |
 | 10 | `||` | Left-to-right |
 
-Assignment is a statement, not an expression, and therefore has no expression precedence. Postfix `++` and `--` are also standalone statements.
+Assignment is a statement, not an expression, and therefore has no expression precedence. Prefix and postfix `++` and `--` are also standalone statements.
 
 Examples:
 
-```measure
+```sml
 3m as cm + 2cm        // (3m as cm) + 2cm
 -2 ^ 2               // -(2 ^ 2)
 a + b * c             // a + (b * c)
@@ -384,7 +386,7 @@ relational       = additive, [ ( "<" | "<=" | ">" | ">=" ), additive ] ;
 additive         = multiplicative, { ( "+" | "-" ), multiplicative } ;
 multiplicative   = unary, { ( "*" | "/" | "%" ), unary } ;
 unary            = ( "!" | "+" | "-" ), unary | power ;
-power            = postfix, [ "^", power ] ;
+power            = postfix, [ "^", unary ] ;
 postfix          = primary, { "as", [ "to" ], unit_target } ;
 unit_target      = IDENT | "[", unit_expression, "]" ;
 
@@ -397,12 +399,10 @@ primary
     | "false"
     | IDENT
     | call_expression
-    | input_expression
     | "(", expression, ")" ;
 
 call_expression  = IDENT, "(", [ argument_list ], ")" ;
 argument_list    = expression, { ",", expression } ;
-input_expression = "input", "(", ")" ;
 
 simple_quantity
     = NUMBER, IDENT ;
@@ -430,7 +430,7 @@ The `NUMBER` and following `IDENT` in `simple_quantity`, or `NUMBER` and `[` in 
 
 ### 7.1 Dimension model
 
-Measure initially uses three base dimensions:
+SML initially uses three base dimensions:
 
 ```text
 Length = (1, 0, 0)
@@ -471,13 +471,24 @@ Primitive `int` and `float` values are dimensionless. A dimension annotation acc
 
 ### 7.3 Declaration grammar
 
-Every declaration introduces one binding and has an initializer:
+Every declaration introduces one binding. A `let` declaration may omit its initializer. A `const` declaration must be initialized immediately:
 
 ```ebnf
 declaration
-    = ( "let" | "const" ), IDENT,
-      [ ":", declaration_annotation ],
-      "=", expression, ";" ;
+    = let_declaration
+    | const_declaration ;
+
+let_declaration
+    = "let", IDENT, [ ":", declaration_annotation ],
+      [ "=", declaration_value ], ";" ;
+
+const_declaration
+    = "const", IDENT, [ ":", declaration_annotation ],
+      "=", declaration_value, ";" ;
+
+declaration_value
+    = expression
+    | input_expression ;
 
 declaration_annotation
     = primitive_type
@@ -490,8 +501,10 @@ dimension_name = "Length" | "Mass" | "Time" | "Force" ;
 
 Examples:
 
-```measure
+```sml
 let count: int = 5;
+let pending: Length;
+let untyped;
 let ratio = 0.5;
 let span: Length = 5m;
 let exactSpan: [m] = 5m;
@@ -500,7 +513,7 @@ let duration: Time = 5min;
 let volume: [m^3] = 12[m^3];
 ```
 
-If the annotation is omitted, the intended static semantics infer the binding constraint only from the initializer. Parameters and function return values require explicit annotations.
+If an initializer is present and the annotation is omitted, the intended static semantics may infer the binding constraint from that initializer. The later semantic specification must define definite assignment and the constraint acquired by an unannotated, uninitialized `let`. Parameters and function return values require explicit annotations.
 
 ## 8. Statements
 
@@ -530,25 +543,35 @@ All simple statements end with `;`. Every conditional and iterative body is a bl
 
 ```ebnf
 assignment_statement
-    = IDENT, assignment_operator, expression, ";" ;
+    = IDENT, "=", assignment_value, ";"
+    | IDENT, compound_assignment_operator, expression, ";" ;
+
+assignment_value
+    = expression
+    | input_expression ;
 
 assignment_operator
     = "=" | "+=" | "-=" | "*=" | "/=" ;
 
+compound_assignment_operator
+    = "+=" | "-=" | "*=" | "/=" ;
+
 update_statement
-    = IDENT, ( "++" | "--" ), ";" ;
+    = IDENT, ( "++" | "--" ), ";"
+    | ( "++" | "--" ), IDENT, ";" ;
 ```
 
 Examples:
 
-```measure
+```sml
 length = 5m;
 length += 1m;
 length *= 2;
-length++;
+count++;
+++count;
 ```
 
-Assignment is not an expression. `++length`, `print(length++)`, and chained assignment are invalid. Postfix update adds or subtracts one in the target's current unit representation. `*=` and `/=` require a dimensionless right operand so the binding's dimension does not change.
+Assignment and update are not expressions. Prefix and postfix updates are standalone statements, so `print(count++)` and chained assignment are invalid. Both update forms require a mutable, dimensionless numeric target. A variable with an associated unit cannot use either update form; it must use an explicit unit-bearing compound assignment such as `length += 1m;`, where the operand carries the required unit. The parser recognizes the update form without deciding whether its target has an associated unit because that requires name resolution and checking. `*=` and `/=` require a dimensionless right operand so the binding's dimension does not change.
 
 ### 8.3 Input and output
 
@@ -561,19 +584,25 @@ print_statement
 
 Examples:
 
-```measure
+```sml
 print("Speed: ", speed);
 print(height);
 ```
 
-`input()` is a context-sensitive input expression. It is valid only as the direct initializer or right-hand side of a binding whose expected primitive or exact-unit annotation is known. Unit-bearing runtime input therefore uses an exact-unit target:
+`input()` is a context-sensitive input expression:
 
-```measure
+```ebnf
+input_expression = "input", "(", ")" ;
+```
+
+It is valid only as the complete initializer or simple-assignment right-hand side of a binding whose expected primitive or exact-unit annotation is known. It is not a general primary expression, so forms such as `print(input())`, `f(input())`, and `input() + 1` are invalid. Unit-bearing runtime input therefore uses an exact-unit target:
+
+```sml
 let height: [m] = input();
 height = input();
 ```
 
-An unannotated declaration such as `let value = input();` is invalid because no type or unit can be inferred from the source expression.
+An unannotated declaration such as `let value = input();`, or a declaration with only a dimension annotation such as `let value: Length = input();`, is invalid because the input representation is not fixed. For `value = input();`, confirming that `value` has a suitable declared constraint requires later name resolution and checking rather than parsing.
 
 ### 8.4 Conditional statements
 
@@ -586,7 +615,7 @@ if_statement
 
 Conditions must have type `bool`.
 
-```measure
+```sml
 if (speed > limit) then {
     print("Over the limit");
 } else if (speed == limit) {
@@ -598,7 +627,7 @@ if (speed > limit) then {
 
 Nested conditionals use the same mandatory-brace rule:
 
-```measure
+```sml
 if (load > 0kN) {
     if (load > 100kN) {
         print("High load");
@@ -621,20 +650,22 @@ for_statement
 
 for_initializer
     = "let", IDENT,
-      [ ":", declaration_annotation ], "=", expression
+      [ ":", declaration_annotation ], "=", declaration_value
     | assignment_core ;
 
 for_update
     = assignment_core
-    | IDENT, ( "++" | "--" ) ;
+    | IDENT, ( "++" | "--" )
+    | ( "++" | "--" ), IDENT ;
 
 assignment_core
-    = IDENT, assignment_operator, expression ;
+    = IDENT, "=", assignment_value
+    | IDENT, compound_assignment_operator, expression ;
 ```
 
 Loop conditions must have type `bool`.
 
-```measure
+```sml
 for (let t: [s] = 0s; t < 5s; t += 1s) do {
     print("Time: ", t);
 }
@@ -648,7 +679,7 @@ while (fuel > 0kg) {
 
 Nested loops are ordinary blocks containing another loop:
 
-```measure
+```sml
 for (let row: int = 0; row < 3; row++) {
     for (let column: int = 0; column < 3; column++) {
         print(row, ",", column);
@@ -656,7 +687,7 @@ for (let row: int = 0; row < 3; row++) {
 }
 ```
 
-`break;` exits the nearest loop. `continue;` begins its next iteration.
+`break;` exits the nearest loop. `continue;` begins its next iteration. Either statement outside a loop is a context-sensitive syntax error reported by the parser.
 
 ### 8.6 Assertions
 
@@ -666,7 +697,7 @@ assert_statement = "assert", expression, ";" ;
 
 The expression must be `bool`.
 
-```measure
+```sml
 assert deflection <= allowableDeflection;
 ```
 
@@ -699,9 +730,9 @@ break_statement    = "break", ";" ;
 continue_statement = "continue", ";" ;
 ```
 
-Function parameters and return values use explicit contracts. A function without a return annotation after `:` returns no value. A `return` with an expression is valid only in a value-returning function.
+Function parameters and return values use explicit contracts. A function without a return annotation returns no value. A `return` with an expression is valid only in a value-returning function, and a bare `return;` is valid only in a function without a return annotation. The parser enforces these rules from the enclosing function syntax.
 
-```measure
+```sml
 fn speed(distance: Length, time: Time): [m/s] {
     return (distance as m) / (time as s);
 }
@@ -713,6 +744,8 @@ fn main() {
 ```
 
 `main` is lexically an ordinary `IDENT`. The proposal uses `fn main()` as the conventional program entry point rather than reserving the spelling as a keyword.
+
+The parser accepts a syntactically valid call without checking whether its function is defined or whether its arguments match the function's parameters. Those checks require name resolution and later semantic analysis.
 
 ## 10. Consolidated token inventory
 

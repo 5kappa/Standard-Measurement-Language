@@ -1,0 +1,7107 @@
+{
+  "format_version": 1,
+  "language_version": "0.1",
+  "fixtures": [
+    {
+      "id": "parse-missing-closing-brace-eof",
+      "description": "A missing closing brace is diagnosed at EOF.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f() { print(1);"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 7,
+                "end_byte": 8
+              }
+            },
+            {
+              "kind": "PRINT",
+              "lexeme": "print",
+              "span": {
+                "start_byte": 9,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 18
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN002",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 18
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 18,
+                  "line": 1,
+                  "column": 19
+                },
+                "end": {
+                  "byte_offset": 18,
+                  "line": 1,
+                  "column": 19
+                }
+              }
+            },
+            "secondary": [
+              {
+                "role": "opened_here",
+                "span": {
+                  "start_byte": 7,
+                  "end_byte": 8
+                }
+              }
+            ],
+            "notes": [],
+            "data": {
+              "expected_kinds": [
+                "RBRACE"
+              ],
+              "actual_kind": "EOF"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "PRINT",
+          "NUMBER",
+          "SEMICOLON",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.general-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary",
+          "SOURCE-LOCATIONS.missing-syntax"
+        ]
+      }
+    },
+    {
+      "id": "parse-missing-unit-bracket-eof",
+      "description": "A missing unit bracket is diagnosed at EOF and labels its opener.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 19
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN002",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 19
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 19,
+                  "line": 1,
+                  "column": 20
+                },
+                "end": {
+                  "byte_offset": 19,
+                  "line": 1,
+                  "column": 20
+                }
+              }
+            },
+            "secondary": [
+              {
+                "role": "opened_here",
+                "span": {
+                  "start_byte": 17,
+                  "end_byte": 18
+                }
+              }
+            ],
+            "notes": [],
+            "data": {
+              "expected_kinds": [
+                "RBRACKET"
+              ],
+              "actual_kind": "EOF"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.general-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary",
+          "SOURCE-LOCATIONS.missing-syntax",
+          "DIAGNOSTICS.expression-delimiter-labels"
+        ]
+      }
+    },
+    {
+      "id": "parse-expected-identifier",
+      "description": "SYN003",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn () {}"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 7,
+                "end_byte": 8
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 8
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN003",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 3
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 3,
+                  "line": 1,
+                  "column": 4
+                },
+                "end": {
+                  "byte_offset": 3,
+                  "line": 1,
+                  "column": 4
+                }
+              }
+            },
+            "secondary": [
+              {
+                "role": "encountered_instead",
+                "span": {
+                  "start_byte": 3,
+                  "end_byte": 4
+                }
+              }
+            ],
+            "notes": [],
+            "data": {
+              "actual_kind": "LPAREN"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN003"
+        ],
+        "rules": [
+          "DIAGNOSTICS.general-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-expected-expression",
+      "description": "SYN004",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f() { print(); }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 7,
+                "end_byte": 8
+              }
+            },
+            {
+              "kind": "PRINT",
+              "lexeme": "print",
+              "span": {
+                "start_byte": 9,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 19
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN004",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "actual_kind": "RPAREN"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "PRINT",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN004"
+        ],
+        "rules": [
+          "DIAGNOSTICS.general-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-expected-statement",
+      "description": "SYN005",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f() { else }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 7,
+                "end_byte": 8
+              }
+            },
+            {
+              "kind": "ELSE",
+              "lexeme": "else",
+              "span": {
+                "start_byte": 9,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 15
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN005",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 9,
+                "end_byte": 13
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "actual_kind": "ELSE"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "ELSE",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN005"
+        ],
+        "rules": [
+          "DIAGNOSTICS.general-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-expected-function",
+      "description": "SYN006",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "let x;"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 3
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 6
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN006",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 3
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "actual_kind": "LET"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "LET",
+          "IDENT",
+          "SEMICOLON",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN006"
+        ],
+        "rules": [
+          "DIAGNOSTICS.general-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-detached-simple-quantity",
+      "description": "SYN010",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 10 m; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 23
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN010",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            "secondary": [
+              {
+                "role": "magnitude",
+                "span": {
+                  "start_byte": 16,
+                  "end_byte": 18
+                }
+              },
+              {
+                "role": "detached_unit",
+                "span": {
+                  "start_byte": 19,
+                  "end_byte": 20
+                }
+              }
+            ],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN010"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary",
+          "DIAGNOSTICS.detached-quantity-labels"
+        ]
+      }
+    },
+    {
+      "id": "parse-detached-simple-quantity-comment",
+      "description": "SYN010",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 10/*x*/m; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 27
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 27
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN010",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 23
+              }
+            },
+            "secondary": [
+              {
+                "role": "magnitude",
+                "span": {
+                  "start_byte": 16,
+                  "end_byte": 18
+                }
+              },
+              {
+                "role": "detached_unit",
+                "span": {
+                  "start_byte": 23,
+                  "end_byte": 24
+                }
+              }
+            ],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN010"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary",
+          "DIAGNOSTICS.detached-quantity-labels"
+        ]
+      }
+    },
+    {
+      "id": "parse-detached-compound-quantity-space",
+      "description": "SYN010",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 10 [m]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 25
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN010",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            "secondary": [
+              {
+                "role": "magnitude",
+                "span": {
+                  "start_byte": 16,
+                  "end_byte": 18
+                }
+              },
+              {
+                "role": "detached_unit",
+                "span": {
+                  "start_byte": 19,
+                  "end_byte": 20
+                }
+              }
+            ],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN010"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary",
+          "DIAGNOSTICS.detached-quantity-labels"
+        ]
+      }
+    },
+    {
+      "id": "parse-detached-compound-quantity",
+      "description": "SYN010",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 10 /*x*/ [m]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 27
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 28,
+                "end_byte": 29
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 30,
+                "end_byte": 31
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 31,
+                "end_byte": 31
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN010",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 25
+              }
+            },
+            "secondary": [
+              {
+                "role": "magnitude",
+                "span": {
+                  "start_byte": 16,
+                  "end_byte": 18
+                }
+              },
+              {
+                "role": "detached_unit",
+                "span": {
+                  "start_byte": 25,
+                  "end_byte": 26
+                }
+              }
+            ],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN010"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary",
+          "DIAGNOSTICS.detached-quantity-labels"
+        ]
+      }
+    },
+    {
+      "id": "parse-const-initializer-required-again",
+      "description": "SYN011",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ const x; const y; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "CONST",
+              "lexeme": "const",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            {
+              "kind": "CONST",
+              "lexeme": "const",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "y",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 27
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 27
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN011",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 15
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 15,
+                  "line": 1,
+                  "column": 16
+                },
+                "end": {
+                  "byte_offset": 15,
+                  "line": 1,
+                  "column": 16
+                }
+              }
+            },
+            "secondary": [
+              {
+                "role": "encountered_instead",
+                "span": {
+                  "start_byte": 15,
+                  "end_byte": 16
+                }
+              }
+            ],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "CONST",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN011"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-invalid-declaration-annotation",
+      "description": "SYN012",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x: m; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "COLON",
+              "lexeme": ":",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 19
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN012",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "COLON",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN012"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-invalid-input-position",
+      "description": "SYN013",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ print(input()); }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "PRINT",
+              "lexeme": "print",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "INPUT",
+              "lexeme": "input",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 25
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN013",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 19
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "PRINT",
+          "INPUT",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN013"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-input-arguments-not-allowed",
+      "description": "SYN014",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x: int = input(1); }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "COLON",
+              "lexeme": ":",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "INT",
+              "lexeme": "int",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "INPUT",
+              "lexeme": "input",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 27
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 28,
+                "end_byte": 29
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 29,
+                "end_byte": 30
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 31,
+                "end_byte": 32
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 32,
+                "end_byte": 32
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN014",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "COLON",
+          "INT",
+          "ASSIGN",
+          "INPUT",
+          "NUMBER",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN014"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-input-annotation-required",
+      "description": "SYN015",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = input(); }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "INPUT",
+              "lexeme": "input",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 26
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN015",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 21
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "INPUT",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN015"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-assignment-not-expression",
+      "description": "SYN016",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ print(x = 1); }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "PRINT",
+              "lexeme": "print",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 23
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN016",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "PRINT",
+          "ASSIGN",
+          "NUMBER",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN016"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-update-not-expression",
+      "description": "SYN017",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ print(x++); }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "PRINT",
+              "lexeme": "print",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "PLUS_PLUS",
+              "lexeme": "++",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 21
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN017",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 17
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "PRINT",
+          "PLUS_PLUS",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN017"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-chained-relational",
+      "description": "SYN018",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ assert 1 < 2 < 3; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "ASSERT",
+              "lexeme": "assert",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            {
+              "kind": "LESS",
+              "lexeme": "<",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "LESS",
+              "lexeme": "<",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "3",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 27
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 27
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN018",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "operator_kind": "LESS"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "ASSERT",
+          "NUMBER",
+          "LESS",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN018"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary",
+          "GRAMMAR.nonchaining-comparisons"
+        ]
+      }
+    },
+    {
+      "id": "parse-chained-equality",
+      "description": "SYN019",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ assert true == false == true; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "ASSERT",
+              "lexeme": "assert",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "TRUE",
+              "lexeme": "true",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "EQUAL_EQUAL",
+              "lexeme": "==",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "FALSE",
+              "lexeme": "false",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "EQUAL_EQUAL",
+              "lexeme": "==",
+              "span": {
+                "start_byte": 29,
+                "end_byte": 31
+              }
+            },
+            {
+              "kind": "TRUE",
+              "lexeme": "true",
+              "span": {
+                "start_byte": 32,
+                "end_byte": 36
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 36,
+                "end_byte": 37
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 38,
+                "end_byte": 39
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 39,
+                "end_byte": 39
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN019",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 29,
+                "end_byte": 31
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "operator_kind": "EQUAL_EQUAL"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "ASSERT",
+          "TRUE",
+          "EQUAL_EQUAL",
+          "FALSE",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN019"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary",
+          "GRAMMAR.nonchaining-comparisons"
+        ]
+      }
+    },
+    {
+      "id": "parse-misplaced-to",
+      "description": "SYN020",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1 to m; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "TO",
+              "lexeme": "to",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 25
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN020",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 20
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "noise_word_kind": "TO",
+              "allowed_context": "AFTER_AS"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "TO",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN020"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-misplaced-then",
+      "description": "SYN020",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ then }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "THEN",
+              "lexeme": "then",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 12
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 14
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN020",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 12
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "noise_word_kind": "THEN",
+              "allowed_context": "AFTER_IF_CONDITION"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "THEN",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN020"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-misplaced-do",
+      "description": "SYN020",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ do }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "DO",
+              "lexeme": "do",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 10
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 11,
+                "end_byte": 12
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 12
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN020",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 10
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "noise_word_kind": "DO",
+              "allowed_context": "AFTER_LOOP_HEADER"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "DO",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN020"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-break-outside-loop",
+      "description": "SYN021",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ break; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "BREAK",
+              "lexeme": "break",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 16
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN021",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 13
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "BREAK",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN021"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-continue-outside-loop",
+      "description": "SYN022",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ continue; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "CONTINUE",
+              "lexeme": "continue",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 16
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 19
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN022",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 16
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "CONTINUE",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN022"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-return-value-required",
+      "description": "SYN023",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(): int { return; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "COLON",
+              "lexeme": ":",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "INT",
+              "lexeme": "int",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "RETURN",
+              "lexeme": "return",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 23
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN023",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "COLON",
+          "INT",
+          "LBRACE",
+          "RETURN",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN023"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-return-value-forbidden",
+      "description": "SYN024",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ return 1; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "RETURN",
+              "lexeme": "return",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 19
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN024",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 16
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "RETURN",
+          "NUMBER",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN024"
+        ],
+        "rules": [
+          "DIAGNOSTICS.specialized-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-empty-unit-annotation",
+      "description": "SYN030",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 22
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN030",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN030"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-expected-unit-factor",
+      "description": "SYN031",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m*]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 24
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN031",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "STAR",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN031"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-missing-unit-exponent",
+      "description": "SYN032",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m^]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 24
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN032",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 20
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 20,
+                  "line": 1,
+                  "column": 21
+                },
+                "end": {
+                  "byte_offset": 20,
+                  "line": 1,
+                  "column": 21
+                }
+              }
+            },
+            "secondary": [
+              {
+                "role": "encountered_instead",
+                "span": {
+                  "start_byte": 20,
+                  "end_byte": 21
+                }
+              }
+            ],
+            "notes": [],
+            "data": {}
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "CARET",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN032"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-invalid-unit-exponent-plus",
+      "description": "SYN033",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m^+2]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "PLUS",
+              "lexeme": "+",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 26
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN033",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "exponent_lexeme": "+2"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "CARET",
+          "PLUS",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN033"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-unit-exponent-out-of-range",
+      "description": "SYN034",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m^17]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "17",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 26
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN034",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 22
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "source_exponent": 17,
+              "minimum": -16,
+              "maximum": 16
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "CARET",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN034"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-unit-repeated-division",
+      "description": "SYN035",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m/s/kg]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "SLASH",
+              "lexeme": "/",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "s",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "SLASH",
+              "lexeme": "/",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "kg",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 28,
+                "end_byte": 28
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN035",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "reason": "REPEATED_DIVISION"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "SLASH",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN035"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-unit-nested-division",
+      "description": "SYN035",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m/(s/kg)]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "SLASH",
+              "lexeme": "/",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "s",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "SLASH",
+              "lexeme": "/",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "kg",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 27
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 29,
+                "end_byte": 30
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 30,
+                "end_byte": 30
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN035",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "reason": "NESTED_DIVISION"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "SLASH",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN035"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-unit-grouped-numerator",
+      "description": "SYN035",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[(m*s)/kg]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "s",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "SLASH",
+              "lexeme": "/",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "kg",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 27
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 29,
+                "end_byte": 30
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 30,
+                "end_byte": 30
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN035",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "reason": "GROUPED_NUMERATOR"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "STAR",
+          "SLASH",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN035"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-unit-group-power",
+      "description": "SYN035",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m/(s*kg)^2]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "SLASH",
+              "lexeme": "/",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "s",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "kg",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 27
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 28,
+                "end_byte": 29
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 29,
+                "end_byte": 30
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 31,
+                "end_byte": 32
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 32,
+                "end_byte": 32
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN035",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 27
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "reason": "GROUP_POWER"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "SLASH",
+          "STAR",
+          "CARET",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN035"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-unit-implicit-multiplication",
+      "description": "SYN035",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m s]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "s",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 25
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN035",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "reason": "IMPLICIT_MULTIPLICATION"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN035"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-unit-numeric-factor",
+      "description": "SYN035",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[2*m]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 25
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN035",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "reason": "NUMERIC_FACTOR"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "STAR",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN035"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-unit-unparenthesized-product-denominator",
+      "description": "SYN035",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m/s*kg]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "SLASH",
+              "lexeme": "/",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "s",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "kg",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 28,
+                "end_byte": 28
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN035",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            "secondary": [],
+            "notes": [],
+            "data": {
+              "reason": "UNPARENTHESIZED_PRODUCT_DENOMINATOR"
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "SLASH",
+          "STAR",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN035"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary"
+        ]
+      }
+    },
+    {
+      "id": "parse-too-many-unit-factors",
+      "description": "The ninth written unit factor exceeds the limit.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[a*b*c*d*e*f*g*h*i]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "a",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 19,
+                "end_byte": 20
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "b",
+              "span": {
+                "start_byte": 20,
+                "end_byte": 21
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 21,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "c",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 23,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "d",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 25
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "e",
+              "span": {
+                "start_byte": 26,
+                "end_byte": 27
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 28,
+                "end_byte": 29
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 29,
+                "end_byte": 30
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "g",
+              "span": {
+                "start_byte": 30,
+                "end_byte": 31
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 31,
+                "end_byte": 32
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "h",
+              "span": {
+                "start_byte": 32,
+                "end_byte": 33
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 33,
+                "end_byte": 34
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "i",
+              "span": {
+                "start_byte": 34,
+                "end_byte": 35
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 35,
+                "end_byte": 36
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 36,
+                "end_byte": 37
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 38,
+                "end_byte": 39
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 39,
+                "end_byte": 39
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN036",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 34,
+                "end_byte": 35
+              }
+            },
+            "secondary": [
+              {
+                "role": "limit_started_here",
+                "span": {
+                  "start_byte": 18,
+                  "end_byte": 19
+                }
+              }
+            ],
+            "notes": [],
+            "data": {
+              "factor_count": 9,
+              "maximum": 8
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "STAR",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN036"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary",
+          "DIAGNOSTICS.limit-labels"
+        ]
+      }
+    },
+    {
+      "id": "parse-unit-annotation-too-long",
+      "description": "The first content byte beyond 128 characters is labeled.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn f(){ let x = 1[m                                                                                                                                ]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "f",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 6
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 7
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 12,
+                "end_byte": 13
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 14,
+                "end_byte": 15
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 16,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 19
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 147,
+                "end_byte": 148
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 148,
+                "end_byte": 149
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 150,
+                "end_byte": 151
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 151,
+                "end_byte": 151
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "failure",
+          "diagnostic": {
+            "code": "SYN037",
+            "phase": "PARSER",
+            "severity": "ERROR",
+            "primary": {
+              "role": "PRIMARY",
+              "span": {
+                "start_byte": 146,
+                "end_byte": 147
+              }
+            },
+            "secondary": [
+              {
+                "role": "limit_started_here",
+                "span": {
+                  "start_byte": 17,
+                  "end_byte": 18
+                }
+              }
+            ],
+            "notes": [],
+            "data": {
+              "content_length": 129,
+              "maximum": 128
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "RBRACKET",
+          "SEMICOLON",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "SYN037"
+        ],
+        "rules": [
+          "DIAGNOSTICS.unit-syntax-codes",
+          "RECOVERY.parser-failure",
+          "AST-SCHEMA.failure-boundary",
+          "DIAGNOSTICS.limit-labels"
+        ]
+      }
+    }
+  ]
+}

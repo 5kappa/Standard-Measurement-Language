@@ -10,9 +10,9 @@ Extended by: decision 076 and `LANGUAGE-SPECIFICATION.md`
 
 Version 0.1 includes unary `+` and `-`, binary `+`, `-`, `*`, and `/`, parentheses, and postfix `as`. Precedence from strongest to weakest is primary, postfix conversion, unary sign, multiplication/division, and addition/subtraction.
 
-Numeric exponentiation and standalone postfix increment/decrement were initially staged under SD-026 and SD-029. Modulo, assignment, comparison, equality, and logical operators were also staged pending their dependent decisions. Unit exponents do not by themselves imply numeric exponentiation.
+Numeric exponentiation and standalone increment/decrement were initially staged under SD-026 and SD-029. Modulo, assignment, comparison, equality, and logical operators were also staged pending their dependent decisions. Unit exponents do not by themselves imply numeric exponentiation.
 
-Decision 076 completed the proposal surface: `%`, comparisons, equality, `!`, `&&`, and `||` are included; assignment remains a statement; and postfix `++`/`--` remain standalone statements. The consolidated precedence table in `LANGUAGE-SPECIFICATION.md` supersedes this record's earlier partial table.
+Decision 076 completed the broader proposal surface. The current grammar includes `%`, comparisons, equality, `!`, `&&`, and `||`; assignment remains a statement; numeric power permits negative exponents; and prefix/postfix `++`/`--` are standalone statements. The consolidated precedence table in `LANGUAGE-SPECIFICATION.md` supersedes this record's earlier partial table.
 
 ## Validation
 

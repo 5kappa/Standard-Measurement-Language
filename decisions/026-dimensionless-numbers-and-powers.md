@@ -14,6 +14,7 @@ Measure does not require every number or numerical variable to carry a unit. A u
 Numeric exponentiation uses `^` in a later expression layer:
 
 - the exponent must be dimensionless;
+- a unary sign is permitted on the exponent, so negative exponents such as `x ^ -2` are syntactically valid;
 - a dimensionless base may have an integer or decimal exponent;
 - a dimensioned base requires a compile-time integer exponent;
 - a decimal exponent is never part of a unit expression.
@@ -27,7 +28,10 @@ Engineering formulas frequently raise dimensionless coefficients and ratios to d
 ## Validation
 
 - `16 ^ 0.5` is valid and dimensionless.
+- `2 ^ -3` is syntactically valid and dimensionless.
 - `3m ^ 2` has dimension `Length^2`.
+- `3m ^ -2` has dimension `Length^-2`.
+- `2 ^ 3m` parses as a power expression but is rejected during checking because the exponent carries a unit.
 - `3m ^ 0.5` is rejected during checking.
 - Future `sqrt(9[m^2])` may produce `3m`; `sqrt(9m)` is rejected.
 

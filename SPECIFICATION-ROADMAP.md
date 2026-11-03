@@ -156,7 +156,7 @@ The implementation language still appears after the grammar so one host language
 | --- | --- | --- |
 | 0. Baseline | Frozen lexer/parser boundary and shared fixtures | Everyone can state what the current project parses and what later phases are excluded. |
 | 1. Lexical surface | Deterministic token vocabulary and selected quantity-literal boundary | Every fixture has one documented token stream and local lexical errors. |
-| 2. Grammar and AST | Readable EBNF, precedence, AST, and parser recovery contract | Every fixture has one parse or one local syntax diagnostic. |
+| 2. Grammar and AST | Readable EBNF, precedence, AST, and parser failure contract | Every fixture has one parse or one first local syntax diagnostic. |
 | 3. Semantic rationale | Existing dimension and unit decisions retained informatively | No semantic rule becomes a lexer/parser dependency. |
 | 4. Deferred semantics | Conversion, numeric, kind, currency, and temperature behavior | Explicitly outside the current proposal where not already covered by physical-unit rules. |
 | 5. Diagnostics and conformance | Lexical/syntax diagnostics and token/AST fixtures | The written front-end specification determines pass/fail. |
@@ -239,7 +239,7 @@ Do not discuss implementation language, parser libraries, or code generation as 
 
 ### SD-010: Source encoding and canonical character set
 
-**Current state: ACCEPTED by decision 076.** Source files use UTF-8; the canonical language surface is the enumerated ASCII subset in `LANGUAGE-SPECIFICATION.md`. Unicode aliases are excluded from the current proposal.
+**Current state: ACCEPTED by decisions 076 and 088.** Source files use UTF-8; the canonical language surface is the enumerated ASCII subset in `LANGUAGE-SPECIFICATION.md`. Unicode aliases are excluded from the current proposal. At an offset where no complete well-formed UTF-8 scalar begins, the lexer diagnoses and consumes exactly one byte and advances one display column before continuing.
 
 Alternatives to compare:
 
@@ -257,7 +257,7 @@ Likely version 0.1 direction to evaluate: UTF-8 files with canonical ASCII synta
 
 ### SD-011: Whitespace, line endings, and comments
 
-**Current state: ACCEPTED by decision 076.** Measure is free-field; ordinary whitespace is insignificant except for quantity attachment. It supports `//` and non-nesting `/* */` comments. Unterminated strings or block comments are lexical errors.
+**Current state: ACCEPTED by decision 076.** SML is free-field; ordinary whitespace is insignificant except for quantity attachment. It supports `//` and non-nesting `/* */` comments. Unterminated strings or block comments are lexical errors.
 
 Decide:
 
@@ -273,14 +273,15 @@ Dependency: SD-010.
 
 **Current state: ACCEPTED by decisions 076, 082, and 083.** `NUMBER` is `(0|[1-9][0-9]*)(\.[0-9]+)?`; signs are parser-level unary operators. Leading zeros, leading/trailing-dot forms, exponents, separators, and alternate bases are excluded.
 
-Alternatives to compare:
+Rejected alternatives recorded during design:
 
 - integers and required-leading-digit decimals only: `5`, `5.0`, `0.5`;
 - leading or trailing decimal-point forms: `.5`, `5.`;
 - scientific notation: `2.5e3`; and
-- numeric separators: `1_000`.
+- underscore or comma numeric separators such as `1_000` or `1,000`; and
+- alternate number systems such as hexadecimal and binary.
 
-Version 0.1 should adopt only forms required by structural fixtures. Decide whether a sign is part of a numeric token or a unary parser operator.
+Version 0.1 accepts only unsigned decimal integer and fixed-point token spellings. Leading or trailing decimal-point forms, scientific notation, numeric separators, and alternate bases are excluded. A leading sign is a separate unary parser operator rather than part of a `NUMBER` token.
 
 Required outputs:
 
@@ -385,7 +386,7 @@ Dependencies: SD-010 and SD-015.
 
 ### SD-017: Optional noise words
 
-**Current state: ACCEPTED.** Measure retains the teammate proposal's optional `to`, `then`, and `do` noise words. They are reserved syntactic tokens with no semantic effect. `to` may follow postfix `as`; `then` may follow a future `if` condition; `do` may follow a future loop header. See `decisions/017-optional-noise-words.md`.
+**Current state: ACCEPTED.** SML retains the teammate proposal's optional `to`, `then`, and `do` noise words. They are reserved syntactic tokens with no semantic effect. `to` may follow postfix `as`; `then` may follow a future `if` condition; `do` may follow a future loop header. See `decisions/017-optional-noise-words.md`.
 
 Noise words must appear only in their assigned grammar positions and must not be accepted as ordinary identifiers.
 
@@ -407,7 +408,7 @@ Only after this gate should the lexical state-machine diagrams for the course do
 
 ### SD-020: Expression operator set
 
-**Current state: ACCEPTED and completed by decision 076.** The proposal includes unary `!`, `+`, `-`; numeric `^`; binary `*`, `/`, `%`, `+`, `-`; comparisons, equality, `&&`, `||`; postfix `as`; assignment statements; and standalone postfix update statements. See `LANGUAGE-SPECIFICATION.md`.
+**Current state: ACCEPTED and completed by decisions 076 and 029.** The proposal includes unary `!`, `+`, `-`; numeric `^`; binary `*`, `/`, `%`, `+`, `-`; comparisons, equality, `&&`, `||`; postfix `as`; assignment statements; and standalone prefix and postfix update statements. See `LANGUAGE-SPECIFICATION.md`.
 
 Confirm which of these belong in version 0.1:
 
@@ -465,7 +466,7 @@ Dependencies: SD-011, SD-020, SD-021, and SD-022.
 
 ### SD-024: Source AST
 
-**Current state: NOT REQUIRED.** The current deliverable is a proposal. EBNF and lexical machines are required; an AST data model is not.
+**Current state: ACCEPTED for the current parser contract by decisions 085 and 086 and `docs/frontend/AST-SCHEMA.md`.** The parser uses a source-faithful hybrid AST. Grammar repetitions become ordered collections, alternatives become tagged variants, and expression associativity remains explicit through nesting. Parentheses and diagnostic token references are preserved. The schema covers successful parses; a syntax failure returns no AST, missing-token variant, or error node.
 
 Confirm the node set and fields for:
 
@@ -479,13 +480,13 @@ Confirm the node set and fields for:
 - unit quotients; and
 - unit powers.
 
-Decide which punctuation survives in nodes and which source spans must be retained for diagnostics.
+Operators, delimiters, keywords, separators, statement terminators, and optional noise-word tokens needed for precise diagnostics survive as token references. `SourceFile` covers the complete source byte range; other nodes exclude unrelated surrounding trivia. See `decisions/085-source-ast-representation.md` and `docs/frontend/AST-SCHEMA.md`.
 
 Dependency: SD-023.
 
 ### SD-025: Parser error recovery
 
-**Current state: NOT REQUIRED.** Lexical and syntactic rules must explain malformed examples, but no parser recovery algorithm is required by the proposal outline.
+**Current state: PARSER RECOVERY DEFERRED by decision 086; lexical continuation ACCEPTED.** The lexer continues after lexical failures and the parser runs only if lexing succeeds. The parser stops at its first syntax error, emits one diagnostic, returns no AST, and performs no synchronization, token synthesis, or recovered-tree construction. `docs/frontend/RECOVERY.md` fixes the lexical continuation boundaries, partial-token failure result, phase gate, and fail-fast parser policy.
 
 Define recovery behavior for:
 
@@ -497,13 +498,13 @@ Define recovery behavior for:
 - trailing token; and
 - malformed nested unit expression.
 
-For an isolated expression, stopping after one precise syntax error may be best. For statement source files, compare recovery at semicolons and closing braces so one malformed statement does not hide the rest of the file.
+The previously considered semicolon, brace, list, expression, and unit-annotation synchronization boundaries are deferred guidance for a future parser-recovery proposal, not version 0.1 requirements.
 
 Dependency: SD-023.
 
 ### SD-026: Dimensionless numbers and numeric exponentiation
 
-**Current state: ACCEPTED for staged parser grammar.** Numeric `^` produces a power AST. The parser does not determine whether a base or exponent is dimensionless; all dimension-based restrictions are future semantic checks. Decimal exponents remain disallowed inside unit expressions by grammar. See `decisions/026-dimensionless-numbers-and-powers.md`.
+**Current state: ACCEPTED for staged parser grammar.** Numeric `^` produces a right-associative power AST and permits unary-signed operands such as a negative exponent. The parser does not determine whether a base or exponent is dimensionless; all dimension-based restrictions are future semantic checks. Decimal exponents remain disallowed inside unit expressions by grammar. See `decisions/026-dimensionless-numbers-and-powers.md`.
 
 Dependencies: SD-020, SD-021, SD-031, and SD-041.
 
@@ -517,13 +518,13 @@ Dependencies: SD-002, SD-014, SD-022, SD-023, and SD-043.
 
 ### SD-028: Local initializer inference
 
-**Current state: ACCEPTED for current declaration grammar.** Every declaration has one initializer and an optional annotation. The parser records that structure but performs no inference. Function parameters and returns use explicit annotations. Uninitialized and multi-binding declarations are rejected by grammar. See `decisions/028-local-initializer-inference.md`.
+**Current state: ACCEPTED for current declaration grammar.** Every declaration has one binding and an optional annotation. A `let` may omit its initializer; a `const` must be initialized immediately. The parser records that structure but performs no inference or definite-assignment analysis. Function parameters and returns use explicit annotations. Multi-binding declarations are rejected by grammar. See `decisions/028-local-initializer-inference.md`.
 
 Dependencies: SD-024, SD-027, SD-035, and SD-043.
 
 ### SD-029: Increment and decrement statements
 
-**Current state: ACCEPTED for current parser grammar.** Postfix `++` and `--` are standalone identifier-target statements and do not produce expression nodes. Prefix forms and expression use are syntax errors. Mutability, numeric type, and update behavior are deferred. See `decisions/029-increment-decrement-statements.md`.
+**Current state: ACCEPTED for current parser grammar.** Prefix and postfix `++` and `--` are standalone identifier-target statements and do not produce expression nodes. Expression use is a syntax error. Mutability, numeric type, dimensionless-target enforcement, and update behavior are deferred. See `decisions/029-increment-decrement-statements.md`.
 
 Dependencies: SD-023, SD-027, SD-028, and the later mutation rules.
 
@@ -790,7 +791,7 @@ The specification gives an unambiguous result for every required same-dimension 
 
 ### SD-060: Diagnostic taxonomy
 
-Define stable categories for:
+**Current state: ACCEPTED by decision 086 and `docs/frontend/DIAGNOSTICS.md`.** Stable lexical, syntactic, and internal-failure codes, phases, severity, labels, diagnostic data, ordering, and limits are fixed. The categories are:
 
 - lexical errors;
 - syntax errors; and
@@ -800,21 +801,17 @@ Unknown units, incompatible dimensions or kinds, invalid conversions, and runtim
 
 ### SD-061: Source-span and labeling policy
 
-Decide:
+**Current state: ACCEPTED by `SOURCE-LOCATIONS.md` and decision 086.** The contract uses byte offsets, one-based diagnostic lines and display columns, four-column tab stops, one primary span, and optional secondary labels, notes, or corrections. Exact message wording is not normative.
 
-- byte offsets versus character offsets;
-- one-based versus zero-based lines and columns;
-- how tabs affect columns;
-- how nested expressions are highlighted; and
-- how recovered or missing tokens are represented.
+Nested-expression highlights follow the primary and optional secondary label rules in `docs/frontend/DIAGNOSTICS.md`. Same-position lexical diagnostics are ordered by end byte and then code.
 
-This decision should be made before implementation data structures are frozen.
+These rules are frozen before implementation data structures are introduced.
 
 ### SD-062: Error recovery and cascade control
 
-Specify how the lexer and parser resume after malformed input and how an `Error` node or missing-token marker prevents duplicate syntax messages.
+**Current state: ACCEPTED by decision 086 and `docs/frontend/RECOVERY.md`.** The lexer continues and may collect multiple lexical errors, exposes valid partial tokens, and suppresses records after the twenty-diagnostic cap without stopping its scan. A lexical failure prevents parser invocation. The parser reports its first syntax error and returns no AST, so parser cascades, error nodes, missing-token markers, and synchronization are outside version 0.1.
 
-Required test: one malformed unit annotation must not produce a cascade of unrelated parser errors.
+Required test: one malformed unit annotation produces exactly one syntax diagnostic and no AST.
 
 ### SD-063: Normative versus explanatory text
 
@@ -828,6 +825,8 @@ Mark specification statements using consistent language:
 
 ### SD-064: Version 0.1 conformance suite
 
+**Current state: COMPLETE.** Decisions 087 and 089, `docs/frontend/fixtures/README.md`, and `docs/frontend/TRACEABILITY.md` define a strict versioned format and a completed 93-case suite. Static validation covers all 62 token kinds, all 53 AST node kinds, all ten lexical codes, all 28 active syntax codes, source locations, continuation, phase gating, and all 112 traceability rules through evidence or explicit process rationale.
+
 Create fixtures for:
 
 - token streams;
@@ -836,7 +835,7 @@ Create fixtures for:
 - syntax diagnostics; and
 - recovery results.
 
-The suite should allow two independent implementations to be compared against the same expected behavior.
+The accepted suite allows two independent implementations to be compared against the same expected behavior without sharing implementation-language data structures. Fixture execution remains an implementation task rather than a documentation-hardening gap.
 
 ### Phase 6 gate
 
@@ -855,7 +854,9 @@ These are engineering decisions, not language semantics. They come after the rel
 
 ### IM-070: Implementation language
 
-Compare candidates using:
+**Current state: ACCEPTED by decision 089.** The initial frontend uses Python 3.11.9 as its exact reference interpreter with no runtime dependencies. Standard-library data classes, enums, JSON, tests, and CLI facilities cover the initial engineering needs.
+
+The candidates were compared using:
 
 - support for algebraic data types or equivalent AST modeling;
 - source-span handling;
@@ -869,7 +870,9 @@ Do not choose solely because a language makes one parser technique convenient.
 
 ### IM-071: Lexer strategy
 
-Compare:
+**Current state: ACCEPTED by decision 089.** The lexer is a handwritten deterministic scanner over original source bytes. It uses explicit byte classification and dedicated state functions rather than core regular expressions or generated code.
+
+Compared alternatives:
 
 - handwritten deterministic scanner;
 - regular-expression-driven scanner; and
@@ -881,7 +884,9 @@ Dependencies: Phase 1 gate and IM-070.
 
 ### IM-072: Parser strategy
 
-Compare:
+**Current state: ACCEPTED FOR LATER IMPLEMENTATION by decision 089.** The parser will be handwritten recursive descent, with one function per grammar or expression-precedence level. Parser implementation remains deferred until the lexer work and relevant fixtures are complete.
+
+Compared alternatives:
 
 - recursive descent;
 - Pratt parsing;
@@ -895,7 +900,7 @@ Dependencies: Phase 2 gate and IM-070.
 
 ### IM-073: Internal architecture
 
-Confirm module boundaries corresponding to the specified pipeline:
+**Current state: ACCEPTED by decision 089 and `docs/frontend/IMPLEMENTATION.md`.** The Python module boundary preserves the specified pipeline:
 
 ```text
 source -> lexer -> tokens -> parser -> source-located AST
@@ -914,7 +919,9 @@ No alternative needs selection for the current deliverable.
 
 ### IM-075: Repository and quality tooling
 
-Decide:
+**Current state: ACCEPTED INITIAL BASELINE by decision 089.** Machine-readable fixtures remain under `docs/frontend/fixtures/`; implementation modules use the top-level `sml_frontend/` package; tests use `tests/`. Initial checks use Python 3.11.9 standard-library `unittest` and `compileall` without installing the package. A formatter, linter, static type checker, third-party test runner, package publisher, and CI service are not prerequisites. GitHub Actions may be added later.
+
+The baseline covers:
 
 - directory structure;
 - formatter and linter;
@@ -928,7 +935,7 @@ Dependency: IM-070.
 
 ### Phase 7 gate
 
-Every engineering choice cites a specification need. No implementation constraint silently changes the accepted grammar or semantics.
+**Current state: COMPLETE FOR THE INITIAL FRONTEND BASELINE.** Every selected engineering choice cites a specification need. No implementation constraint changes the accepted grammar or semantics. Additional development tools remain non-normative conveniences. The fixture-readiness gate is complete; implementation still waits only for the final repository-wide documentation audit and commit readiness review.
 
 ## 15. Deliver thin lexer/parser slices
 
@@ -971,7 +978,7 @@ Parse the selected declarations, assignments, input/output statements, condition
 
 ### V-007: Diagnostic hardening
 
-Add malformed number, delimiter, exponent, semicolon, brace, and syntax-cascade fixtures. Unknown identifiers remain syntactically valid.
+Add malformed number, delimiter, exponent, semicolon, and brace fixtures. Verify multiple lexical diagnostics, parser phase gating after lexical failure, and exactly one syntax diagnostic for lexically valid malformed input. Unknown identifiers remain syntactically valid.
 
 ### V-008: Lexer/parser conformance run
 

@@ -1,0 +1,2589 @@
+{
+  "format_version": 1,
+  "language_version": "0.1",
+  "fixtures": [
+    {
+      "id": "parse-conditionals-and-loops",
+      "description": "Condition branches, nesting, loop control, empty for clauses, and all for header variants remain explicit.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn control() { if(true) then {} else if(false) {} else if(flag) {} else { if(false) then {} } while(true) do { break; continue; } for(;;) {} for(let i = 0; i < 10; i++) do {} for(i = 0; true; i += 1) {} for(;; --i) {} }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "control",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 10
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 10,
+                "end_byte": 11
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 11,
+                "end_byte": 12
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 14
+              }
+            },
+            {
+              "kind": "IF",
+              "lexeme": "if",
+              "span": {
+                "start_byte": 15,
+                "end_byte": 17
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 18
+              }
+            },
+            {
+              "kind": "TRUE",
+              "lexeme": "true",
+              "span": {
+                "start_byte": 18,
+                "end_byte": 22
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 22,
+                "end_byte": 23
+              }
+            },
+            {
+              "kind": "THEN",
+              "lexeme": "then",
+              "span": {
+                "start_byte": 24,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 29,
+                "end_byte": 30
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 30,
+                "end_byte": 31
+              }
+            },
+            {
+              "kind": "ELSE",
+              "lexeme": "else",
+              "span": {
+                "start_byte": 32,
+                "end_byte": 36
+              }
+            },
+            {
+              "kind": "IF",
+              "lexeme": "if",
+              "span": {
+                "start_byte": 37,
+                "end_byte": 39
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 39,
+                "end_byte": 40
+              }
+            },
+            {
+              "kind": "FALSE",
+              "lexeme": "false",
+              "span": {
+                "start_byte": 40,
+                "end_byte": 45
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 45,
+                "end_byte": 46
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 47,
+                "end_byte": 48
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 48,
+                "end_byte": 49
+              }
+            },
+            {
+              "kind": "ELSE",
+              "lexeme": "else",
+              "span": {
+                "start_byte": 50,
+                "end_byte": 54
+              }
+            },
+            {
+              "kind": "IF",
+              "lexeme": "if",
+              "span": {
+                "start_byte": 55,
+                "end_byte": 57
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 57,
+                "end_byte": 58
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "flag",
+              "span": {
+                "start_byte": 58,
+                "end_byte": 62
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 62,
+                "end_byte": 63
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 64,
+                "end_byte": 65
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 65,
+                "end_byte": 66
+              }
+            },
+            {
+              "kind": "ELSE",
+              "lexeme": "else",
+              "span": {
+                "start_byte": 67,
+                "end_byte": 71
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 72,
+                "end_byte": 73
+              }
+            },
+            {
+              "kind": "IF",
+              "lexeme": "if",
+              "span": {
+                "start_byte": 74,
+                "end_byte": 76
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 76,
+                "end_byte": 77
+              }
+            },
+            {
+              "kind": "FALSE",
+              "lexeme": "false",
+              "span": {
+                "start_byte": 77,
+                "end_byte": 82
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 82,
+                "end_byte": 83
+              }
+            },
+            {
+              "kind": "THEN",
+              "lexeme": "then",
+              "span": {
+                "start_byte": 84,
+                "end_byte": 88
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 89,
+                "end_byte": 90
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 90,
+                "end_byte": 91
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 92,
+                "end_byte": 93
+              }
+            },
+            {
+              "kind": "WHILE",
+              "lexeme": "while",
+              "span": {
+                "start_byte": 94,
+                "end_byte": 99
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 99,
+                "end_byte": 100
+              }
+            },
+            {
+              "kind": "TRUE",
+              "lexeme": "true",
+              "span": {
+                "start_byte": 100,
+                "end_byte": 104
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 104,
+                "end_byte": 105
+              }
+            },
+            {
+              "kind": "DO",
+              "lexeme": "do",
+              "span": {
+                "start_byte": 106,
+                "end_byte": 108
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 109,
+                "end_byte": 110
+              }
+            },
+            {
+              "kind": "BREAK",
+              "lexeme": "break",
+              "span": {
+                "start_byte": 111,
+                "end_byte": 116
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 116,
+                "end_byte": 117
+              }
+            },
+            {
+              "kind": "CONTINUE",
+              "lexeme": "continue",
+              "span": {
+                "start_byte": 118,
+                "end_byte": 126
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 126,
+                "end_byte": 127
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 128,
+                "end_byte": 129
+              }
+            },
+            {
+              "kind": "FOR",
+              "lexeme": "for",
+              "span": {
+                "start_byte": 130,
+                "end_byte": 133
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 133,
+                "end_byte": 134
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 134,
+                "end_byte": 135
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 135,
+                "end_byte": 136
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 136,
+                "end_byte": 137
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 138,
+                "end_byte": 139
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 139,
+                "end_byte": 140
+              }
+            },
+            {
+              "kind": "FOR",
+              "lexeme": "for",
+              "span": {
+                "start_byte": 141,
+                "end_byte": 144
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 144,
+                "end_byte": 145
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 145,
+                "end_byte": 148
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "i",
+              "span": {
+                "start_byte": 149,
+                "end_byte": 150
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 151,
+                "end_byte": 152
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "0",
+              "span": {
+                "start_byte": 153,
+                "end_byte": 154
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 154,
+                "end_byte": 155
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "i",
+              "span": {
+                "start_byte": 156,
+                "end_byte": 157
+              }
+            },
+            {
+              "kind": "LESS",
+              "lexeme": "<",
+              "span": {
+                "start_byte": 158,
+                "end_byte": 159
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 160,
+                "end_byte": 162
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 162,
+                "end_byte": 163
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "i",
+              "span": {
+                "start_byte": 164,
+                "end_byte": 165
+              }
+            },
+            {
+              "kind": "PLUS_PLUS",
+              "lexeme": "++",
+              "span": {
+                "start_byte": 165,
+                "end_byte": 167
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 167,
+                "end_byte": 168
+              }
+            },
+            {
+              "kind": "DO",
+              "lexeme": "do",
+              "span": {
+                "start_byte": 169,
+                "end_byte": 171
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 172,
+                "end_byte": 173
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 173,
+                "end_byte": 174
+              }
+            },
+            {
+              "kind": "FOR",
+              "lexeme": "for",
+              "span": {
+                "start_byte": 175,
+                "end_byte": 178
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 178,
+                "end_byte": 179
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "i",
+              "span": {
+                "start_byte": 179,
+                "end_byte": 180
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 181,
+                "end_byte": 182
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "0",
+              "span": {
+                "start_byte": 183,
+                "end_byte": 184
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 184,
+                "end_byte": 185
+              }
+            },
+            {
+              "kind": "TRUE",
+              "lexeme": "true",
+              "span": {
+                "start_byte": 186,
+                "end_byte": 190
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 190,
+                "end_byte": 191
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "i",
+              "span": {
+                "start_byte": 192,
+                "end_byte": 193
+              }
+            },
+            {
+              "kind": "PLUS_ASSIGN",
+              "lexeme": "+=",
+              "span": {
+                "start_byte": 194,
+                "end_byte": 196
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 197,
+                "end_byte": 198
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 198,
+                "end_byte": 199
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 200,
+                "end_byte": 201
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 201,
+                "end_byte": 202
+              }
+            },
+            {
+              "kind": "FOR",
+              "lexeme": "for",
+              "span": {
+                "start_byte": 203,
+                "end_byte": 206
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 206,
+                "end_byte": 207
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 207,
+                "end_byte": 208
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 208,
+                "end_byte": 209
+              }
+            },
+            {
+              "kind": "MINUS_MINUS",
+              "lexeme": "--",
+              "span": {
+                "start_byte": 210,
+                "end_byte": 212
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "i",
+              "span": {
+                "start_byte": 212,
+                "end_byte": 213
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 213,
+                "end_byte": 214
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 215,
+                "end_byte": 216
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 216,
+                "end_byte": 217
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 218,
+                "end_byte": 219
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 219,
+                "end_byte": 219
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "success",
+          "ast": {
+            "kind": "SourceFile",
+            "functions": [
+              {
+                "kind": "FunctionDef",
+                "fn_keyword": {
+                  "token_index": 0
+                },
+                "name": {
+                  "token_index": 1
+                },
+                "left_paren": {
+                  "token_index": 2
+                },
+                "parameters": null,
+                "right_paren": {
+                  "token_index": 3
+                },
+                "return_contract": null,
+                "body": {
+                  "kind": "Block",
+                  "left_brace": {
+                    "token_index": 4
+                  },
+                  "statements": [
+                    {
+                      "kind": "IfStmt",
+                      "first_branch": {
+                        "kind": "IfBranch",
+                        "if_keyword": {
+                          "token_index": 5
+                        },
+                        "left_paren": {
+                          "token_index": 6
+                        },
+                        "condition": {
+                          "kind": "BoolLiteral",
+                          "token": {
+                            "token_index": 7
+                          },
+                          "span": {
+                            "start_byte": 18,
+                            "end_byte": 22
+                          }
+                        },
+                        "right_paren": {
+                          "token_index": 8
+                        },
+                        "then_keyword": {
+                          "token_index": 9
+                        },
+                        "body": {
+                          "kind": "Block",
+                          "left_brace": {
+                            "token_index": 10
+                          },
+                          "statements": [],
+                          "right_brace": {
+                            "token_index": 11
+                          },
+                          "span": {
+                            "start_byte": 29,
+                            "end_byte": 31
+                          }
+                        },
+                        "span": {
+                          "start_byte": 15,
+                          "end_byte": 31
+                        }
+                      },
+                      "else_if_branches": [
+                        {
+                          "kind": "ElseIfBranch",
+                          "else_keyword": {
+                            "token_index": 12
+                          },
+                          "if_keyword": {
+                            "token_index": 13
+                          },
+                          "left_paren": {
+                            "token_index": 14
+                          },
+                          "condition": {
+                            "kind": "BoolLiteral",
+                            "token": {
+                              "token_index": 15
+                            },
+                            "span": {
+                              "start_byte": 40,
+                              "end_byte": 45
+                            }
+                          },
+                          "right_paren": {
+                            "token_index": 16
+                          },
+                          "then_keyword": null,
+                          "body": {
+                            "kind": "Block",
+                            "left_brace": {
+                              "token_index": 17
+                            },
+                            "statements": [],
+                            "right_brace": {
+                              "token_index": 18
+                            },
+                            "span": {
+                              "start_byte": 47,
+                              "end_byte": 49
+                            }
+                          },
+                          "span": {
+                            "start_byte": 32,
+                            "end_byte": 49
+                          }
+                        },
+                        {
+                          "kind": "ElseIfBranch",
+                          "else_keyword": {
+                            "token_index": 19
+                          },
+                          "if_keyword": {
+                            "token_index": 20
+                          },
+                          "left_paren": {
+                            "token_index": 21
+                          },
+                          "condition": {
+                            "kind": "IdentifierExpr",
+                            "name": {
+                              "token_index": 22
+                            },
+                            "span": {
+                              "start_byte": 58,
+                              "end_byte": 62
+                            }
+                          },
+                          "right_paren": {
+                            "token_index": 23
+                          },
+                          "then_keyword": null,
+                          "body": {
+                            "kind": "Block",
+                            "left_brace": {
+                              "token_index": 24
+                            },
+                            "statements": [],
+                            "right_brace": {
+                              "token_index": 25
+                            },
+                            "span": {
+                              "start_byte": 64,
+                              "end_byte": 66
+                            }
+                          },
+                          "span": {
+                            "start_byte": 50,
+                            "end_byte": 66
+                          }
+                        }
+                      ],
+                      "else_clause": {
+                        "kind": "ElseClause",
+                        "else_keyword": {
+                          "token_index": 26
+                        },
+                        "body": {
+                          "kind": "Block",
+                          "left_brace": {
+                            "token_index": 27
+                          },
+                          "statements": [
+                            {
+                              "kind": "IfStmt",
+                              "first_branch": {
+                                "kind": "IfBranch",
+                                "if_keyword": {
+                                  "token_index": 28
+                                },
+                                "left_paren": {
+                                  "token_index": 29
+                                },
+                                "condition": {
+                                  "kind": "BoolLiteral",
+                                  "token": {
+                                    "token_index": 30
+                                  },
+                                  "span": {
+                                    "start_byte": 77,
+                                    "end_byte": 82
+                                  }
+                                },
+                                "right_paren": {
+                                  "token_index": 31
+                                },
+                                "then_keyword": {
+                                  "token_index": 32
+                                },
+                                "body": {
+                                  "kind": "Block",
+                                  "left_brace": {
+                                    "token_index": 33
+                                  },
+                                  "statements": [],
+                                  "right_brace": {
+                                    "token_index": 34
+                                  },
+                                  "span": {
+                                    "start_byte": 89,
+                                    "end_byte": 91
+                                  }
+                                },
+                                "span": {
+                                  "start_byte": 74,
+                                  "end_byte": 91
+                                }
+                              },
+                              "else_if_branches": [],
+                              "else_clause": null,
+                              "span": {
+                                "start_byte": 74,
+                                "end_byte": 91
+                              }
+                            }
+                          ],
+                          "right_brace": {
+                            "token_index": 35
+                          },
+                          "span": {
+                            "start_byte": 72,
+                            "end_byte": 93
+                          }
+                        },
+                        "span": {
+                          "start_byte": 67,
+                          "end_byte": 93
+                        }
+                      },
+                      "span": {
+                        "start_byte": 15,
+                        "end_byte": 93
+                      }
+                    },
+                    {
+                      "kind": "WhileStmt",
+                      "while_keyword": {
+                        "token_index": 36
+                      },
+                      "left_paren": {
+                        "token_index": 37
+                      },
+                      "condition": {
+                        "kind": "BoolLiteral",
+                        "token": {
+                          "token_index": 38
+                        },
+                        "span": {
+                          "start_byte": 100,
+                          "end_byte": 104
+                        }
+                      },
+                      "right_paren": {
+                        "token_index": 39
+                      },
+                      "do_keyword": {
+                        "token_index": 40
+                      },
+                      "body": {
+                        "kind": "Block",
+                        "left_brace": {
+                          "token_index": 41
+                        },
+                        "statements": [
+                          {
+                            "kind": "BreakStmt",
+                            "break_keyword": {
+                              "token_index": 42
+                            },
+                            "semicolon": {
+                              "token_index": 43
+                            },
+                            "span": {
+                              "start_byte": 111,
+                              "end_byte": 117
+                            }
+                          },
+                          {
+                            "kind": "ContinueStmt",
+                            "continue_keyword": {
+                              "token_index": 44
+                            },
+                            "semicolon": {
+                              "token_index": 45
+                            },
+                            "span": {
+                              "start_byte": 118,
+                              "end_byte": 127
+                            }
+                          }
+                        ],
+                        "right_brace": {
+                          "token_index": 46
+                        },
+                        "span": {
+                          "start_byte": 109,
+                          "end_byte": 129
+                        }
+                      },
+                      "span": {
+                        "start_byte": 94,
+                        "end_byte": 129
+                      }
+                    },
+                    {
+                      "kind": "ForStmt",
+                      "for_keyword": {
+                        "token_index": 47
+                      },
+                      "left_paren": {
+                        "token_index": 48
+                      },
+                      "initializer": null,
+                      "first_semicolon": {
+                        "token_index": 49
+                      },
+                      "condition": null,
+                      "second_semicolon": {
+                        "token_index": 50
+                      },
+                      "update": null,
+                      "right_paren": {
+                        "token_index": 51
+                      },
+                      "do_keyword": null,
+                      "body": {
+                        "kind": "Block",
+                        "left_brace": {
+                          "token_index": 52
+                        },
+                        "statements": [],
+                        "right_brace": {
+                          "token_index": 53
+                        },
+                        "span": {
+                          "start_byte": 138,
+                          "end_byte": 140
+                        }
+                      },
+                      "span": {
+                        "start_byte": 130,
+                        "end_byte": 140
+                      }
+                    },
+                    {
+                      "kind": "ForStmt",
+                      "for_keyword": {
+                        "token_index": 54
+                      },
+                      "left_paren": {
+                        "token_index": 55
+                      },
+                      "initializer": {
+                        "kind": "ForLetInitializer",
+                        "let_keyword": {
+                          "token_index": 56
+                        },
+                        "name": {
+                          "token_index": 57
+                        },
+                        "annotation_clause": null,
+                        "assign": {
+                          "token_index": 58
+                        },
+                        "value": {
+                          "kind": "NumberLiteral",
+                          "token": {
+                            "token_index": 59
+                          },
+                          "span": {
+                            "start_byte": 153,
+                            "end_byte": 154
+                          }
+                        },
+                        "span": {
+                          "start_byte": 145,
+                          "end_byte": 154
+                        }
+                      },
+                      "first_semicolon": {
+                        "token_index": 60
+                      },
+                      "condition": {
+                        "kind": "BinaryExpr",
+                        "left": {
+                          "kind": "IdentifierExpr",
+                          "name": {
+                            "token_index": 61
+                          },
+                          "span": {
+                            "start_byte": 156,
+                            "end_byte": 157
+                          }
+                        },
+                        "operator": {
+                          "token_index": 62
+                        },
+                        "right": {
+                          "kind": "NumberLiteral",
+                          "token": {
+                            "token_index": 63
+                          },
+                          "span": {
+                            "start_byte": 160,
+                            "end_byte": 162
+                          }
+                        },
+                        "span": {
+                          "start_byte": 156,
+                          "end_byte": 162
+                        }
+                      },
+                      "second_semicolon": {
+                        "token_index": 64
+                      },
+                      "update": {
+                        "kind": "UpdateCore",
+                        "target": {
+                          "token_index": 65
+                        },
+                        "operator": {
+                          "token_index": 66
+                        },
+                        "position": "POSTFIX",
+                        "span": {
+                          "start_byte": 164,
+                          "end_byte": 167
+                        }
+                      },
+                      "right_paren": {
+                        "token_index": 67
+                      },
+                      "do_keyword": {
+                        "token_index": 68
+                      },
+                      "body": {
+                        "kind": "Block",
+                        "left_brace": {
+                          "token_index": 69
+                        },
+                        "statements": [],
+                        "right_brace": {
+                          "token_index": 70
+                        },
+                        "span": {
+                          "start_byte": 172,
+                          "end_byte": 174
+                        }
+                      },
+                      "span": {
+                        "start_byte": 141,
+                        "end_byte": 174
+                      }
+                    },
+                    {
+                      "kind": "ForStmt",
+                      "for_keyword": {
+                        "token_index": 71
+                      },
+                      "left_paren": {
+                        "token_index": 72
+                      },
+                      "initializer": {
+                        "kind": "AssignmentCore",
+                        "target": {
+                          "token_index": 73
+                        },
+                        "operation": {
+                          "kind": "SimpleAssignment",
+                          "operator": {
+                            "token_index": 74
+                          },
+                          "value": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 75
+                            },
+                            "span": {
+                              "start_byte": 183,
+                              "end_byte": 184
+                            }
+                          },
+                          "span": {
+                            "start_byte": 181,
+                            "end_byte": 184
+                          }
+                        },
+                        "span": {
+                          "start_byte": 179,
+                          "end_byte": 184
+                        }
+                      },
+                      "first_semicolon": {
+                        "token_index": 76
+                      },
+                      "condition": {
+                        "kind": "BoolLiteral",
+                        "token": {
+                          "token_index": 77
+                        },
+                        "span": {
+                          "start_byte": 186,
+                          "end_byte": 190
+                        }
+                      },
+                      "second_semicolon": {
+                        "token_index": 78
+                      },
+                      "update": {
+                        "kind": "AssignmentCore",
+                        "target": {
+                          "token_index": 79
+                        },
+                        "operation": {
+                          "kind": "CompoundAssignment",
+                          "operator": {
+                            "token_index": 80
+                          },
+                          "value": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 81
+                            },
+                            "span": {
+                              "start_byte": 197,
+                              "end_byte": 198
+                            }
+                          },
+                          "span": {
+                            "start_byte": 194,
+                            "end_byte": 198
+                          }
+                        },
+                        "span": {
+                          "start_byte": 192,
+                          "end_byte": 198
+                        }
+                      },
+                      "right_paren": {
+                        "token_index": 82
+                      },
+                      "do_keyword": null,
+                      "body": {
+                        "kind": "Block",
+                        "left_brace": {
+                          "token_index": 83
+                        },
+                        "statements": [],
+                        "right_brace": {
+                          "token_index": 84
+                        },
+                        "span": {
+                          "start_byte": 200,
+                          "end_byte": 202
+                        }
+                      },
+                      "span": {
+                        "start_byte": 175,
+                        "end_byte": 202
+                      }
+                    },
+                    {
+                      "kind": "ForStmt",
+                      "for_keyword": {
+                        "token_index": 85
+                      },
+                      "left_paren": {
+                        "token_index": 86
+                      },
+                      "initializer": null,
+                      "first_semicolon": {
+                        "token_index": 87
+                      },
+                      "condition": null,
+                      "second_semicolon": {
+                        "token_index": 88
+                      },
+                      "update": {
+                        "kind": "UpdateCore",
+                        "target": {
+                          "token_index": 90
+                        },
+                        "operator": {
+                          "token_index": 89
+                        },
+                        "position": "PREFIX",
+                        "span": {
+                          "start_byte": 210,
+                          "end_byte": 213
+                        }
+                      },
+                      "right_paren": {
+                        "token_index": 91
+                      },
+                      "do_keyword": null,
+                      "body": {
+                        "kind": "Block",
+                        "left_brace": {
+                          "token_index": 92
+                        },
+                        "statements": [],
+                        "right_brace": {
+                          "token_index": 93
+                        },
+                        "span": {
+                          "start_byte": 215,
+                          "end_byte": 217
+                        }
+                      },
+                      "span": {
+                        "start_byte": 203,
+                        "end_byte": 217
+                      }
+                    }
+                  ],
+                  "right_brace": {
+                    "token_index": 94
+                  },
+                  "span": {
+                    "start_byte": 13,
+                    "end_byte": 219
+                  }
+                },
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 219
+                }
+              }
+            ],
+            "eof_token": {
+              "token_index": 95
+            },
+            "span": {
+              "start_byte": 0,
+              "end_byte": 219
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "IF",
+          "TRUE",
+          "THEN",
+          "RBRACE",
+          "ELSE",
+          "FALSE",
+          "WHILE",
+          "DO",
+          "BREAK",
+          "SEMICOLON",
+          "CONTINUE",
+          "FOR",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LESS",
+          "PLUS_PLUS",
+          "PLUS_ASSIGN",
+          "MINUS_MINUS",
+          "EOF"
+        ],
+        "ast_kinds": [
+          "SourceFile",
+          "FunctionDef",
+          "Block",
+          "IfStmt",
+          "IfBranch",
+          "BoolLiteral",
+          "ElseIfBranch",
+          "IdentifierExpr",
+          "ElseClause",
+          "WhileStmt",
+          "BreakStmt",
+          "ContinueStmt",
+          "ForStmt",
+          "ForLetInitializer",
+          "NumberLiteral",
+          "BinaryExpr",
+          "UpdateCore",
+          "AssignmentCore",
+          "SimpleAssignment",
+          "CompoundAssignment"
+        ],
+        "diagnostic_codes": [],
+        "rules": [
+          "GRAMMAR.program-functions",
+          "GRAMMAR.blocks-statements",
+          "AST-SCHEMA.source-references",
+          "AST-SCHEMA.source-file-functions",
+          "AST-SCHEMA.blocks-statements",
+          "AST-SCHEMA.span-composition",
+          "AST-SCHEMA.success-invariants",
+          "SOURCE-LOCATIONS.ast-spans",
+          "FIXTURES.parse-expectations",
+          "FIXTURES.ast-mapping",
+          "GRAMMAR.assignments-updates",
+          "AST-SCHEMA.assignments-updates",
+          "GRAMMAR.conditionals",
+          "AST-SCHEMA.conditionals",
+          "GRAMMAR.loops",
+          "AST-SCHEMA.loops",
+          "GRAMMAR.transfer-assertion",
+          "GRAMMAR.control-transfer-context",
+          "AST-SCHEMA.transfer-assertion",
+          "GRAMMAR.expression-precedence",
+          "AST-SCHEMA.expressions",
+          "AST-SCHEMA.operators-conversions"
+        ]
+      }
+    },
+    {
+      "id": "parse-unit-expression-structures",
+      "description": "Unit products, simple and grouped denominators, and signed exponents preserve their written structure.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "fn units() { let product = 1[kg*m^1*s^-2]; let simpleden = 1[kg/s^2]; let groupden = 1[kg/(m^1*s^-2)]; }"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "FN",
+              "lexeme": "fn",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "units",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 8
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 9
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 9,
+                "end_byte": 10
+              }
+            },
+            {
+              "kind": "LBRACE",
+              "lexeme": "{",
+              "span": {
+                "start_byte": 11,
+                "end_byte": 12
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 16
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "product",
+              "span": {
+                "start_byte": 17,
+                "end_byte": 24
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 25,
+                "end_byte": 26
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 27,
+                "end_byte": 28
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 28,
+                "end_byte": 29
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "kg",
+              "span": {
+                "start_byte": 29,
+                "end_byte": 31
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 31,
+                "end_byte": 32
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 32,
+                "end_byte": 33
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 33,
+                "end_byte": 34
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 34,
+                "end_byte": 35
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 35,
+                "end_byte": 36
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "s",
+              "span": {
+                "start_byte": 36,
+                "end_byte": 37
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 37,
+                "end_byte": 38
+              }
+            },
+            {
+              "kind": "MINUS",
+              "lexeme": "-",
+              "span": {
+                "start_byte": 38,
+                "end_byte": 39
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 39,
+                "end_byte": 40
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 40,
+                "end_byte": 41
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 41,
+                "end_byte": 42
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 43,
+                "end_byte": 46
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "simpleden",
+              "span": {
+                "start_byte": 47,
+                "end_byte": 56
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 57,
+                "end_byte": 58
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 59,
+                "end_byte": 60
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 60,
+                "end_byte": 61
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "kg",
+              "span": {
+                "start_byte": 61,
+                "end_byte": 63
+              }
+            },
+            {
+              "kind": "SLASH",
+              "lexeme": "/",
+              "span": {
+                "start_byte": 63,
+                "end_byte": 64
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "s",
+              "span": {
+                "start_byte": 64,
+                "end_byte": 65
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 65,
+                "end_byte": 66
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 66,
+                "end_byte": 67
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 67,
+                "end_byte": 68
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 68,
+                "end_byte": 69
+              }
+            },
+            {
+              "kind": "LET",
+              "lexeme": "let",
+              "span": {
+                "start_byte": 70,
+                "end_byte": 73
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "groupden",
+              "span": {
+                "start_byte": 74,
+                "end_byte": 82
+              }
+            },
+            {
+              "kind": "ASSIGN",
+              "lexeme": "=",
+              "span": {
+                "start_byte": 83,
+                "end_byte": 84
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 85,
+                "end_byte": 86
+              }
+            },
+            {
+              "kind": "LBRACKET",
+              "lexeme": "[",
+              "span": {
+                "start_byte": 86,
+                "end_byte": 87
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "kg",
+              "span": {
+                "start_byte": 87,
+                "end_byte": 89
+              }
+            },
+            {
+              "kind": "SLASH",
+              "lexeme": "/",
+              "span": {
+                "start_byte": 89,
+                "end_byte": 90
+              }
+            },
+            {
+              "kind": "LPAREN",
+              "lexeme": "(",
+              "span": {
+                "start_byte": 90,
+                "end_byte": 91
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 91,
+                "end_byte": 92
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 92,
+                "end_byte": 93
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "1",
+              "span": {
+                "start_byte": 93,
+                "end_byte": 94
+              }
+            },
+            {
+              "kind": "STAR",
+              "lexeme": "*",
+              "span": {
+                "start_byte": 94,
+                "end_byte": 95
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "s",
+              "span": {
+                "start_byte": 95,
+                "end_byte": 96
+              }
+            },
+            {
+              "kind": "CARET",
+              "lexeme": "^",
+              "span": {
+                "start_byte": 96,
+                "end_byte": 97
+              }
+            },
+            {
+              "kind": "MINUS",
+              "lexeme": "-",
+              "span": {
+                "start_byte": 97,
+                "end_byte": 98
+              }
+            },
+            {
+              "kind": "NUMBER",
+              "lexeme": "2",
+              "span": {
+                "start_byte": 98,
+                "end_byte": 99
+              }
+            },
+            {
+              "kind": "RPAREN",
+              "lexeme": ")",
+              "span": {
+                "start_byte": 99,
+                "end_byte": 100
+              }
+            },
+            {
+              "kind": "RBRACKET",
+              "lexeme": "]",
+              "span": {
+                "start_byte": 100,
+                "end_byte": 101
+              }
+            },
+            {
+              "kind": "SEMICOLON",
+              "lexeme": ";",
+              "span": {
+                "start_byte": 101,
+                "end_byte": 102
+              }
+            },
+            {
+              "kind": "RBRACE",
+              "lexeme": "}",
+              "span": {
+                "start_byte": 103,
+                "end_byte": 104
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 104,
+                "end_byte": 104
+              }
+            }
+          ]
+        },
+        "parse": {
+          "status": "success",
+          "ast": {
+            "kind": "SourceFile",
+            "functions": [
+              {
+                "kind": "FunctionDef",
+                "fn_keyword": {
+                  "token_index": 0
+                },
+                "name": {
+                  "token_index": 1
+                },
+                "left_paren": {
+                  "token_index": 2
+                },
+                "parameters": null,
+                "right_paren": {
+                  "token_index": 3
+                },
+                "return_contract": null,
+                "body": {
+                  "kind": "Block",
+                  "left_brace": {
+                    "token_index": 4
+                  },
+                  "statements": [
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 5
+                      },
+                      "name": {
+                        "token_index": 6
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 7
+                        },
+                        "value": {
+                          "kind": "CompoundQuantityLiteral",
+                          "magnitude": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 8
+                            },
+                            "span": {
+                              "start_byte": 27,
+                              "end_byte": 28
+                            }
+                          },
+                          "unit_annotation": {
+                            "kind": "ExactUnitAnnotation",
+                            "left_bracket": {
+                              "token_index": 9
+                            },
+                            "unit": {
+                              "kind": "UnitExpr",
+                              "numerator": {
+                                "kind": "UnitProduct",
+                                "first": {
+                                  "kind": "UnitPower",
+                                  "base": {
+                                    "kind": "UnitName",
+                                    "token": {
+                                      "token_index": 10
+                                    },
+                                    "span": {
+                                      "start_byte": 29,
+                                      "end_byte": 31
+                                    }
+                                  },
+                                  "exponent": null,
+                                  "span": {
+                                    "start_byte": 29,
+                                    "end_byte": 31
+                                  }
+                                },
+                                "rest": [
+                                  {
+                                    "kind": "UnitProductPart",
+                                    "star": {
+                                      "token_index": 11
+                                    },
+                                    "factor": {
+                                      "kind": "UnitPower",
+                                      "base": {
+                                        "kind": "UnitName",
+                                        "token": {
+                                          "token_index": 12
+                                        },
+                                        "span": {
+                                          "start_byte": 32,
+                                          "end_byte": 33
+                                        }
+                                      },
+                                      "exponent": {
+                                        "kind": "UnitExponent",
+                                        "caret": {
+                                          "token_index": 13
+                                        },
+                                        "minus": null,
+                                        "magnitude": {
+                                          "token_index": 14
+                                        },
+                                        "span": {
+                                          "start_byte": 33,
+                                          "end_byte": 35
+                                        }
+                                      },
+                                      "span": {
+                                        "start_byte": 32,
+                                        "end_byte": 35
+                                      }
+                                    },
+                                    "span": {
+                                      "start_byte": 31,
+                                      "end_byte": 35
+                                    }
+                                  },
+                                  {
+                                    "kind": "UnitProductPart",
+                                    "star": {
+                                      "token_index": 15
+                                    },
+                                    "factor": {
+                                      "kind": "UnitPower",
+                                      "base": {
+                                        "kind": "UnitName",
+                                        "token": {
+                                          "token_index": 16
+                                        },
+                                        "span": {
+                                          "start_byte": 36,
+                                          "end_byte": 37
+                                        }
+                                      },
+                                      "exponent": {
+                                        "kind": "UnitExponent",
+                                        "caret": {
+                                          "token_index": 17
+                                        },
+                                        "minus": {
+                                          "token_index": 18
+                                        },
+                                        "magnitude": {
+                                          "token_index": 19
+                                        },
+                                        "span": {
+                                          "start_byte": 37,
+                                          "end_byte": 40
+                                        }
+                                      },
+                                      "span": {
+                                        "start_byte": 36,
+                                        "end_byte": 40
+                                      }
+                                    },
+                                    "span": {
+                                      "start_byte": 35,
+                                      "end_byte": 40
+                                    }
+                                  }
+                                ],
+                                "span": {
+                                  "start_byte": 29,
+                                  "end_byte": 40
+                                }
+                              },
+                              "quotient": null,
+                              "span": {
+                                "start_byte": 29,
+                                "end_byte": 40
+                              }
+                            },
+                            "right_bracket": {
+                              "token_index": 20
+                            },
+                            "span": {
+                              "start_byte": 28,
+                              "end_byte": 41
+                            }
+                          },
+                          "span": {
+                            "start_byte": 27,
+                            "end_byte": 41
+                          }
+                        },
+                        "span": {
+                          "start_byte": 25,
+                          "end_byte": 41
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 21
+                      },
+                      "span": {
+                        "start_byte": 13,
+                        "end_byte": 42
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 22
+                      },
+                      "name": {
+                        "token_index": 23
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 24
+                        },
+                        "value": {
+                          "kind": "CompoundQuantityLiteral",
+                          "magnitude": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 25
+                            },
+                            "span": {
+                              "start_byte": 59,
+                              "end_byte": 60
+                            }
+                          },
+                          "unit_annotation": {
+                            "kind": "ExactUnitAnnotation",
+                            "left_bracket": {
+                              "token_index": 26
+                            },
+                            "unit": {
+                              "kind": "UnitExpr",
+                              "numerator": {
+                                "kind": "UnitProduct",
+                                "first": {
+                                  "kind": "UnitPower",
+                                  "base": {
+                                    "kind": "UnitName",
+                                    "token": {
+                                      "token_index": 27
+                                    },
+                                    "span": {
+                                      "start_byte": 61,
+                                      "end_byte": 63
+                                    }
+                                  },
+                                  "exponent": null,
+                                  "span": {
+                                    "start_byte": 61,
+                                    "end_byte": 63
+                                  }
+                                },
+                                "rest": [],
+                                "span": {
+                                  "start_byte": 61,
+                                  "end_byte": 63
+                                }
+                              },
+                              "quotient": {
+                                "kind": "UnitQuotient",
+                                "slash": {
+                                  "token_index": 28
+                                },
+                                "denominator": {
+                                  "kind": "UnitPower",
+                                  "base": {
+                                    "kind": "UnitName",
+                                    "token": {
+                                      "token_index": 29
+                                    },
+                                    "span": {
+                                      "start_byte": 64,
+                                      "end_byte": 65
+                                    }
+                                  },
+                                  "exponent": {
+                                    "kind": "UnitExponent",
+                                    "caret": {
+                                      "token_index": 30
+                                    },
+                                    "minus": null,
+                                    "magnitude": {
+                                      "token_index": 31
+                                    },
+                                    "span": {
+                                      "start_byte": 65,
+                                      "end_byte": 67
+                                    }
+                                  },
+                                  "span": {
+                                    "start_byte": 64,
+                                    "end_byte": 67
+                                  }
+                                },
+                                "span": {
+                                  "start_byte": 63,
+                                  "end_byte": 67
+                                }
+                              },
+                              "span": {
+                                "start_byte": 61,
+                                "end_byte": 67
+                              }
+                            },
+                            "right_bracket": {
+                              "token_index": 32
+                            },
+                            "span": {
+                              "start_byte": 60,
+                              "end_byte": 68
+                            }
+                          },
+                          "span": {
+                            "start_byte": 59,
+                            "end_byte": 68
+                          }
+                        },
+                        "span": {
+                          "start_byte": 57,
+                          "end_byte": 68
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 33
+                      },
+                      "span": {
+                        "start_byte": 43,
+                        "end_byte": 69
+                      }
+                    },
+                    {
+                      "kind": "LetDecl",
+                      "let_keyword": {
+                        "token_index": 34
+                      },
+                      "name": {
+                        "token_index": 35
+                      },
+                      "annotation_clause": null,
+                      "initializer": {
+                        "kind": "InitializerClause",
+                        "assign": {
+                          "token_index": 36
+                        },
+                        "value": {
+                          "kind": "CompoundQuantityLiteral",
+                          "magnitude": {
+                            "kind": "NumberLiteral",
+                            "token": {
+                              "token_index": 37
+                            },
+                            "span": {
+                              "start_byte": 85,
+                              "end_byte": 86
+                            }
+                          },
+                          "unit_annotation": {
+                            "kind": "ExactUnitAnnotation",
+                            "left_bracket": {
+                              "token_index": 38
+                            },
+                            "unit": {
+                              "kind": "UnitExpr",
+                              "numerator": {
+                                "kind": "UnitProduct",
+                                "first": {
+                                  "kind": "UnitPower",
+                                  "base": {
+                                    "kind": "UnitName",
+                                    "token": {
+                                      "token_index": 39
+                                    },
+                                    "span": {
+                                      "start_byte": 87,
+                                      "end_byte": 89
+                                    }
+                                  },
+                                  "exponent": null,
+                                  "span": {
+                                    "start_byte": 87,
+                                    "end_byte": 89
+                                  }
+                                },
+                                "rest": [],
+                                "span": {
+                                  "start_byte": 87,
+                                  "end_byte": 89
+                                }
+                              },
+                              "quotient": {
+                                "kind": "UnitQuotient",
+                                "slash": {
+                                  "token_index": 40
+                                },
+                                "denominator": {
+                                  "kind": "GroupedUnitProduct",
+                                  "left_paren": {
+                                    "token_index": 41
+                                  },
+                                  "product": {
+                                    "kind": "UnitProduct",
+                                    "first": {
+                                      "kind": "UnitPower",
+                                      "base": {
+                                        "kind": "UnitName",
+                                        "token": {
+                                          "token_index": 42
+                                        },
+                                        "span": {
+                                          "start_byte": 91,
+                                          "end_byte": 92
+                                        }
+                                      },
+                                      "exponent": {
+                                        "kind": "UnitExponent",
+                                        "caret": {
+                                          "token_index": 43
+                                        },
+                                        "minus": null,
+                                        "magnitude": {
+                                          "token_index": 44
+                                        },
+                                        "span": {
+                                          "start_byte": 92,
+                                          "end_byte": 94
+                                        }
+                                      },
+                                      "span": {
+                                        "start_byte": 91,
+                                        "end_byte": 94
+                                      }
+                                    },
+                                    "rest": [
+                                      {
+                                        "kind": "UnitProductPart",
+                                        "star": {
+                                          "token_index": 45
+                                        },
+                                        "factor": {
+                                          "kind": "UnitPower",
+                                          "base": {
+                                            "kind": "UnitName",
+                                            "token": {
+                                              "token_index": 46
+                                            },
+                                            "span": {
+                                              "start_byte": 95,
+                                              "end_byte": 96
+                                            }
+                                          },
+                                          "exponent": {
+                                            "kind": "UnitExponent",
+                                            "caret": {
+                                              "token_index": 47
+                                            },
+                                            "minus": {
+                                              "token_index": 48
+                                            },
+                                            "magnitude": {
+                                              "token_index": 49
+                                            },
+                                            "span": {
+                                              "start_byte": 96,
+                                              "end_byte": 99
+                                            }
+                                          },
+                                          "span": {
+                                            "start_byte": 95,
+                                            "end_byte": 99
+                                          }
+                                        },
+                                        "span": {
+                                          "start_byte": 94,
+                                          "end_byte": 99
+                                        }
+                                      }
+                                    ],
+                                    "span": {
+                                      "start_byte": 91,
+                                      "end_byte": 99
+                                    }
+                                  },
+                                  "right_paren": {
+                                    "token_index": 50
+                                  },
+                                  "span": {
+                                    "start_byte": 90,
+                                    "end_byte": 100
+                                  }
+                                },
+                                "span": {
+                                  "start_byte": 89,
+                                  "end_byte": 100
+                                }
+                              },
+                              "span": {
+                                "start_byte": 87,
+                                "end_byte": 100
+                              }
+                            },
+                            "right_bracket": {
+                              "token_index": 51
+                            },
+                            "span": {
+                              "start_byte": 86,
+                              "end_byte": 101
+                            }
+                          },
+                          "span": {
+                            "start_byte": 85,
+                            "end_byte": 101
+                          }
+                        },
+                        "span": {
+                          "start_byte": 83,
+                          "end_byte": 101
+                        }
+                      },
+                      "semicolon": {
+                        "token_index": 52
+                      },
+                      "span": {
+                        "start_byte": 70,
+                        "end_byte": 102
+                      }
+                    }
+                  ],
+                  "right_brace": {
+                    "token_index": 53
+                  },
+                  "span": {
+                    "start_byte": 11,
+                    "end_byte": 104
+                  }
+                },
+                "span": {
+                  "start_byte": 0,
+                  "end_byte": 104
+                }
+              }
+            ],
+            "eof_token": {
+              "token_index": 54
+            },
+            "span": {
+              "start_byte": 0,
+              "end_byte": 104
+            }
+          }
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "FN",
+          "IDENT",
+          "LPAREN",
+          "RPAREN",
+          "LBRACE",
+          "LET",
+          "ASSIGN",
+          "NUMBER",
+          "LBRACKET",
+          "STAR",
+          "CARET",
+          "MINUS",
+          "RBRACKET",
+          "SEMICOLON",
+          "SLASH",
+          "RBRACE",
+          "EOF"
+        ],
+        "ast_kinds": [
+          "SourceFile",
+          "FunctionDef",
+          "Block",
+          "LetDecl",
+          "InitializerClause",
+          "CompoundQuantityLiteral",
+          "NumberLiteral",
+          "ExactUnitAnnotation",
+          "UnitExpr",
+          "UnitProduct",
+          "UnitPower",
+          "UnitName",
+          "UnitProductPart",
+          "UnitExponent",
+          "UnitQuotient",
+          "GroupedUnitProduct"
+        ],
+        "diagnostic_codes": [],
+        "rules": [
+          "GRAMMAR.program-functions",
+          "GRAMMAR.blocks-statements",
+          "AST-SCHEMA.source-references",
+          "AST-SCHEMA.source-file-functions",
+          "AST-SCHEMA.blocks-statements",
+          "AST-SCHEMA.span-composition",
+          "AST-SCHEMA.success-invariants",
+          "SOURCE-LOCATIONS.ast-spans",
+          "FIXTURES.parse-expectations",
+          "FIXTURES.ast-mapping",
+          "GRAMMAR.declarations",
+          "AST-SCHEMA.declarations",
+          "GRAMMAR.annotations",
+          "GRAMMAR.annotation-consistency",
+          "AST-SCHEMA.annotations",
+          "GRAMMAR.expression-precedence",
+          "AST-SCHEMA.expressions",
+          "GRAMMAR.quantities",
+          "GRAMMAR.quantity-attachment",
+          "GRAMMAR.unit-expressions",
+          "GRAMMAR.unit-exponents",
+          "GRAMMAR.unit-limits",
+          "AST-SCHEMA.unit-expressions"
+        ]
+      }
+    }
+  ]
+}

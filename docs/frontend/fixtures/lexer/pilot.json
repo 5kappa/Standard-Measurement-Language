@@ -1,0 +1,71 @@
+{
+  "format_version": 1,
+  "language_version": "0.1",
+  "fixtures": [
+    {
+      "id": "lex-pilot-attached-quantity-tokens",
+      "description": "An attached simple quantity produces separate adjacent NUMBER and IDENT tokens followed by physical EOF.",
+      "entrypoint": "lexer",
+      "source": {
+        "kind": "utf8",
+        "text": "10m"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "m",
+              "span": {
+                "start_byte": 2,
+                "end_byte": 3
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 3
+              }
+            }
+          ]
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "NUMBER",
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [],
+        "rules": [
+          "TOKEN-SPEC.token-model",
+          "TOKEN-SPEC.scanning-contract",
+          "TOKEN-SPEC.identifiers",
+          "TOKEN-SPEC.numbers",
+          "TOKEN-SPEC.eof",
+          "SOURCE-LOCATIONS.source-preservation",
+          "SOURCE-LOCATIONS.byte-spans",
+          "SOURCE-LOCATIONS.trivia-adjacency",
+          "FIXTURES.suite-layout",
+          "FIXTURES.strict-json",
+          "FIXTURES.fixture-record",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.token-mapping",
+          "FIXTURES.coverage-metadata"
+        ]
+      }
+    }
+  ]
+}

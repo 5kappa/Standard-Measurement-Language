@@ -6,7 +6,7 @@ Standard Measurement Language (SML) is an educational, unit-aware programming-la
 
 ## Current status
 
-The project is in the **front-end documentation-hardening phase**. Lexer and parser implementation has not started.
+The **front-end documentation-hardening phase is complete**. Lexer and parser implementation has not started.
 
 The final implementation boundary is:
 
@@ -22,10 +22,13 @@ Semantic analysis, unit-name resolution, dimensional checking, unit normalizatio
 
 ## Start here
 
-- [Project handoff](HANDOFF.md) — current state, finalized decisions, next task, and continuation instructions
+- [Project handoff](HANDOFF.md) — current state, finalized decisions, and continuation instructions
 - [Front-end development charter](docs/frontend/README.md) — scope and document authority
 - [Source-location contract](docs/frontend/SOURCE-LOCATIONS.md) — accepted spans, lines, columns, and adjacency
 - [Token specification](docs/frontend/TOKEN-SPEC.md) — accepted tokens and lexical behavior
+- [Grammar](docs/frontend/GRAMMAR.ebnf) — accepted token-level syntax and parser context constraints
+- [Source AST schema](docs/frontend/AST-SCHEMA.md) — accepted successful-parse nodes, source preservation, collections, and spans
+- [Diagnostic contract](docs/frontend/DIAGNOSTICS.md) — accepted lexical and syntactic codes, labels, ordering, and failure behavior
 - [Language specification](LANGUAGE-SPECIFICATION.md) — normative language surface
 - [Decision index](decisions/README.md) — design history and rationale
 
@@ -44,15 +47,17 @@ For example:
 
 Unknown-unit detection would require name resolution, which is not part of the lexer/parser-only implementation.
 
-## Next task
+## Implementation readiness
 
-The next documentation-hardening artifact is `docs/frontend/GRAMMAR.ebnf`. It must consolidate the complete version 0.1 grammar and expose any genuine ambiguity before parser implementation begins.
+The machine-readable fixture format and complete 93-case conformance suite are accepted in [`docs/frontend/fixtures/README.md`](docs/frontend/fixtures/README.md), and [`docs/frontend/TRACEABILITY.md`](docs/frontend/TRACEABILITY.md) contains the completed coverage registry. The final repository-wide consistency and coverage audit is complete, so the hardened frontend contracts are ready for review and commit before lexer implementation begins.
+
+The initial engineering stack is accepted in [`docs/frontend/IMPLEMENTATION.md`](docs/frontend/IMPLEMENTATION.md): Python 3.11.9, a handwritten byte-oriented lexer, standard-library fixtures and tests, and a handwritten recursive-descent parser later.
 
 See [`HANDOFF.md`](HANDOFF.md) before continuing work on another workstation.
 
-## Naming migration
+## Naming history
 
-The current project name is **Standard Measurement Language (SML)**. Some older proposal and decision documents still use the former name **Measure**. The handoff documents the controlled migration required; avoid an indiscriminate global replacement because “measure” may also occur as an ordinary word.
+The current project name is **Standard Measurement Language (SML)**. The teammate draft, legacy proposal, and historical decision records may retain the former name **Measure** when recording earlier work. Current normative, planning, and implementation-facing documents use the new name.
 
 ## Educational-use boundary
 

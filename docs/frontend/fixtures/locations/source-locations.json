@@ -1,0 +1,668 @@
+{
+  "format_version": 1,
+  "language_version": "0.1",
+  "fixtures": [
+    {
+      "id": "location-empty-source",
+      "description": "Empty source has one zero-width EOF at line one column one.",
+      "entrypoint": "lexer",
+      "source": {
+        "kind": "utf8",
+        "text": ""
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 0
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 0,
+                  "line": 1,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 0,
+                  "line": 1,
+                  "column": 1
+                }
+              }
+            }
+          ]
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [],
+        "rules": [
+          "SOURCE-LOCATIONS.byte-spans",
+          "TOKEN-SPEC.eof"
+        ]
+      }
+    },
+    {
+      "id": "location-adjacent-quantity-boundary",
+      "description": "The exact 10foo spelling has adjacent NUMBER and IDENT spans.",
+      "entrypoint": "lexer",
+      "source": {
+        "kind": "utf8",
+        "text": "10foo"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 0,
+                  "line": 1,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 2,
+                  "line": 1,
+                  "column": 3
+                }
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "foo",
+              "span": {
+                "start_byte": 2,
+                "end_byte": 5
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 2,
+                  "line": 1,
+                  "column": 3
+                },
+                "end": {
+                  "byte_offset": 5,
+                  "line": 1,
+                  "column": 6
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 5,
+                "end_byte": 5
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 5,
+                  "line": 1,
+                  "column": 6
+                },
+                "end": {
+                  "byte_offset": 5,
+                  "line": 1,
+                  "column": 6
+                }
+              }
+            }
+          ]
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "NUMBER",
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [],
+        "rules": [
+          "SOURCE-LOCATIONS.trivia-adjacency"
+        ]
+      }
+    },
+    {
+      "id": "location-space-detached-quantity-boundary",
+      "description": "A space remains a physical gap between NUMBER and IDENT.",
+      "entrypoint": "lexer",
+      "source": {
+        "kind": "utf8",
+        "text": "10 foo"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 0,
+                  "line": 1,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 2,
+                  "line": 1,
+                  "column": 3
+                }
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "foo",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 6
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 3,
+                  "line": 1,
+                  "column": 4
+                },
+                "end": {
+                  "byte_offset": 6,
+                  "line": 1,
+                  "column": 7
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 6,
+                "end_byte": 6
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 6,
+                  "line": 1,
+                  "column": 7
+                },
+                "end": {
+                  "byte_offset": 6,
+                  "line": 1,
+                  "column": 7
+                }
+              }
+            }
+          ]
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "NUMBER",
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [],
+        "rules": [
+          "SOURCE-LOCATIONS.trivia-adjacency"
+        ]
+      }
+    },
+    {
+      "id": "location-comment-detached-quantity-boundary",
+      "description": "A block comment remains a physical gap between NUMBER and IDENT.",
+      "entrypoint": "lexer",
+      "source": {
+        "kind": "utf8",
+        "text": "10/*note*/foo"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "NUMBER",
+              "lexeme": "10",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 2
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 0,
+                  "line": 1,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 2,
+                  "line": 1,
+                  "column": 3
+                }
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "foo",
+              "span": {
+                "start_byte": 10,
+                "end_byte": 13
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 10,
+                  "line": 1,
+                  "column": 11
+                },
+                "end": {
+                  "byte_offset": 13,
+                  "line": 1,
+                  "column": 14
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 13
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 13,
+                  "line": 1,
+                  "column": 14
+                },
+                "end": {
+                  "byte_offset": 13,
+                  "line": 1,
+                  "column": 14
+                }
+              }
+            }
+          ]
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "NUMBER",
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [],
+        "rules": [
+          "SOURCE-LOCATIONS.trivia-adjacency",
+          "TOKEN-SPEC.trivia-comments"
+        ]
+      }
+    },
+    {
+      "id": "location-newline-and-tab-forms",
+      "description": "LF, CR, CRLF, and tab stops retain exact byte and display positions.",
+      "entrypoint": "lexer",
+      "source": {
+        "kind": "utf8",
+        "text": "a\nb\rc\r\n\td\te"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "a",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 1
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 0,
+                  "line": 1,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 1,
+                  "line": 1,
+                  "column": 2
+                }
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "b",
+              "span": {
+                "start_byte": 2,
+                "end_byte": 3
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 2,
+                  "line": 2,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 3,
+                  "line": 2,
+                  "column": 2
+                }
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "c",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 5
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 4,
+                  "line": 3,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 5,
+                  "line": 3,
+                  "column": 2
+                }
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "d",
+              "span": {
+                "start_byte": 8,
+                "end_byte": 9
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 8,
+                  "line": 4,
+                  "column": 5
+                },
+                "end": {
+                  "byte_offset": 9,
+                  "line": 4,
+                  "column": 6
+                }
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "e",
+              "span": {
+                "start_byte": 10,
+                "end_byte": 11
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 10,
+                  "line": 4,
+                  "column": 9
+                },
+                "end": {
+                  "byte_offset": 11,
+                  "line": 4,
+                  "column": 10
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 11,
+                "end_byte": 11
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 11,
+                  "line": 4,
+                  "column": 10
+                },
+                "end": {
+                  "byte_offset": 11,
+                  "line": 4,
+                  "column": 10
+                }
+              }
+            }
+          ]
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [],
+        "rules": [
+          "SOURCE-LOCATIONS.human-positions",
+          "SOURCE-LOCATIONS.newlines",
+          "SOURCE-LOCATIONS.columns-tabs"
+        ]
+      }
+    },
+    {
+      "id": "location-multiline-block-comment",
+      "description": "A token after a multiline block comment retains its physical location.",
+      "entrypoint": "lexer",
+      "source": {
+        "kind": "utf8",
+        "text": "/*a\r\nb*/\tname"
+      },
+      "expected": {
+        "lex": {
+          "status": "success",
+          "tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "name",
+              "span": {
+                "start_byte": 9,
+                "end_byte": 13
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 9,
+                  "line": 2,
+                  "column": 5
+                },
+                "end": {
+                  "byte_offset": 13,
+                  "line": 2,
+                  "column": 9
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 13,
+                "end_byte": 13
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 13,
+                  "line": 2,
+                  "column": 9
+                },
+                "end": {
+                  "byte_offset": 13,
+                  "line": 2,
+                  "column": 9
+                }
+              }
+            }
+          ]
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [],
+        "rules": [
+          "SOURCE-LOCATIONS.newlines",
+          "SOURCE-LOCATIONS.columns-tabs",
+          "TOKEN-SPEC.trivia-comments"
+        ]
+      }
+    },
+    {
+      "id": "location-invalid-unicode-scalar",
+      "description": "A valid but noncanonical Unicode scalar owns its complete UTF-8 bytes and advances one column.",
+      "entrypoint": "frontend",
+      "source": {
+        "kind": "utf8",
+        "text": "x\u00e9y"
+      },
+      "expected": {
+        "lex": {
+          "status": "failure",
+          "partial_tokens": [
+            {
+              "kind": "IDENT",
+              "lexeme": "x",
+              "span": {
+                "start_byte": 0,
+                "end_byte": 1
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 0,
+                  "line": 1,
+                  "column": 1
+                },
+                "end": {
+                  "byte_offset": 1,
+                  "line": 1,
+                  "column": 2
+                }
+              }
+            },
+            {
+              "kind": "IDENT",
+              "lexeme": "y",
+              "span": {
+                "start_byte": 3,
+                "end_byte": 4
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 3,
+                  "line": 1,
+                  "column": 4
+                },
+                "end": {
+                  "byte_offset": 4,
+                  "line": 1,
+                  "column": 5
+                }
+              }
+            },
+            {
+              "kind": "EOF",
+              "lexeme": "",
+              "span": {
+                "start_byte": 4,
+                "end_byte": 4
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 4,
+                  "line": 1,
+                  "column": 5
+                },
+                "end": {
+                  "byte_offset": 4,
+                  "line": 1,
+                  "column": 5
+                }
+              }
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "LEX002",
+              "phase": "LEXER",
+              "severity": "ERROR",
+              "primary": {
+                "role": "PRIMARY",
+                "span": {
+                  "start_byte": 1,
+                  "end_byte": 3
+                },
+                "positions": {
+                  "start": {
+                    "byte_offset": 1,
+                    "line": 1,
+                    "column": 2
+                  },
+                  "end": {
+                    "byte_offset": 3,
+                    "line": 1,
+                    "column": 4
+                  }
+                }
+              },
+              "secondary": [],
+              "notes": [],
+              "data": {
+                "character_bytes": "c3a9"
+              }
+            }
+          ],
+          "diagnostics_truncated": false
+        },
+        "parse": {
+          "status": "not_run",
+          "reason": "lexical_failure"
+        }
+      },
+      "covers": {
+        "token_kinds": [
+          "IDENT",
+          "EOF"
+        ],
+        "ast_kinds": [],
+        "diagnostic_codes": [
+          "LEX002"
+        ],
+        "rules": [
+          "DIAGNOSTICS.result-phase-policy",
+          "RECOVERY.lexical-result",
+          "RECOVERY.progress-invariants",
+          "RECOVERY.parser-phase-gate",
+          "FIXTURES.lexical-expectations",
+          "FIXTURES.diagnostic-mapping",
+          "SOURCE-LOCATIONS.columns-tabs",
+          "RECOVERY.invalid-source-character"
+        ]
+      }
+    }
+  ]
+}
