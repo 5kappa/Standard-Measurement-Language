@@ -20,6 +20,11 @@ BASIC_LOCATION_FIXTURE_IDS = (
     "location-space-detached-quantity-boundary",
 )
 
+TOKEN_INVENTORY_FIXTURE_IDS = (
+    "lex-all-token-kinds",
+    "lex-maximal-munch-boundaries",
+)
+
 
 class PilotLexerFixtureTests(unittest.TestCase):
     def test_authoritative_pilot_fixture(self) -> None:
@@ -60,6 +65,22 @@ class BasicLocationFixtureTests(unittest.TestCase):
         self.assertEqual(
             [fixture.fixture_id for fixture in fixtures],
             list(BASIC_LOCATION_FIXTURE_IDS),
+        )
+        for fixture in fixtures:
+            with self.subTest(fixture=fixture.fixture_id):
+                self.assertEqual(lex(fixture.source), fixture.expected)
+
+
+class TokenInventoryFixtureTests(unittest.TestCase):
+    def test_r4_token_inventory_fixtures(self) -> None:
+        fixtures = load_lexer_success_fixtures(
+            FIXTURE_ROOT / "lexer" / "tokens.json",
+            TOKEN_INVENTORY_FIXTURE_IDS,
+        )
+
+        self.assertEqual(
+            [fixture.fixture_id for fixture in fixtures],
+            list(TOKEN_INVENTORY_FIXTURE_IDS),
         )
         for fixture in fixtures:
             with self.subTest(fixture=fixture.fixture_id):

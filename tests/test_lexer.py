@@ -86,6 +86,9 @@ class SourceFoundationTests(unittest.TestCase):
 
 
 class PilotScannerTests(unittest.TestCase):
+    def test_token_kind_inventory_contains_exactly_62_kinds(self) -> None:
+        self.assertEqual(len(TokenKind), 62)
+
     def test_attached_quantity_produces_adjacent_tokens_and_eof(self) -> None:
         result = lex(b"10m")
 
@@ -152,11 +155,76 @@ class PilotScannerTests(unittest.TestCase):
                 self.assertEqual(result.tokens[0].kind, expected_kind)
                 self.assertEqual(result.tokens[0].lexeme, spelling.decode("ascii"))
 
-    def test_r4_multi_byte_sign_operators_remain_deferred(self) -> None:
-        for source in (b"++5", b"--5", b"+=5", b"-=5"):
+    def test_longest_valid_operator_wins(self) -> None:
+        cases = {
+            b"++": TokenKind.PLUS_PLUS,
+            b"--": TokenKind.MINUS_MINUS,
+            b"+=": TokenKind.PLUS_ASSIGN,
+            b"-=": TokenKind.MINUS_ASSIGN,
+            b"*=": TokenKind.STAR_ASSIGN,
+            b"/=": TokenKind.SLASH_ASSIGN,
+            b"<=": TokenKind.LESS_EQUAL,
+            b">=": TokenKind.GREATER_EQUAL,
+            b"==": TokenKind.EQUAL_EQUAL,
+            b"!=": TokenKind.BANG_EQUAL,
+            b"&&": TokenKind.AND_AND,
+            b"||": TokenKind.OR_OR,
+        }
+
+        for spelling, expected_kind in cases.items():
+            with self.subTest(spelling=spelling):
+                result = lex(spelling)
+                self.assertIsInstance(result, LexSuccess)
+                self.assertEqual(result.tokens[0].kind, expected_kind)
+                self.assertEqual(result.tokens[0].lexeme, spelling.decode("ascii"))
+
+    def test_single_byte_operators_and_delimiters_are_tokens(self) -> None:
+        cases = {
+            b"+": TokenKind.PLUS,
+            b"-": TokenKind.MINUS,
+            b"*": TokenKind.STAR,
+            b"/": TokenKind.SLASH,
+            b"%": TokenKind.PERCENT,
+            b"^": TokenKind.CARET,
+            b"!": TokenKind.BANG,
+            b"=": TokenKind.ASSIGN,
+            b"<": TokenKind.LESS,
+            b">": TokenKind.GREATER,
+            b"(": TokenKind.LPAREN,
+            b")": TokenKind.RPAREN,
+            b"{": TokenKind.LBRACE,
+            b"}": TokenKind.RBRACE,
+            b"[": TokenKind.LBRACKET,
+            b"]": TokenKind.RBRACKET,
+            b";": TokenKind.SEMICOLON,
+            b":": TokenKind.COLON,
+            b",": TokenKind.COMMA,
+        }
+
+        for spelling, expected_kind in cases.items():
+            with self.subTest(spelling=spelling):
+                result = lex(spelling)
+                self.assertIsInstance(result, LexSuccess)
+                self.assertEqual(result.tokens[0].kind, expected_kind)
+
+    def test_slash_comment_prefixes_are_recognized_before_slash_tokens(self) -> None:
+        for source in (b"//comment", b"/*comment*/"):
             with self.subTest(source=source):
-                with self.assertRaises(NotImplementedError):
+                with self.assertRaisesRegex(NotImplementedError, "R5"):
                     lex(source)
+
+    def test_closed_ascii_string_is_constructible_for_the_r4_inventory(self) -> None:
+        result = lex(b'"x"')
+
+        self.assertEqual(
+            result,
+            LexSuccess(
+                (
+                    Token(TokenKind.STRING, '"x"', SourceSpan(0, 3)),
+                    Token(TokenKind.EOF, "", SourceSpan(3, 3)),
+                )
+            ),
+        )
 
     def test_unimplemented_surface_fails_loudly(self) -> None:
         deferred_sources = (b"0123", b"2.5e3", b"0x10")

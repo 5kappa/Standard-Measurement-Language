@@ -40,6 +40,46 @@ _RESERVED_IDENTIFIER_KINDS = {
     b"false": TokenKind.FALSE,
 }
 
+_TWO_BYTE_OPERATOR_KINDS = {
+    b"++": TokenKind.PLUS_PLUS,
+    b"--": TokenKind.MINUS_MINUS,
+    b"+=": TokenKind.PLUS_ASSIGN,
+    b"-=": TokenKind.MINUS_ASSIGN,
+    b"*=": TokenKind.STAR_ASSIGN,
+    b"/=": TokenKind.SLASH_ASSIGN,
+    b"<=": TokenKind.LESS_EQUAL,
+    b">=": TokenKind.GREATER_EQUAL,
+    b"==": TokenKind.EQUAL_EQUAL,
+    b"!=": TokenKind.BANG_EQUAL,
+    b"&&": TokenKind.AND_AND,
+    b"||": TokenKind.OR_OR,
+}
+
+_ONE_BYTE_OPERATOR_KINDS = {
+    0x2B: TokenKind.PLUS,
+    0x2D: TokenKind.MINUS,
+    0x2A: TokenKind.STAR,
+    0x2F: TokenKind.SLASH,
+    0x25: TokenKind.PERCENT,
+    0x5E: TokenKind.CARET,
+    0x21: TokenKind.BANG,
+    0x3D: TokenKind.ASSIGN,
+    0x3C: TokenKind.LESS,
+    0x3E: TokenKind.GREATER,
+}
+
+_DELIMITER_KINDS = {
+    0x28: TokenKind.LPAREN,
+    0x29: TokenKind.RPAREN,
+    0x7B: TokenKind.LBRACE,
+    0x7D: TokenKind.RBRACE,
+    0x5B: TokenKind.LBRACKET,
+    0x5D: TokenKind.RBRACKET,
+    0x3B: TokenKind.SEMICOLON,
+    0x3A: TokenKind.COLON,
+    0x2C: TokenKind.COMMA,
+}
+
 
 @dataclass(frozen=True, slots=True)
 class LexSuccess:
@@ -97,8 +137,14 @@ class _Scanner:
                 self._scan_decimal_number()
             elif byte is not None and _is_ascii_letter(byte):
                 self._scan_identifier()
-            elif byte is not None and byte in b"+-":
-                self._scan_sign()
+            elif byte == 0x22:
+                self._scan_closed_ascii_string()
+            elif byte == 0x2F:
+                self._scan_slash_prefix()
+            elif byte in _ONE_BYTE_OPERATOR_KINDS or byte in b"&|":
+                self._scan_operator()
+            elif byte in _DELIMITER_KINDS:
+                self._scan_delimiter()
             elif byte == 0x20:
                 self._skip_ascii_spaces()
             else:
@@ -139,13 +185,48 @@ class _Scanner:
         kind = _RESERVED_IDENTIFIER_KINDS.get(spelling, TokenKind.IDENT)
         self._emit_ascii_token(kind, start)
 
-    def _scan_sign(self) -> None:
+    def _scan_closed_ascii_string(self) -> None:
+        start = self.cursor.offset
+        self.advance_one()
+        while (byte := self.cursor.peek_byte()) != 0x22:
+            if byte is None or byte in b"\r\n":
+                raise NotImplementedError("string termination behavior begins in R5")
+            if byte == 0x5C or byte < 0x20 or byte > 0x7E:
+                raise NotImplementedError(
+                    "string character diagnostics begin after R4"
+                )
+            self.advance_one()
+        self.advance_one()
+        self._emit_ascii_token(TokenKind.STRING, start)
+
+    def _scan_slash_prefix(self) -> None:
+        prefix = self.source[self.cursor.offset : self.cursor.offset + 2]
+        if prefix in (b"//", b"/*"):
+            raise NotImplementedError("comment bodies and trivia begin in R5")
+        self._scan_operator()
+
+    def _scan_operator(self) -> None:
+        start = self.cursor.offset
+        spelling = self.source[start : start + 2]
+        kind = _TWO_BYTE_OPERATOR_KINDS.get(spelling)
+        if kind is not None:
+            self.advance_one()
+            self.advance_one()
+            self._emit_ascii_token(kind, start)
+            return
+
+        byte = self.cursor.peek_byte()
+        kind = _ONE_BYTE_OPERATOR_KINDS.get(byte)
+        if kind is None:
+            raise NotImplementedError("lone logical operators begin in R9")
+        self.advance_one()
+        self._emit_ascii_token(kind, start)
+
+    def _scan_delimiter(self) -> None:
         start = self.cursor.offset
         byte = self.cursor.peek_byte()
-        if self.cursor.peek_byte(1) in (byte, 0x3D):
-            raise NotImplementedError("multi-byte operators begin in R4")
+        kind = _DELIMITER_KINDS[byte]
         self.advance_one()
-        kind = TokenKind.PLUS if byte == 0x2B else TokenKind.MINUS
         self._emit_ascii_token(kind, start)
 
     def _skip_ascii_spaces(self) -> None:
