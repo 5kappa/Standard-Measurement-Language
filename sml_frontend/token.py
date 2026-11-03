@@ -7,9 +7,10 @@ from .source import SourceSpan
 
 
 class TokenKind(Enum):
-    """Token kinds implemented through lexer roadmap milestone R3."""
+    """Complete Standard Measurement Language version 0.1 token inventory."""
 
     NUMBER = "NUMBER"
+    STRING = "STRING"
     IDENT = "IDENT"
 
     TRUE = "TRUE"
@@ -43,6 +44,40 @@ class TokenKind(Enum):
 
     PLUS = "PLUS"
     MINUS = "MINUS"
+    STAR = "STAR"
+    SLASH = "SLASH"
+    PERCENT = "PERCENT"
+    CARET = "CARET"
+    BANG = "BANG"
+
+    PLUS_PLUS = "PLUS_PLUS"
+    MINUS_MINUS = "MINUS_MINUS"
+
+    ASSIGN = "ASSIGN"
+    PLUS_ASSIGN = "PLUS_ASSIGN"
+    MINUS_ASSIGN = "MINUS_ASSIGN"
+    STAR_ASSIGN = "STAR_ASSIGN"
+    SLASH_ASSIGN = "SLASH_ASSIGN"
+
+    LESS = "LESS"
+    LESS_EQUAL = "LESS_EQUAL"
+    GREATER = "GREATER"
+    GREATER_EQUAL = "GREATER_EQUAL"
+    EQUAL_EQUAL = "EQUAL_EQUAL"
+    BANG_EQUAL = "BANG_EQUAL"
+
+    AND_AND = "AND_AND"
+    OR_OR = "OR_OR"
+
+    LPAREN = "LPAREN"
+    RPAREN = "RPAREN"
+    LBRACE = "LBRACE"
+    RBRACE = "RBRACE"
+    LBRACKET = "LBRACKET"
+    RBRACKET = "RBRACKET"
+    SEMICOLON = "SEMICOLON"
+    COLON = "COLON"
+    COMMA = "COMMA"
 
     EOF = "EOF"
 
