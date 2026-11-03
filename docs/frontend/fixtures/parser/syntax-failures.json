@@ -424,10 +424,30 @@
               "role": "PRIMARY",
               "span": {
                 "start_byte": 3,
-                "end_byte": 4
+                "end_byte": 3
+              },
+              "positions": {
+                "start": {
+                  "byte_offset": 3,
+                  "line": 1,
+                  "column": 4
+                },
+                "end": {
+                  "byte_offset": 3,
+                  "line": 1,
+                  "column": 4
+                }
               }
             },
-            "secondary": [],
+            "secondary": [
+              {
+                "role": "encountered_instead",
+                "span": {
+                  "start_byte": 3,
+                  "end_byte": 4
+                }
+              }
+            ],
             "notes": [],
             "data": {
               "actual_kind": "LPAREN"
