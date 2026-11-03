@@ -14,7 +14,7 @@ The implementation has no runtime dependencies. It uses the Python standard libr
 
 The lexer is a handwritten deterministic scanner over the original `bytes`. It does not decode the complete file before scanning. It uses explicit byte classification and dedicated scanner functions rather than a regular-expression-driven lexer or lexer generator.
 
-The scanner owns the current byte offset, logical line, display column, lexical state, tokens, diagnostics, and truncation flag. Returned tokens, spans, diagnostics, and result records are immutable data classes.
+The scanner owns the current byte offset, logical line, display column, lexical state, tokens, diagnostics, and truncation flag. Returned tokens, spans, diagnostics, and result records are immutable data classes. A diagnostic's code-specific stable data uses a small dictionary whose required keys are determined by its diagnostic code.
 
 ### Results and failures
 
@@ -24,7 +24,7 @@ Malformed source is ordinary result data and must not raise an exception. File-o
 
 ### Fixtures and tests
 
-The implementation loads the accepted strict JSON fixtures using the standard-library `json` module and performs the additional structural checks required by `docs/frontend/fixtures/README.md`. Tests use standard-library `unittest`. Exact rendered diagnostic English is not snapshot-tested as conformance behavior.
+Fixtures are trusted, version-controlled conformance data. Small test-only helpers use the standard-library `json` module to decode only the fixture variants required by the current implementation milestone. Exhaustive validation of hostile or deliberately corrupted fixture data is not an implementation requirement. Tests use standard-library `unittest`. Exact rendered diagnostic English is not snapshot-tested as conformance behavior.
 
 ### Command line and repository tools
 
@@ -44,8 +44,8 @@ sml_frontend/
     token.py
     diagnostic.py
     lexer.py
-    fixture_loader.py
 tests/
+    fixture_loader.py
     test_source.py
     test_lexer.py
     test_fixtures.py

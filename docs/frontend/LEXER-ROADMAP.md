@@ -1,6 +1,6 @@
 # Standard Measurement Language Lexer Development Roadmap
 
-Status: proposed for review
+Status: active; R0 through R2 complete
 
 Applies to: initial SML version 0.1 lexer implementation only
 
@@ -48,16 +48,18 @@ The parser may later receive only `LexSuccess.tokens`. `LexFailure.partial_token
 | --- | --- | --- |
 | `sml_frontend/source.py` | Immutable source spans and positions; a byte cursor that advances through ASCII, UTF-8 scalars, `LF`, `CR`, `CRLF`, tabs, and invalid bytes according to the accepted location rules | Token recognition, diagnostic selection, file I/O |
 | `sml_frontend/token.py` | Complete `TokenKind` enum and immutable `Token` record | Keyword scanning logic, unit lookup, parser categories |
-| `sml_frontend/diagnostic.py` | Lexical diagnostic codes `LEX001`–`LEX010`, phase/severity/label records, stable code-specific data, and immutable diagnostic records | English rendering as conformance data, syntax diagnostics beyond shared enum placeholders |
+| `sml_frontend/diagnostic.py` | Lexical diagnostic codes `LEX001`–`LEX010`, phase/severity/label records, one direct stable-data mapping, and immutable diagnostic records | English rendering as conformance data, syntax diagnostics beyond shared enum placeholders |
 | `sml_frontend/lexer.py` | `LexSuccess`, `LexFailure`, scanner state, token scanners, trivia scanning, diagnostic accumulation, recovery, and public `lex(bytes)` | File access, parser calls, AST construction, semantic/unit lookup |
-| `sml_frontend/fixture_loader.py` | Strict JSON loading for the lexer/location conformance slice, duplicate-key detection, source-byte construction, expected-result decoding, and structured comparison | Changing fixture expectations, interpreting ASTs, running a parser |
 | `sml_frontend/__init__.py` | Stable exports for the lexer API and returned records | Eager CLI work or parser exports |
 | `sml_frontend/__main__.py` | Small `argparse` boundary that reads files as bytes, invokes the lexer, and distinguishes file-I/O/internal failures from lexical failures | Decoding the complete file before lexing, parser behavior |
+| `tests/fixture_loader.py` | Small test-only decoder for the trusted fixture variants required by the current milestone | Exhaustive format validation, parser/AST decoding before its milestone |
 | `tests/test_source.py` | Cursor, byte-span, newline, tab, Unicode-scalar, and invalid-byte unit tests | Scanner integration assertions |
-| `tests/test_lexer.py` | Focused scanner and recovery unit tests, including contract cases not exposed through a lexer-entrypoint fixture | Fixture-schema validation |
-| `tests/test_fixtures.py` | Fixture-loader validation and fixture-driven lexer conformance classes | Parser/AST conformance |
+| `tests/test_lexer.py` | Focused scanner and recovery unit tests, including contract cases not exposed through a lexer-entrypoint fixture | Fixture decoding |
+| `tests/test_fixtures.py` | Fixture-driven lexer conformance classes | Parser/AST conformance |
 
 `sml_frontend/parser.py`, `sml_frontend/syntax.py`, and parser test modules are intentionally absent during this roadmap.
+
+Fixtures are trusted, version-controlled conformance data. The test loader validates only enough structure to decode and execute the indexed fixture cases. Exhaustive validation of the fixture format is not part of the lexer implementation.
 
 ## Verification commands
 
@@ -147,7 +149,7 @@ Purpose: prove the end-to-end byte-scanner shape with the smallest accepted fixt
 Primary files:
 
 - `sml_frontend/lexer.py`
-- `sml_frontend/fixture_loader.py`
+- `tests/fixture_loader.py`
 - `tests/test_fixtures.py`
 
 Work:
@@ -155,7 +157,7 @@ Work:
 - recognize the minimum decimal-integer, ASCII-identifier, and EOF paths;
 - retain exact lexemes and half-open byte spans;
 - derive adjacency only from `NUMBER.end_byte == IDENT.start_byte`;
-- load the indexed fixture as strict JSON with duplicate-key detection; and
+- decode the trusted indexed pilot with a small test-only helper; and
 - compare the structured result rather than rendered text.
 
 Fixture group unlocked:

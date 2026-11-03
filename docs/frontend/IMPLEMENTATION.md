@@ -17,7 +17,7 @@ This document selects implementation technology. It is not a language specificat
 | Lexer | Handwritten deterministic scanner over original `bytes` |
 | Token recognition | Explicit byte classification and loops; no core regex |
 | Frontend records | Standard-library `dataclasses` and `enum` |
-| Fixture input | Standard-library `json` plus explicit strict validation |
+| Fixture input | Trusted version-controlled JSON decoded by test-only helpers |
 | Tests | Standard-library `unittest` |
 | CLI | Standard-library `argparse` |
 | Initial checks | `python -m unittest discover`; `python -m compileall sml_frontend tests` |
@@ -41,6 +41,8 @@ The complete source must not be decoded before lexing. The lexer decodes only sp
 The implementation uses immutable returned records conceptually equivalent to:
 
 ```python
+from dataclasses import dataclass, field
+
 @dataclass(frozen=True)
 class SourceSpan:
     start_byte: int
@@ -59,6 +61,8 @@ class DiagnosticCode(Enum):
     LEX001 = "LEX001"
     # ... through LEX010 and later parser codes
 
+DiagnosticValue = str | int | bool
+
 @dataclass(frozen=True)
 class Diagnostic:
     code: DiagnosticCode
@@ -67,7 +71,7 @@ class Diagnostic:
     primary: DiagnosticLabel
     secondary: tuple[DiagnosticLabel, ...]
     notes: tuple[DiagnosticNote, ...]
-    data: DiagnosticData
+    data: dict[str, DiagnosticValue] = field(default_factory=dict)
 
 @dataclass(frozen=True)
 class LexSuccess:
@@ -100,7 +104,7 @@ Required invariants:
 - `LexFailure.diagnostics` contains from one through twenty diagnostics;
 - every contained diagnostic has phase `LEXER` and code `LEX001` through `LEX010`;
 - different codes may coexist in one result;
-- code-specific `DiagnosticData` carries the stable fields required by `DIAGNOSTICS.md`;
+- the direct `Diagnostic.data` mapping carries the stable fields required by `DIAGNOSTICS.md`;
 - `partial_tokens` ends with physical `EOF`;
 - malformed source does not raise a Python exception; and
 - the parser is never called with `LexFailure`.
@@ -139,13 +143,15 @@ The lexer does not consult declarations, units, functions, types, dimensions, or
 
 ## Fixture and test architecture
 
-The fixture loader reads `docs/frontend/fixtures/index.json`, validates format version 1, rejects duplicate keys and unknown fields, loads source bytes, runs the declared entry point, and compares structured results.
+Fixtures are trusted, version-controlled conformance data. The test loader validates only enough structure to decode and execute the indexed fixture cases. Exhaustive validation of the fixture format is not part of the lexer implementation.
+
+Test-only helpers use the standard-library `json` module to read the fixture records needed by the current milestone, construct source bytes and expected frontend records, and compare those expectations with actual results. Support for a new fixture result variant is added only when the corresponding lexer or parser milestone begins.
 
 Test layers are:
 
 1. focused unit tests for byte classification, UTF-8 validation, positions, and scanner functions;
-2. fixture-loader validation tests;
-3. machine-readable lexer conformance fixtures; and
+2. machine-readable lexer conformance fixtures decoded by small test-only helpers;
+3. later lexical-failure fixture cases as their milestones begin; and
 4. later source-to-AST frontend fixtures after parser implementation.
 
 Rendered English diagnostic messages may have implementation-specific tests but are not conformance snapshots.
@@ -160,8 +166,8 @@ sml_frontend/
     token.py
     diagnostic.py
     lexer.py
-    fixture_loader.py
 tests/
+    fixture_loader.py
     test_source.py
     test_lexer.py
     test_fixtures.py
@@ -187,5 +193,5 @@ GitHub Actions may run the two accepted check commands with Python 3.11.9 after 
 
 ## Readiness rule
 
-The technology decision, pilot fixtures, strict loader expectations, and complete static conformance suite are accepted. The first code slice should implement source positions and the smallest token subset needed to pass the lexer pilot; later slices expand through the remaining lexer fixtures before parser work begins.
+The technology decision, pilot fixtures, trusted-fixture policy, and complete static conformance suite are accepted. The first code slice should implement source positions and the smallest token subset needed to pass the lexer pilot; later slices expand through the remaining lexer fixtures before parser work begins.
 

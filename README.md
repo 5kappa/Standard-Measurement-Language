@@ -6,7 +6,7 @@ Standard Measurement Language (SML) is an educational, unit-aware programming-la
 
 ## Current status
 
-The **front-end documentation-hardening phase is complete**. Lexer and parser implementation has not started.
+The **front-end documentation-hardening phase is complete**, and lexer implementation is active. Roadmap milestones R0 through R2 are complete; parser implementation has not started.
 
 The final implementation boundary is:
 
@@ -29,6 +29,7 @@ Semantic analysis, unit-name resolution, dimensional checking, unit normalizatio
 - [Grammar](docs/frontend/GRAMMAR.ebnf) — accepted token-level syntax and parser context constraints
 - [Source AST schema](docs/frontend/AST-SCHEMA.md) — accepted successful-parse nodes, source preservation, collections, and spans
 - [Diagnostic contract](docs/frontend/DIAGNOSTICS.md) — accepted lexical and syntactic codes, labels, ordering, and failure behavior
+- [Lexer development roadmap](docs/frontend/LEXER-ROADMAP.md) — active lexer-only milestones and progress
 - [Language specification](LANGUAGE-SPECIFICATION.md) — normative language surface
 - [Decision index](decisions/README.md) — design history and rationale
 
@@ -49,7 +50,7 @@ Unknown-unit detection would require name resolution, which is not part of the l
 
 ## Implementation readiness
 
-The machine-readable fixture format and complete 93-case conformance suite are accepted in [`docs/frontend/fixtures/README.md`](docs/frontend/fixtures/README.md), and [`docs/frontend/TRACEABILITY.md`](docs/frontend/TRACEABILITY.md) contains the completed coverage registry. The final repository-wide consistency and coverage audit is complete, so the hardened frontend contracts are ready for review and commit before lexer implementation begins.
+The machine-readable fixture format and complete 93-case conformance suite are accepted in [`docs/frontend/fixtures/README.md`](docs/frontend/fixtures/README.md), and [`docs/frontend/TRACEABILITY.md`](docs/frontend/TRACEABILITY.md) contains the completed coverage registry. Lexer implementation now proceeds incrementally against those accepted contracts and fixtures; R0 through R2, including the `10m` lexer pilot, are complete.
 
 The initial engineering stack is accepted in [`docs/frontend/IMPLEMENTATION.md`](docs/frontend/IMPLEMENTATION.md): Python 3.11.9, a handwritten byte-oriented lexer, standard-library fixtures and tests, and a handwritten recursive-descent parser later.
 

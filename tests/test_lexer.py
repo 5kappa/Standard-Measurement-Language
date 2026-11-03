@@ -5,7 +5,6 @@ from sml_frontend.diagnostic import (
     Diagnostic,
     DiagnosticCode,
     DiagnosticLabel,
-    EmptyDiagnosticData,
     LabelRole,
 )
 from sml_frontend.lexer import LexFailure, LexSuccess, _Scanner, lex
@@ -41,17 +40,35 @@ class SourceFoundationTests(unittest.TestCase):
         diagnostic = Diagnostic(
             DiagnosticCode.LEX002,
             primary,
-            data=EmptyDiagnosticData(),
         )
         eof = Token(TokenKind.EOF, "", SourceSpan(1, 1))
 
         result = LexFailure((eof,), (diagnostic,), False)
 
+        self.assertEqual(diagnostic.data, {})
         self.assertEqual(result.diagnostics, (diagnostic,))
         with self.assertRaises(ValueError):
             LexFailure((eof,), (), False)
         with self.assertRaises(ValueError):
             LexFailure((eof,), (diagnostic,) * 21, True)
+
+    def test_diagnostic_requires_a_primary_label(self) -> None:
+        secondary = DiagnosticLabel(LabelRole.REACHED_EOF, SourceSpan(0, 0))
+
+        with self.assertRaises(ValueError):
+            Diagnostic(DiagnosticCode.LEX008, secondary)
+
+    def test_diagnostic_notes_are_empty_in_version_0_1(self) -> None:
+        primary = DiagnosticLabel(LabelRole.PRIMARY, SourceSpan(0, 0))
+        diagnostic = Diagnostic(DiagnosticCode.LEX008, primary)
+
+        self.assertEqual(diagnostic.notes, ())
+        with self.assertRaises(ValueError):
+            Diagnostic(
+                DiagnosticCode.LEX008,
+                primary,
+                notes=((),),
+            )
 
     def test_scanner_advance_makes_progress(self) -> None:
         scanner = _Scanner(b"\xff")
