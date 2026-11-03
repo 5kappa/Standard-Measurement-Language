@@ -104,9 +104,8 @@ def _decode_lexer_success_fixture(value: Any, context: str) -> LexerFixture:
     expected = _decode_success_expectation(
         fixture["expected"], f"{context}.expected"
     )
+    _validate_expected_tokens(source, expected.tokens, f"{context}.expected.lex.tokens")
     _validate_coverage(fixture["covers"], f"{context}.covers")
-    if expected.tokens[-1].span.end_byte != len(source):
-        raise FixtureFormatError(f"{context} EOF does not match source byte length")
     return LexerFixture(fixture_id, source, expected)
 
 
@@ -155,6 +154,44 @@ def _decode_token(value: Any, context: str) -> Token:
         return Token(kind, token["lexeme"], SourceSpan(start, end))
     except ValueError as error:
         raise FixtureFormatError(f"{context} is not a valid token") from error
+
+
+def _validate_expected_tokens(
+    source: bytes, tokens: tuple[Token, ...], context: str
+) -> None:
+    source_length = len(source)
+    previous_end = 0
+
+    for index, token in enumerate(tokens):
+        token_context = f"{context}[{index}]"
+        if token.span.end_byte > source_length:
+            raise FixtureFormatError(
+                f"{token_context}.span exceeds the source byte length"
+            )
+        if token.span.start_byte < previous_end:
+            raise FixtureFormatError(
+                f"{token_context}.span overlaps or precedes the previous token"
+            )
+
+        if token.kind is TokenKind.EOF:
+            if token.span != SourceSpan(source_length, source_length):
+                raise FixtureFormatError(
+                    f"{token_context} must be physical EOF at the source byte length"
+                )
+        else:
+            token_bytes = source[token.span.start_byte : token.span.end_byte]
+            try:
+                source_lexeme = token_bytes.decode("utf-8")
+            except UnicodeDecodeError as error:
+                raise FixtureFormatError(
+                    f"{token_context}.span does not select complete UTF-8 text"
+                ) from error
+            if source_lexeme != token.lexeme:
+                raise FixtureFormatError(
+                    f"{token_context}.lexeme does not match its source span"
+                )
+
+        previous_end = token.span.end_byte
 
 
 def _validate_coverage(value: Any, context: str) -> None:
