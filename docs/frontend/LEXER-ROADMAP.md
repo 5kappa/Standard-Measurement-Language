@@ -1,6 +1,6 @@
 # Standard Measurement Language Lexer Development Roadmap
 
-Status: active; R0 through R2 complete
+Status: active; R0 through R3 complete
 
 Applies to: initial SML version 0.1 lexer implementation only
 
@@ -19,7 +19,7 @@ The accepted contracts and indexed fixtures remain authoritative. This document 
 - [x] R0 — Confirm repository and contract baseline
 - [x] R1 — Establish lexer records, source cursor, and focused test harness
 - [x] R2 — Pass the `10m` lexer pilot
-- [ ] R3 — Complete ordinary names, numbers, signs, EOF, and basic adjacency
+- [x] R3 — Complete ordinary names, numbers, signs, EOF, and basic adjacency
 - [ ] R4 — Complete token inventory, delimiters, and maximal-munch operators
 - [ ] R5 — Complete strings, trivia, newlines, tabs, and comment adjacency
 - [ ] R6 — Complete UTF-8 and canonical-character diagnostics
@@ -178,6 +178,8 @@ Completion criteria:
 - the pilot passes through the fixture loader, not only a hand-authored unit test.
 
 ### R3 — Complete ordinary names, numbers, signs, EOF, and basic adjacency
+
+Status: complete; passing under the exact Python 3.11.9 reference interpreter.
 
 Purpose: finish the successful token families that do not require multi-byte operator or comment lookahead.
 

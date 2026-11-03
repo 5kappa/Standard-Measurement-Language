@@ -6,7 +6,7 @@ Standard Measurement Language (SML) is an educational, unit-aware programming-la
 
 ## Current status
 
-The **front-end documentation-hardening phase is complete**, and lexer implementation is active. Roadmap milestones R0 through R2 are complete; parser implementation has not started.
+The **front-end documentation-hardening phase is complete**, and lexer implementation is active. Roadmap milestones R0 through R3 are complete; parser implementation has not started.
 
 The final implementation boundary is:
 
@@ -50,7 +50,7 @@ Unknown-unit detection would require name resolution, which is not part of the l
 
 ## Implementation readiness
 
-The machine-readable fixture format and complete 93-case conformance suite are accepted in [`docs/frontend/fixtures/README.md`](docs/frontend/fixtures/README.md), and [`docs/frontend/TRACEABILITY.md`](docs/frontend/TRACEABILITY.md) contains the completed coverage registry. Lexer implementation now proceeds incrementally against those accepted contracts and fixtures; R0 through R2, including the `10m` lexer pilot, are complete.
+The machine-readable fixture format and complete 93-case conformance suite are accepted in [`docs/frontend/fixtures/README.md`](docs/frontend/fixtures/README.md), and [`docs/frontend/TRACEABILITY.md`](docs/frontend/TRACEABILITY.md) contains the completed coverage registry. Lexer implementation now proceeds incrementally against those accepted contracts and fixtures; R0 through R3, including ordinary names, accepted decimal numbers, separate signs, EOF, and basic adjacency, are complete.
 
 The initial engineering stack is accepted in [`docs/frontend/IMPLEMENTATION.md`](docs/frontend/IMPLEMENTATION.md): Python 3.11.9, a handwritten byte-oriented lexer, standard-library fixtures and tests, and a handwritten recursive-descent parser later.
 

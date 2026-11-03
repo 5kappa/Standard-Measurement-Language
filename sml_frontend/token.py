@@ -7,10 +7,43 @@ from .source import SourceSpan
 
 
 class TokenKind(Enum):
-    """Token kinds required by the first lexer pilot."""
+    """Token kinds implemented through lexer roadmap milestone R3."""
 
     NUMBER = "NUMBER"
     IDENT = "IDENT"
+
+    TRUE = "TRUE"
+    FALSE = "FALSE"
+
+    LET = "LET"
+    CONST = "CONST"
+    FN = "FN"
+    RETURN = "RETURN"
+    IF = "IF"
+    ELSE = "ELSE"
+    FOR = "FOR"
+    WHILE = "WHILE"
+    BREAK = "BREAK"
+    CONTINUE = "CONTINUE"
+    PRINT = "PRINT"
+    INPUT = "INPUT"
+    ASSERT = "ASSERT"
+    AS = "AS"
+    INT = "INT"
+    FLOAT = "FLOAT"
+    BOOL = "BOOL"
+    TEXT = "TEXT"
+    LENGTH = "LENGTH"
+    MASS = "MASS"
+    TIME = "TIME"
+    FORCE = "FORCE"
+    TO = "TO"
+    THEN = "THEN"
+    DO = "DO"
+
+    PLUS = "PLUS"
+    MINUS = "MINUS"
+
     EOF = "EOF"
 
 
