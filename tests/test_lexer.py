@@ -8,7 +8,7 @@ from sml_frontend.diagnostic import (
     LabelRole,
 )
 from sml_frontend.lexer import LexFailure, LexSuccess, _Scanner, lex
-from sml_frontend.source import SourceSpan
+from sml_frontend.source import PositionRange, SourcePosition, SourceSpan
 from sml_frontend.token import Token, TokenKind
 
 
@@ -277,12 +277,6 @@ class PilotScannerTests(unittest.TestCase):
             ),
         )
 
-    def test_invalid_string_and_comment_characters_remain_deferred_to_r6(self) -> None:
-        for source in (b'"bad\\character"', b"//bad\\character"):
-            with self.subTest(source=source):
-                with self.assertRaisesRegex(NotImplementedError, "R6"):
-                    lex(source)
-
     def test_unclosed_string_and_block_comment_remain_deferred_to_r8(self) -> None:
         for source in (b'"unclosed', b"/*unclosed"):
             with self.subTest(source=source):
@@ -296,6 +290,87 @@ class PilotScannerTests(unittest.TestCase):
             with self.subTest(source=source):
                 with self.assertRaises(NotImplementedError):
                     lex(source)
+
+
+class InvalidUtf8Tests(unittest.TestCase):
+    def test_invalid_byte_owns_one_byte_and_scanning_continues(self) -> None:
+        result = lex(b"x\xffy")
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(
+            result.partial_tokens,
+            (
+                Token(TokenKind.IDENT, "x", SourceSpan(0, 1)),
+                Token(TokenKind.IDENT, "y", SourceSpan(2, 3)),
+                Token(TokenKind.EOF, "", SourceSpan(3, 3)),
+            ),
+        )
+        self.assertEqual(len(result.diagnostics), 1)
+        diagnostic = result.diagnostics[0]
+        self.assertEqual(diagnostic.code, DiagnosticCode.LEX001)
+        self.assertEqual(diagnostic.primary.span, SourceSpan(1, 2))
+        self.assertEqual(
+            diagnostic.primary.positions,
+            PositionRange(
+                SourcePosition(1, 1, 2),
+                SourcePosition(2, 1, 3),
+            ),
+        )
+        self.assertEqual(diagnostic.data, {"invalid_bytes": "ff"})
+
+    def test_bad_bytes_preserve_string_and_comment_states(self) -> None:
+        result = lex(b'"a\xffb" c//\xfe\nd/*\xfd*/e')
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(
+            [(token.kind, token.lexeme) for token in result.partial_tokens],
+            [
+                (TokenKind.IDENT, "c"),
+                (TokenKind.IDENT, "d"),
+                (TokenKind.IDENT, "e"),
+                (TokenKind.EOF, ""),
+            ],
+        )
+        self.assertEqual(
+            [diagnostic.code for diagnostic in result.diagnostics],
+            [DiagnosticCode.LEX001] * 3,
+        )
+        self.assertEqual(
+            [diagnostic.data for diagnostic in result.diagnostics],
+            [
+                {"invalid_bytes": "ff"},
+                {"invalid_bytes": "fe"},
+                {"invalid_bytes": "fd"},
+            ],
+        )
+
+
+class InvalidSourceCharacterTests(unittest.TestCase):
+    def test_complete_unicode_scalar_owns_all_bytes_and_one_column(self) -> None:
+        result = lex("xéy".encode("utf-8"))
+
+        self.assertIsInstance(result, LexFailure)
+        diagnostic = result.diagnostics[0]
+        self.assertEqual(diagnostic.code, DiagnosticCode.LEX002)
+        self.assertEqual(diagnostic.primary.span, SourceSpan(1, 3))
+        self.assertEqual(
+            diagnostic.primary.positions,
+            PositionRange(
+                SourcePosition(1, 1, 2),
+                SourcePosition(3, 1, 3),
+            ),
+        )
+        self.assertEqual(diagnostic.data, {"character_bytes": "c3a9"})
+
+    def test_closed_string_with_failure_emits_no_string_token(self) -> None:
+        result = lex(b'"x\\y"')
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(
+            result.partial_tokens,
+            (Token(TokenKind.EOF, "", SourceSpan(5, 5)),),
+        )
+        self.assertEqual(result.diagnostics[0].code, DiagnosticCode.LEX002)
 
 
 if __name__ == "__main__":

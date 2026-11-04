@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .diagnostic import Diagnostic
-from .source import SourceCursor, SourceUnit
+from .diagnostic import Diagnostic, DiagnosticCode, DiagnosticLabel, LabelRole
+from .source import SourceCursor, SourceUnit, SourceUnitKind
 from .source import SourceSpan
 from .token import Token, TokenKind
 
@@ -136,7 +136,11 @@ class _Scanner:
     def scan(self) -> LexResult:
         while not self.cursor.at_end:
             byte = self.cursor.peek_byte()
-            if byte is not None and _is_ascii_digit(byte):
+            if self.cursor.utf8_scalar_length() is None:
+                self._report_invalid_utf8_byte()
+            elif byte is not None and byte >= 0x80:
+                self._report_invalid_source_character()
+            elif byte is not None and _is_ascii_digit(byte):
                 self._scan_decimal_number()
             elif byte is not None and _is_ascii_letter(byte):
                 self._scan_identifier()
@@ -150,15 +154,21 @@ class _Scanner:
                 self._scan_delimiter()
             elif byte in _WHITESPACE_BYTES:
                 self._skip_whitespace()
+            elif byte == 0x2E:
+                raise NotImplementedError("malformed numeric candidates begin in R7")
             else:
-                raise NotImplementedError(
-                    "the current lexer subset does not recognize this source byte"
-                )
+                self._report_invalid_source_character()
 
         eof_offset = self.cursor.offset
         self.tokens.append(
             Token(TokenKind.EOF, "", SourceSpan(eof_offset, eof_offset))
         )
+        if self.diagnostics:
+            return LexFailure(
+                tuple(self.tokens),
+                tuple(self.diagnostics),
+                self.diagnostics_truncated,
+            )
         return LexSuccess(tuple(self.tokens))
 
     def _scan_decimal_number(self) -> None:
@@ -190,15 +200,22 @@ class _Scanner:
 
     def _scan_closed_ascii_string(self) -> None:
         start = self.cursor.offset
+        had_lexical_failure = False
         self.advance_one()
         while (byte := self.cursor.peek_byte()) != 0x22:
             if byte is None or byte in b"\r\n":
                 raise NotImplementedError("unclosed string diagnostics begin in R8")
-            if not _is_canonical_ascii(byte):
-                raise NotImplementedError("source character diagnostics begin in R6")
-            self.advance_one()
+            if self.cursor.utf8_scalar_length() is None:
+                self._report_invalid_utf8_byte()
+                had_lexical_failure = True
+            elif byte >= 0x80 or not _is_canonical_ascii(byte):
+                self._report_invalid_source_character()
+                had_lexical_failure = True
+            else:
+                self.advance_one()
         self.advance_one()
-        self._emit_ascii_token(TokenKind.STRING, start)
+        if not had_lexical_failure:
+            self._emit_ascii_token(TokenKind.STRING, start)
 
     def _scan_slash_prefix(self) -> None:
         prefix = self.source[self.cursor.offset : self.cursor.offset + 2]
@@ -231,9 +248,44 @@ class _Scanner:
         byte = self.cursor.peek_byte()
         if byte is None:
             raise RuntimeError("comment content cannot advance beyond EOF")
-        if not _is_canonical_ascii(byte):
-            raise NotImplementedError("source character diagnostics begin in R6")
-        self.advance_one()
+        if self.cursor.utf8_scalar_length() is None:
+            self._report_invalid_utf8_byte()
+        elif byte >= 0x80 or not _is_canonical_ascii(byte):
+            self._report_invalid_source_character()
+        else:
+            self.advance_one()
+
+    def _report_invalid_utf8_byte(self) -> None:
+        unit = self.advance_one()
+        if unit.kind is not SourceUnitKind.INVALID_UTF8:
+            raise RuntimeError("LEX001 must consume exactly one invalid UTF-8 byte")
+        self.diagnostics.append(
+            Diagnostic(
+                DiagnosticCode.LEX001,
+                DiagnosticLabel(
+                    LabelRole.PRIMARY,
+                    unit.span,
+                    unit.positions,
+                ),
+                data={"invalid_bytes": unit.source_bytes.hex()},
+            )
+        )
+
+    def _report_invalid_source_character(self) -> None:
+        unit = self.advance_one()
+        if unit.kind is SourceUnitKind.INVALID_UTF8:
+            raise RuntimeError("LEX002 requires a complete well-formed UTF-8 scalar")
+        self.diagnostics.append(
+            Diagnostic(
+                DiagnosticCode.LEX002,
+                DiagnosticLabel(
+                    LabelRole.PRIMARY,
+                    unit.span,
+                    unit.positions,
+                ),
+                data={"character_bytes": unit.source_bytes.hex()},
+            )
+        )
 
     def _scan_operator(self) -> None:
         start = self.cursor.offset

@@ -1,9 +1,11 @@
 from pathlib import Path
 import unittest
 
-from sml_frontend.lexer import LexSuccess, lex
+from sml_frontend.lexer import LexFailure, LexSuccess, lex
 from tests.fixture_loader import (
+    LexerFailureFixture,
     LexerFixture,
+    load_lexer_failure_fixtures,
     load_lexer_success_fixtures,
     locate_token_positions,
 )
@@ -38,6 +40,22 @@ TRIVIA_LOCATION_FIXTURE_IDS = (
     "location-comment-detached-quantity-boundary",
     "location-newline-and-tab-forms",
     "location-multiline-block-comment",
+)
+
+SOURCE_CHARACTER_LOCATION_FIXTURE_IDS = (
+    "location-invalid-unicode-scalar",
+)
+
+SOURCE_CHARACTER_LEXER_FIXTURE_IDS = (
+    "lex-invalid-leading-underscore",
+    "lex-invalid-character-closed-string",
+    "lex-invalid-character-line-comment",
+    "lex-invalid-character-block-comment",
+    "lex-malformed-gap-preserves-spans",
+)
+
+SOURCE_CHARACTER_FRONTEND_FIXTURE_IDS = (
+    "frontend-pilot-invalid-utf8-phase-gate",
 )
 
 
@@ -130,6 +148,104 @@ class TriviaAndPositionFixtureTests(unittest.TestCase):
         for index, expected_positions in enumerate(fixture.expected_positions):
             if expected_positions is not None:
                 self.assertEqual(actual_positions[index], expected_positions)
+
+
+class SourceCharacterFixtureTests(unittest.TestCase):
+    def test_r6_source_character_fixtures(self) -> None:
+        location_fixtures = load_lexer_failure_fixtures(
+            FIXTURE_ROOT / "locations" / "source-locations.json",
+            SOURCE_CHARACTER_LOCATION_FIXTURE_IDS,
+        )
+        lexer_fixtures = load_lexer_failure_fixtures(
+            FIXTURE_ROOT / "lexer" / "lexical-failures.json",
+            SOURCE_CHARACTER_LEXER_FIXTURE_IDS,
+        )
+        frontend_fixtures = load_lexer_failure_fixtures(
+            FIXTURE_ROOT / "frontend" / "pilot.json",
+            SOURCE_CHARACTER_FRONTEND_FIXTURE_IDS,
+        )
+        fixtures = location_fixtures + lexer_fixtures + frontend_fixtures
+
+        self.assertEqual(
+            [fixture.fixture_id for fixture in fixtures],
+            list(
+                SOURCE_CHARACTER_LOCATION_FIXTURE_IDS
+                + SOURCE_CHARACTER_LEXER_FIXTURE_IDS
+                + SOURCE_CHARACTER_FRONTEND_FIXTURE_IDS
+            ),
+        )
+        for fixture in fixtures:
+            with self.subTest(fixture=fixture.fixture_id):
+                self._assert_failure_fixture(fixture)
+
+    def test_lexical_failure_keeps_parser_callback_unreachable(self) -> None:
+        fixture = load_lexer_failure_fixtures(
+            FIXTURE_ROOT / "frontend" / "pilot.json",
+            SOURCE_CHARACTER_FRONTEND_FIXTURE_IDS,
+        )[0]
+        parser_calls = []
+        result = lex(fixture.source)
+
+        if isinstance(result, LexSuccess):
+            parser_calls.append(result.tokens)
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertTrue(fixture.expects_parse_not_run)
+        self.assertEqual(parser_calls, [])
+
+    def _assert_failure_fixture(self, fixture: LexerFailureFixture) -> None:
+        actual = lex(fixture.source)
+        self.assertIsInstance(actual, LexFailure)
+        self.assertEqual(actual.partial_tokens, fixture.expected.partial_tokens)
+        self.assertEqual(
+            actual.diagnostics_truncated,
+            fixture.expected.diagnostics_truncated,
+        )
+        self.assertEqual(len(actual.diagnostics), len(fixture.expected.diagnostics))
+
+        actual_token_positions = locate_token_positions(
+            fixture.source,
+            actual.partial_tokens,
+        )
+        for index, expected_positions in enumerate(
+            fixture.expected_token_positions
+        ):
+            if expected_positions is not None:
+                self.assertEqual(
+                    actual_token_positions[index],
+                    expected_positions,
+                )
+
+        for actual_diagnostic, expected_diagnostic in zip(
+            actual.diagnostics,
+            fixture.expected.diagnostics,
+            strict=True,
+        ):
+            self.assertEqual(actual_diagnostic.code, expected_diagnostic.code)
+            self.assertEqual(actual_diagnostic.phase, expected_diagnostic.phase)
+            self.assertEqual(actual_diagnostic.severity, expected_diagnostic.severity)
+            self.assertEqual(actual_diagnostic.notes, expected_diagnostic.notes)
+            self.assertEqual(actual_diagnostic.data, expected_diagnostic.data)
+            self._assert_label(
+                actual_diagnostic.primary,
+                expected_diagnostic.primary,
+            )
+            self.assertEqual(
+                len(actual_diagnostic.secondary),
+                len(expected_diagnostic.secondary),
+            )
+            for actual_label, expected_label in zip(
+                actual_diagnostic.secondary,
+                expected_diagnostic.secondary,
+                strict=True,
+            ):
+                self._assert_label(actual_label, expected_label)
+
+    def _assert_label(self, actual, expected) -> None:
+        self.assertEqual(actual.role, expected.role)
+        self.assertEqual(actual.span, expected.span)
+        if expected.positions is not None:
+            self.assertEqual(actual.positions, expected.positions)
 
 
 if __name__ == "__main__":
