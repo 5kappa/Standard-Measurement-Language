@@ -85,6 +85,12 @@ STRING_COMMENT_FAILURE_FIXTURE_IDS = (
     "lex-unterminated-block-comment",
 )
 
+DIAGNOSTIC_LIMIT_FIXTURE_IDS = (
+    "lex-incomplete-logical-operators",
+    "lex-diagnostic-limit-exactly-twenty",
+    "lex-diagnostic-limit-truncated-continues",
+)
+
 
 class PilotLexerFixtureTests(unittest.TestCase):
     def test_authoritative_pilot_fixture(self) -> None:
@@ -389,6 +395,50 @@ class StringCommentFailureFixtureTests(unittest.TestCase):
         self.assertEqual(actual.span, expected.span)
         if expected.positions is not None:
             self.assertEqual(actual.positions, expected.positions)
+
+
+class DiagnosticLimitFixtureTests(unittest.TestCase):
+    def test_r9_logical_operator_and_diagnostic_limit_fixtures(self) -> None:
+        fixtures = load_lexer_failure_fixtures(
+            FIXTURE_ROOT / "lexer" / "lexical-failures.json",
+            DIAGNOSTIC_LIMIT_FIXTURE_IDS,
+        )
+
+        self.assertEqual(
+            [fixture.fixture_id for fixture in fixtures],
+            list(DIAGNOSTIC_LIMIT_FIXTURE_IDS),
+        )
+        for fixture in fixtures:
+            with self.subTest(fixture=fixture.fixture_id):
+                self._assert_failure_fixture(fixture)
+
+    def _assert_failure_fixture(self, fixture: LexerFailureFixture) -> None:
+        actual = lex(fixture.source)
+
+        self.assertIsInstance(actual, LexFailure)
+        self.assertTrue(fixture.expects_parse_not_run)
+        self.assertEqual(actual.partial_tokens, fixture.expected.partial_tokens)
+        self.assertEqual(
+            actual.diagnostics_truncated,
+            fixture.expected.diagnostics_truncated,
+        )
+        self.assertEqual(len(actual.diagnostics), len(fixture.expected.diagnostics))
+
+        for actual_diagnostic, expected_diagnostic in zip(
+            actual.diagnostics,
+            fixture.expected.diagnostics,
+            strict=True,
+        ):
+            self.assertEqual(actual_diagnostic.code, expected_diagnostic.code)
+            self.assertEqual(actual_diagnostic.phase, expected_diagnostic.phase)
+            self.assertEqual(actual_diagnostic.severity, expected_diagnostic.severity)
+            self.assertEqual(
+                actual_diagnostic.primary.span,
+                expected_diagnostic.primary.span,
+            )
+            self.assertEqual(actual_diagnostic.secondary, expected_diagnostic.secondary)
+            self.assertEqual(actual_diagnostic.notes, expected_diagnostic.notes)
+            self.assertEqual(actual_diagnostic.data, expected_diagnostic.data)
 
 
 if __name__ == "__main__":
