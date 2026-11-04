@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import os
 import subprocess
 import sys
 import tempfile
@@ -112,6 +113,67 @@ class CliTests(unittest.TestCase):
         self.assertEqual(status, 2)
         self.assertEqual(stdout, "")
         self.assertIn("error: cannot write output", stderr)
+
+    def test_stdout_flush_failure_returns_exit_two_and_disables_retry(self) -> None:
+        class FlushFailingStream(io.StringIO):
+            def flush(self) -> None:
+                raise OSError("simulated full filesystem")
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            input_path = Path(temporary_directory, "input.sml")
+            input_path.write_bytes(b"true")
+            stdout = FlushFailingStream()
+            stderr = io.StringIO()
+
+            with patch("sys.stdout", stdout), redirect_stderr(stderr):
+                status = main([str(input_path)])
+                stdout_was_disabled = sys.stdout is None
+
+        self.assertEqual(status, 2)
+        self.assertTrue(stdout_was_disabled)
+        self.assertIn("result: success\n", stdout.getvalue())
+        self.assertIn("error: cannot write output standard output", stderr.getvalue())
+
+    @unittest.skipUnless(Path("/dev/full").exists(), "requires /dev/full")
+    def test_module_stdout_flush_failure_exits_two(self) -> None:
+        repository_root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            input_path = Path(temporary_directory, "input.sml")
+            input_path.write_bytes(b"true")
+            full_device = os.open("/dev/full", os.O_WRONLY)
+            try:
+                completed = subprocess.run(
+                    [sys.executable, "-m", "sml_frontend", str(input_path)],
+                    cwd=repository_root,
+                    stdout=full_device,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    check=False,
+                )
+            finally:
+                os.close(full_device)
+
+        self.assertEqual(completed.returncode, 2, completed.stderr)
+        self.assertIn("error: cannot write output standard output", completed.stderr)
+
+    def test_path_resolution_runtime_error_returns_exit_two(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            input_path = Path(temporary_directory, "input.sml")
+            output_path = Path(temporary_directory, "output.txt")
+            input_path.write_bytes(b"true")
+
+            with patch(
+                "pathlib.Path.resolve",
+                side_effect=RuntimeError("Symlink loop from output path"),
+            ):
+                status, stdout, stderr = self.run_main(
+                    [str(input_path), "--output", str(output_path)]
+                )
+
+        self.assertEqual(status, 2)
+        self.assertEqual(stdout, "")
+        self.assertIn("error: cannot resolve input/output paths", stderr)
+        self.assertIn("Symlink loop", stderr)
 
     def test_input_output_collision_is_rejected_without_overwrite(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:

@@ -95,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
     if output_path is not None:
         try:
             collision = _paths_collide(input_path, output_path)
-        except OSError as error:
+        except (OSError, RuntimeError) as error:
             _report_error(f"error: cannot resolve input/output paths: {error}")
             return 2
         if collision:
@@ -121,10 +121,15 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if output_path is None:
             sys.stdout.write(report)
+            sys.stdout.flush()
         else:
             output_path.write_text(report, encoding="utf-8", newline="\n")
     except OSError as error:
         destination = "standard output" if output_path is None else str(output_path)
+        if output_path is None:
+            # Prevent CPython's shutdown flush from retrying the failed stream
+            # and replacing this documented status with exit code 120.
+            sys.stdout = None
         _report_error(f"error: cannot write output {destination}: {error}")
         return 2
 
