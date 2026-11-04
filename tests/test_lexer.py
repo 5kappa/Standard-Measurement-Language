@@ -277,17 +277,86 @@ class PilotScannerTests(unittest.TestCase):
             ),
         )
 
-    def test_unclosed_string_and_block_comment_remain_deferred_to_r8(self) -> None:
-        for source in (b'"unclosed', b"/*unclosed"):
-            with self.subTest(source=source):
-                with self.assertRaisesRegex(NotImplementedError, "R8"):
-                    lex(source)
-
     def test_lone_logical_operators_remain_deferred_to_r9(self) -> None:
         for source in (b"&", b"|"):
             with self.subTest(source=source):
                 with self.assertRaisesRegex(NotImplementedError, "R9"):
                     lex(source)
+
+
+class StringCommentFailureTests(unittest.TestCase):
+    def test_unclosed_string_termination_and_continuation(self) -> None:
+        cases = (
+            (b'"x\nname', "LF", 3),
+            (b'"x\rname', "CR", 3),
+            (b'"x\r\nname', "CRLF", 4),
+        )
+
+        for source, termination, identifier_start in cases:
+            with self.subTest(termination=termination):
+                result = lex(source)
+
+                self.assertIsInstance(result, LexFailure)
+                self.assertEqual(
+                    [token.kind for token in result.partial_tokens],
+                    [TokenKind.IDENT, TokenKind.EOF],
+                )
+                self.assertEqual(
+                    result.partial_tokens[0].span,
+                    SourceSpan(identifier_start, identifier_start + 4),
+                )
+                self.assertEqual(result.diagnostics[0].code, DiagnosticCode.LEX008)
+                self.assertEqual(
+                    result.diagnostics[0].primary.span,
+                    SourceSpan(0, 2),
+                )
+                self.assertEqual(
+                    result.diagnostics[0].data,
+                    {"termination": termination},
+                )
+
+    def test_unclosed_string_at_eof_owns_the_remaining_bytes(self) -> None:
+        result = lex(b'"x')
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(
+            [token.kind for token in result.partial_tokens],
+            [TokenKind.EOF],
+        )
+        self.assertEqual(result.diagnostics[0].code, DiagnosticCode.LEX008)
+        self.assertEqual(result.diagnostics[0].primary.span, SourceSpan(0, 2))
+        self.assertEqual(result.diagnostics[0].data, {"termination": "EOF"})
+
+    def test_unclosed_string_precedes_its_invalid_character_diagnostic(self) -> None:
+        result = lex(b'"x\\')
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(
+            [diagnostic.code for diagnostic in result.diagnostics],
+            [DiagnosticCode.LEX008, DiagnosticCode.LEX002],
+        )
+        self.assertEqual(result.diagnostics[0].primary.span, SourceSpan(0, 3))
+        self.assertEqual(result.diagnostics[1].primary.span, SourceSpan(2, 3))
+        self.assertNotIn(
+            TokenKind.STRING,
+            [token.kind for token in result.partial_tokens],
+        )
+
+    def test_unterminated_block_comment_labels_opener_and_eof(self) -> None:
+        result = lex(b"/* x")
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(
+            [token.kind for token in result.partial_tokens],
+            [TokenKind.EOF],
+        )
+        diagnostic = result.diagnostics[0]
+        self.assertEqual(diagnostic.code, DiagnosticCode.LEX009)
+        self.assertEqual(diagnostic.primary.span, SourceSpan(0, 2))
+        self.assertEqual(len(diagnostic.secondary), 1)
+        self.assertEqual(diagnostic.secondary[0].role, LabelRole.REACHED_EOF)
+        self.assertEqual(diagnostic.secondary[0].span, SourceSpan(4, 4))
+        self.assertEqual(diagnostic.data, {})
 
 
 class NumericCandidateTests(unittest.TestCase):

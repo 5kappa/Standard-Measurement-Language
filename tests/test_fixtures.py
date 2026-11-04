@@ -76,6 +76,15 @@ MALFORMED_NUMBER_FIXTURE_IDS = (
     "lex-repeated-decimal-exact-boundary",
 )
 
+STRING_COMMENT_FAILURE_FIXTURE_IDS = (
+    "lex-invalid-character-unclosed-string",
+    "lex-unclosed-string-lf",
+    "lex-unclosed-string-cr",
+    "lex-unclosed-string-crlf",
+    "lex-unclosed-string-eof",
+    "lex-unterminated-block-comment",
+)
+
 
 class PilotLexerFixtureTests(unittest.TestCase):
     def test_authoritative_pilot_fixture(self) -> None:
@@ -302,6 +311,84 @@ class MalformedNumberFixtureTests(unittest.TestCase):
                     actual_diagnostic.data,
                     expected_diagnostic.data,
                 )
+
+
+class StringCommentFailureFixtureTests(unittest.TestCase):
+    def test_r8_string_and_comment_failure_fixtures(self) -> None:
+        fixtures = load_lexer_failure_fixtures(
+            FIXTURE_ROOT / "lexer" / "lexical-failures.json",
+            STRING_COMMENT_FAILURE_FIXTURE_IDS,
+        )
+
+        self.assertEqual(
+            [fixture.fixture_id for fixture in fixtures],
+            list(STRING_COMMENT_FAILURE_FIXTURE_IDS),
+        )
+        for fixture in fixtures:
+            with self.subTest(fixture=fixture.fixture_id):
+                actual = lex(fixture.source)
+
+                self.assertIsInstance(actual, LexFailure)
+                self.assertTrue(fixture.expects_parse_not_run)
+                self.assertEqual(
+                    actual.partial_tokens,
+                    fixture.expected.partial_tokens,
+                )
+                self.assertEqual(
+                    actual.diagnostics_truncated,
+                    fixture.expected.diagnostics_truncated,
+                )
+                self.assertEqual(
+                    len(actual.diagnostics),
+                    len(fixture.expected.diagnostics),
+                )
+
+                actual_token_positions = locate_token_positions(
+                    fixture.source,
+                    actual.partial_tokens,
+                )
+                for index, expected_positions in enumerate(
+                    fixture.expected_token_positions
+                ):
+                    if expected_positions is not None:
+                        self.assertEqual(
+                            actual_token_positions[index],
+                            expected_positions,
+                        )
+
+                for actual_diagnostic, expected_diagnostic in zip(
+                    actual.diagnostics,
+                    fixture.expected.diagnostics,
+                    strict=True,
+                ):
+                    self.assertEqual(actual_diagnostic.code, expected_diagnostic.code)
+                    self.assertEqual(actual_diagnostic.phase, expected_diagnostic.phase)
+                    self.assertEqual(
+                        actual_diagnostic.severity,
+                        expected_diagnostic.severity,
+                    )
+                    self.assertEqual(actual_diagnostic.notes, expected_diagnostic.notes)
+                    self.assertEqual(actual_diagnostic.data, expected_diagnostic.data)
+                    self._assert_label(
+                        actual_diagnostic.primary,
+                        expected_diagnostic.primary,
+                    )
+                    self.assertEqual(
+                        len(actual_diagnostic.secondary),
+                        len(expected_diagnostic.secondary),
+                    )
+                    for actual_label, expected_label in zip(
+                        actual_diagnostic.secondary,
+                        expected_diagnostic.secondary,
+                        strict=True,
+                    ):
+                        self._assert_label(actual_label, expected_label)
+
+    def _assert_label(self, actual, expected) -> None:
+        self.assertEqual(actual.role, expected.role)
+        self.assertEqual(actual.span, expected.span)
+        if expected.positions is not None:
+            self.assertEqual(actual.positions, expected.positions)
 
 
 if __name__ == "__main__":

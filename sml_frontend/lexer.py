@@ -151,7 +151,7 @@ class _Scanner:
             elif byte is not None and _is_ascii_letter(byte):
                 self._scan_identifier()
             elif byte == 0x22:
-                self._scan_closed_ascii_string()
+                self._scan_string()
             elif byte == 0x2F:
                 self._scan_slash_prefix()
             elif byte in _ONE_BYTE_OPERATOR_KINDS or byte in b"&|":
@@ -362,13 +362,35 @@ class _Scanner:
         kind = _RESERVED_IDENTIFIER_KINDS.get(spelling, TokenKind.IDENT)
         self._emit_ascii_token(kind, start)
 
-    def _scan_closed_ascii_string(self) -> None:
+    def _scan_string(self) -> None:
         start = self.cursor.offset
+        start_position = self.cursor.position
+        first_string_diagnostic = len(self.diagnostics)
         had_lexical_failure = False
         self.advance_one()
         while (byte := self.cursor.peek_byte()) != 0x22:
             if byte is None or byte in b"\r\n":
-                raise NotImplementedError("unclosed string diagnostics begin in R8")
+                if byte is None:
+                    termination = "EOF"
+                elif byte == 0x0A:
+                    termination = "LF"
+                elif self.cursor.peek_byte(1) == 0x0A:
+                    termination = "CRLF"
+                else:
+                    termination = "CR"
+                self.diagnostics.insert(
+                    first_string_diagnostic,
+                    Diagnostic(
+                        DiagnosticCode.LEX008,
+                        DiagnosticLabel(
+                            LabelRole.PRIMARY,
+                            SourceSpan(start, self.cursor.offset),
+                            PositionRange(start_position, self.cursor.position),
+                        ),
+                        data={"termination": termination},
+                    ),
+                )
+                return
             if self.cursor.utf8_scalar_length() is None:
                 self._report_invalid_utf8_byte()
                 had_lexical_failure = True
@@ -398,15 +420,38 @@ class _Scanner:
             self._advance_comment_content()
 
     def _skip_block_comment(self) -> None:
+        start = self.cursor.offset
+        start_position = self.cursor.position
+        first_comment_diagnostic = len(self.diagnostics)
         self.advance_one()
         self.advance_one()
+        opener_end_position = self.cursor.position
         while not self.cursor.at_end:
             if self.source[self.cursor.offset : self.cursor.offset + 2] == b"*/":
                 self.advance_one()
                 self.advance_one()
                 return
             self._advance_comment_content()
-        raise NotImplementedError("unterminated block-comment diagnostics begin in R8")
+        eof_offset = self.cursor.offset
+        eof_position = self.cursor.position
+        self.diagnostics.insert(
+            first_comment_diagnostic,
+            Diagnostic(
+                DiagnosticCode.LEX009,
+                DiagnosticLabel(
+                    LabelRole.PRIMARY,
+                    SourceSpan(start, start + 2),
+                    PositionRange(start_position, opener_end_position),
+                ),
+                secondary=(
+                    DiagnosticLabel(
+                        LabelRole.REACHED_EOF,
+                        SourceSpan(eof_offset, eof_offset),
+                        PositionRange(eof_position, eof_position),
+                    ),
+                ),
+            ),
+        )
 
     def _advance_comment_content(self) -> None:
         byte = self.cursor.peek_byte()
