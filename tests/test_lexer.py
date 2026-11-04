@@ -376,12 +376,12 @@ class NumericCandidateTests(unittest.TestCase):
 
     def test_unsupported_notation_owns_separator_continuations(self) -> None:
         cases = (
-            (b"1e3_0foo", DiagnosticCode.LEX006, "1e3_0"),
-            (b"0x1_0foo", DiagnosticCode.LEX007, "0x1_0"),
-            (b"0b1_0foo", DiagnosticCode.LEX007, "0b1_0"),
+            (b"1e3_0foo", DiagnosticCode.LEX006, "1e3_0", "foo"),
+            (b"0x1_0foo", DiagnosticCode.LEX007, "0x1_0f", "oo"),
+            (b"0b1_0foo", DiagnosticCode.LEX007, "0b1_0", "foo"),
         )
 
-        for source, code, candidate in cases:
+        for source, code, candidate, later_ident in cases:
             with self.subTest(source=source):
                 result = lex(source)
 
@@ -403,16 +403,37 @@ class NumericCandidateTests(unittest.TestCase):
                     (
                         Token(
                             TokenKind.IDENT,
-                            "foo",
-                            SourceSpan(candidate_end, candidate_end + 3),
+                            later_ident,
+                            SourceSpan(
+                                candidate_end,
+                                candidate_end + len(later_ident),
+                            ),
                         ),
                         Token(
                             TokenKind.EOF,
                             "",
-                            SourceSpan(candidate_end + 3, candidate_end + 3),
+                            SourceSpan(len(source), len(source)),
                         ),
                     ),
                 )
+
+    def test_hex_separator_continuation_accepts_letter_valued_digits(self) -> None:
+        source = b"0xAB_CD"
+        result = lex(source)
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(len(result.diagnostics), 1)
+        diagnostic = result.diagnostics[0]
+        self.assertEqual(diagnostic.code, DiagnosticCode.LEX007)
+        self.assertEqual(diagnostic.primary.span, SourceSpan(0, len(source)))
+        self.assertEqual(
+            diagnostic.data,
+            {"candidate_lexeme": "0xAB_CD"},
+        )
+        self.assertEqual(
+            result.partial_tokens,
+            (Token(TokenKind.EOF, "", SourceSpan(len(source), len(source))),),
+        )
 
     def test_ordinary_attached_e_remains_number_then_identifier(self) -> None:
         result = lex(b"5e")

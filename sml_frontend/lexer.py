@@ -305,19 +305,28 @@ class _Scanner:
         ):
             self.advance_one()
 
-        self._consume_numeric_separator_continuation()
+        self._consume_numeric_separator_continuation(
+            hexadecimal=prefix in b"xX",
+        )
         self._report_numeric_failure(
             DiagnosticCode.LEX007,
             start,
             start_position,
         )
 
-    def _consume_numeric_separator_continuation(self) -> bool:
+    def _consume_numeric_separator_continuation(
+        self,
+        *,
+        hexadecimal: bool = False,
+    ) -> bool:
         if self.cursor.peek_byte() != 0x5F:
             return False
-        while (byte := self.cursor.peek_byte()) is not None and (
-            _is_ascii_digit(byte) or byte in b"._"
-        ):
+        while (byte := self.cursor.peek_byte()) is not None:
+            is_digit = (
+                _is_ascii_hex_digit(byte) if hexadecimal else _is_ascii_digit(byte)
+            )
+            if not is_digit and byte not in b"._":
+                break
             self.advance_one()
         return True
 
