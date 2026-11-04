@@ -435,6 +435,42 @@ class NumericCandidateTests(unittest.TestCase):
             (Token(TokenKind.EOF, "", SourceSpan(len(source), len(source))),),
         )
 
+    def test_binary_candidates_own_invalid_decimal_digit_runs(self) -> None:
+        cases = (b"0b102foo", b"0b234foo")
+
+        for source in cases:
+            with self.subTest(source=source):
+                result = lex(source)
+
+                self.assertIsInstance(result, LexFailure)
+                self.assertEqual(len(result.diagnostics), 1)
+                diagnostic = result.diagnostics[0]
+                candidate_end = 5
+                self.assertEqual(diagnostic.code, DiagnosticCode.LEX007)
+                self.assertEqual(
+                    diagnostic.primary.span,
+                    SourceSpan(0, candidate_end),
+                )
+                self.assertEqual(
+                    diagnostic.data,
+                    {"candidate_lexeme": source[:candidate_end].decode("ascii")},
+                )
+                self.assertEqual(
+                    result.partial_tokens,
+                    (
+                        Token(
+                            TokenKind.IDENT,
+                            "foo",
+                            SourceSpan(candidate_end, len(source)),
+                        ),
+                        Token(
+                            TokenKind.EOF,
+                            "",
+                            SourceSpan(len(source), len(source)),
+                        ),
+                    ),
+                )
+
     def test_ordinary_attached_e_remains_number_then_identifier(self) -> None:
         result = lex(b"5e")
 

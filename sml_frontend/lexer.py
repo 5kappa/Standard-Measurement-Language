@@ -296,7 +296,9 @@ class _Scanner:
             ):
                 self.advance_one()
         else:
-            while (byte := self.cursor.peek_byte()) is not None and byte in b"01":
+            while (byte := self.cursor.peek_byte()) is not None and _is_ascii_digit(
+                byte
+            ):
                 self.advance_one()
 
         byte = self.cursor.peek_byte()
