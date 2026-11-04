@@ -44,7 +44,7 @@ Evidence values are:
 
 `PENDING` in the Fixture IDs column is an explicit incomplete requirement. `N/A` means the rule is a process or implementation constraint that does not require a language-conformance fixture. Fixtures are trusted, version-controlled conformance data. The test loader validates only enough structure to decode and execute the indexed fixture cases. Exhaustive validation of the fixture format is not part of the lexer implementation.
 
-Planned module paths follow decision 089 as revised by the trusted-fixture policy. Test-loader paths identify where a record variant will be decoded when its implementation milestone begins; they do not imply that the current lexer milestone already decodes parser, AST, or lexical-failure records.
+Module paths follow decision 089 as revised by the trusted-fixture policy. The completed lexer decodes the required lexer-success and lexical-failure records. Test-loader paths for parser and AST variants identify where those records will be decoded when parser implementation begins; they do not imply current parser support.
 
 ## Token rules
 

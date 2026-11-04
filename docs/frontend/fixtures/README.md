@@ -467,7 +467,7 @@ The version 1 pilot is structurally accepted and indexed by [`index.json`](index
 | `frontend-pilot-uninitialized-let-ast` | Parse success with token references, explicit nulls, ordered arrays, and complete node spans |
 | `frontend-pilot-const-initializer-required` | Parse failure with one structured syntax diagnostic and no AST |
 
-These fixtures establish the representation and expected behavior before implementation. Their JSON, index relationships, IDs, spans, locations, token references, coverage identifiers, phase combinations, and duplicate-key absence have been audited. Executing them against the frontend remains pending because lexer and parser code do not yet exist.
+These fixtures established the representation and expected behavior before implementation. Their JSON, index relationships, IDs, spans, locations, token references, coverage identifiers, phase combinations, and duplicate-key absence have been audited. The lexer pilot and lexical-failure phase gate now pass against the completed lexer; successful-parse and syntax-failure pilot assertions remain pending until parser implementation.
 
 ## Complete version 0.1 suite
 
@@ -482,7 +482,7 @@ The documentation-hardening suite contains 93 fixtures across eight files listed
 - every required source-location boundary; and
 - all 112 traceability rules through fixture evidence or an explicit process-level `N/A` rationale.
 
-Static validation does not claim that an implementation already passes. Once the relevant frontend phase exists, its test-only fixture decoder and conformance tests execute these same expectations without changing them.
+Static validation remains distinct from runtime conformance. The completed lexer executes all 44 indexed lexer and source-location records plus the frontend invalid-UTF-8 phase-gate case without changing their expectations. Parser and AST records remain statically accepted but await parser implementation and runtime execution.
 
 ## Acceptance rule
 

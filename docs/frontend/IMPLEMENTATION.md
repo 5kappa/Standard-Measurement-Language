@@ -150,9 +150,8 @@ Test-only helpers use the standard-library `json` module to read the fixture rec
 Test layers are:
 
 1. focused unit tests for byte classification, UTF-8 validation, positions, and scanner functions;
-2. machine-readable lexer conformance fixtures decoded by small test-only helpers;
-3. later lexical-failure fixture cases as their milestones begin; and
-4. later source-to-AST frontend fixtures after parser implementation.
+2. machine-readable lexer-success and lexical-failure conformance fixtures decoded by small test-only helpers; and
+3. later source-to-AST frontend fixtures after parser implementation.
 
 Rendered English diagnostic messages may have implementation-specific tests but are not conformance snapshots.
 
@@ -193,5 +192,5 @@ GitHub Actions may run the two accepted check commands with Python 3.11.9 after 
 
 ## Readiness rule
 
-The technology decision, pilot fixtures, trusted-fixture policy, and complete static conformance suite are accepted. The first code slice should implement source positions and the smallest token subset needed to pass the lexer pilot; later slices expand through the remaining lexer fixtures before parser work begins.
+The technology decision, trusted-fixture policy, and complete static conformance suite are accepted. The R0–R10 byte-oriented lexer is implemented and passes the lexer-only conformance gate under Python 3.11.9. Parser work may begin from the accepted grammar, AST, diagnostic, recovery, and fixture contracts without changing the lexer API.
 

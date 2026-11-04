@@ -1,6 +1,6 @@
 # Standard Measurement Language Front-End Development Charter
 
-Status: documentation hardening complete; ready for implementation
+Status: documentation hardening and lexer implementation complete; parser implementation not started
 Target: Standard Measurement Language (SML) version 0.1 lexer and parser
 
 ## Purpose
@@ -113,10 +113,10 @@ Implementation begins only after the relevant contract is frozen:
 - Diagnostic and failure-handling work requires the accepted diagnostic and lexical-continuation documents.
 - Full conformance testing requires machine-readable fixtures covering all accepted grammar surfaces.
 
-The first lexer implementation slice will remain deliberately small:
+The lexer implementation began with the deliberately small slice:
 
 ```sml
 10m
 ```
 
-That slice must demonstrate the exact `NUMBER`, `IDENT`, and physical `EOF` token stream, byte spans, source positions, and quantity adjacency without consulting a unit registry or performing parsing or semantic analysis. Expression precedence, unit-expression structure, and AST construction belong to later parser slices.
+That slice established the exact `NUMBER`, `IDENT`, and physical `EOF` token stream, byte spans, source positions, and quantity adjacency without consulting a unit registry or performing parsing or semantic analysis. The completed R0–R10 lexer now passes the full lexer-only conformance gate. Expression precedence, unit-expression structure, and AST construction remain work for later parser slices.

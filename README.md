@@ -6,7 +6,7 @@ Standard Measurement Language (SML) is an educational, unit-aware programming-la
 
 ## Current status
 
-The **front-end documentation-hardening phase is complete**, and lexer implementation is active. Roadmap milestones R0 through R3 are complete; parser implementation has not started.
+The **front-end documentation-hardening phase and version 0.1 lexer are complete**. Lexer roadmap milestones R0 through R10 and the lexer-only conformance gate pass under Python 3.11.9; parser implementation has not started.
 
 The final implementation boundary is:
 
@@ -29,7 +29,7 @@ Semantic analysis, unit-name resolution, dimensional checking, unit normalizatio
 - [Grammar](docs/frontend/GRAMMAR.ebnf) — accepted token-level syntax and parser context constraints
 - [Source AST schema](docs/frontend/AST-SCHEMA.md) — accepted successful-parse nodes, source preservation, collections, and spans
 - [Diagnostic contract](docs/frontend/DIAGNOSTICS.md) — accepted lexical and syntactic codes, labels, ordering, and failure behavior
-- [Lexer development roadmap](docs/frontend/LEXER-ROADMAP.md) — active lexer-only milestones and progress
+- [Lexer development roadmap](docs/frontend/LEXER-ROADMAP.md) — completed lexer milestones and conformance gate
 - [Language specification](LANGUAGE-SPECIFICATION.md) — normative language surface
 - [Decision index](decisions/README.md) — design history and rationale
 
@@ -50,9 +50,18 @@ Unknown-unit detection would require name resolution, which is not part of the l
 
 ## Implementation readiness
 
-The machine-readable fixture format and complete 93-case conformance suite are accepted in [`docs/frontend/fixtures/README.md`](docs/frontend/fixtures/README.md), and [`docs/frontend/TRACEABILITY.md`](docs/frontend/TRACEABILITY.md) contains the completed coverage registry. Lexer implementation now proceeds incrementally against those accepted contracts and fixtures; R0 through R3, including ordinary names, accepted decimal numbers, separate signs, EOF, and basic adjacency, are complete.
+The machine-readable fixture format and complete 93-case conformance suite are accepted in [`docs/frontend/fixtures/README.md`](docs/frontend/fixtures/README.md), and [`docs/frontend/TRACEABILITY.md`](docs/frontend/TRACEABILITY.md) contains the completed coverage registry. The byte-oriented lexer now passes its complete lexer-only fixture scope: all 44 indexed lexer and source-location records plus the frontend invalid-UTF-8 phase-gate case. Parser and AST fixtures remain pending until parser implementation begins.
 
 The initial engineering stack is accepted in [`docs/frontend/IMPLEMENTATION.md`](docs/frontend/IMPLEMENTATION.md): Python 3.11.9, a handwritten byte-oriented lexer, standard-library fixtures and tests, and a handwritten recursive-descent parser later.
+
+Run the completed lexer gate from the repository root with the exact project interpreter:
+
+~~~powershell
+.venv\Scripts\python.exe --version
+.venv\Scripts\python.exe -m unittest tests.test_source tests.test_lexer tests.test_fixtures
+.venv\Scripts\python.exe -m unittest discover
+.venv\Scripts\python.exe -m compileall sml_frontend tests
+~~~
 
 See [`HANDOFF.md`](HANDOFF.md) before continuing work on another workstation.
 

@@ -1,6 +1,6 @@
 # Standard Measurement Language Lexer Development Roadmap
 
-Status: active; R0 through R9 complete
+Status: complete; R0 through R10 complete
 
 Applies to: initial SML version 0.1 lexer implementation only
 
@@ -26,7 +26,7 @@ The accepted contracts and indexed fixtures remain authoritative. This document 
 - [x] R7 — Complete malformed-number diagnostics and continuation
 - [x] R8 — Complete unclosed strings and unterminated block comments
 - [x] R9 — Complete logical-operator recovery, diagnostic ordering, and the reporting cap
-- [ ] R10 — Run the lexer-only conformance gate
+- [x] R10 — Run the lexer-only conformance gate
 
 Mark a milestone complete only after its tests pass under the exact Python 3.11.9 reference interpreter and its completion criteria are met.
 
@@ -457,6 +457,8 @@ Completion criteria:
 - all failure paths consume a nonempty range and terminate.
 
 ### R10 — Run the lexer-only conformance gate
+
+Status: complete; passing under the exact Python 3.11.9 reference interpreter.
 
 Purpose: verify the assembled lexer rather than treating isolated milestone passes as proof of conformance.
 

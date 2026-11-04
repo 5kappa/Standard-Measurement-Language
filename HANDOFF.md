@@ -1,9 +1,9 @@
 # Standard Measurement Language Project Handoff
 
-Handoff date: 2026-11-03
+Handoff date: 2026-11-04
 Project name: Standard Measurement Language (SML)  
-Current phase: lexer implementation; R3 complete, R4 not started
-Implementation status: lexer R0 through R3 complete; parser not started
+Current phase: lexer complete through R10; parser planning is next
+Implementation status: lexer-only conformance gate passes under Python 3.11.9; parser not started
 
 ## Resume here
 
@@ -214,7 +214,7 @@ Parser recovery starting points previously discussed are deferred guidance only.
 - structured diagnostics without normative English rendering;
 - required byte spans and location-sensitive line/column assertions;
 - non-behavioral coverage metadata; and
-- trusted, version-controlled fixture data decoded by small test-only helpers as each implementation milestone begins.
+- trusted, version-controlled fixture data, with lexer variants decoded by small test-only helpers and parser/AST decoding deferred until parser implementation.
 
 ### Implementation technologies
 
@@ -230,17 +230,17 @@ The mechanical coverage audit found no pending rule rows or reciprocal-link fail
 
 ### Pilot fixtures
 
-[`docs/frontend/fixtures/index.json`](docs/frontend/fixtures/index.json) indexes four structurally validated pilot cases across `lexer/pilot.json` and `frontend/pilot.json`. Together they demonstrate lexer success, lexical failure with valid partial tokens, bytewise invalid UTF-8 and exact positions, parser phase gating, successful source AST serialization, and first-error parser failure without an AST. The `10m` lexer pilot now passes; frontend/parser pilots remain pending until their implementation phases begin.
+[`docs/frontend/fixtures/index.json`](docs/frontend/fixtures/index.json) indexes four structurally validated pilot cases across `lexer/pilot.json` and `frontend/pilot.json`. Together they demonstrate lexer success, lexical failure with valid partial tokens, bytewise invalid UTF-8 and exact positions, parser phase gating, successful source AST serialization, and first-error parser failure without an AST. The `10m` lexer pilot and invalid-UTF-8 lexical phase gate pass; successful-parse and syntax-failure pilot assertions remain pending until parser implementation.
 
 ### Complete fixture suite
 
-The completed suite contains 93 fixtures across eight indexed JSON files. Static validation covers all 62 token kinds, all 53 AST node kinds, all ten lexical codes, all 28 active syntax codes, source positions, continuation boundaries, diagnostic limits, phase gating, token references, node spans, strict JSON, unique IDs, and traceability metadata. `SYN001` is intentionally unused; `ICE001` remains process-level. Runtime execution proceeds milestone by milestone using small test-only decoders for the trusted fixture variants currently needed.
+The completed suite contains 93 fixtures across eight indexed JSON files. Static validation covers all 62 token kinds, all 53 AST node kinds, all ten lexical codes, all 28 active syntax codes, source positions, continuation boundaries, diagnostic limits, phase gating, token references, node spans, strict JSON, unique IDs, and traceability metadata. `SYN001` is intentionally unused; `ICE001` remains process-level. Runtime lexer conformance now covers all 44 indexed lexer and source-location records plus the frontend invalid-UTF-8 phase-gate case. Parser and AST fixture execution remains pending.
 
 ## Hardening completion
 
-The final repository-wide documentation consistency audit, fixture population, traceability completion, and mechanical coverage audit are complete. The hardened contracts now govern the active lexer implementation.
+The final repository-wide documentation consistency audit, fixture population, traceability completion, and mechanical coverage audit are complete. The hardened contracts govern the completed R0–R10 lexer implementation.
 
-Continue implementation only through the active lexer-roadmap milestone and its accepted readiness gate. Parser implementation remains deferred.
+The next implementation phase is parser planning against the accepted grammar, AST, diagnostic, recovery, and fixture contracts. Do not expand into semantics or change the completed lexer contract merely for parser convenience.
 
 ## Language-name migration
 
@@ -256,31 +256,14 @@ Because “SML” is also widely associated with Standard ML, the GitHub reposit
 
 ## Repository status
 
-This folder is a Git repository on branch `main`, with an existing documentation-baseline commit and an `origin` remote for `5kappa/Standard-Measurement-Language`.
-
-Before committing the hardened documentation:
-
-1. Review the complete diff and confirm that the user-added proposal source and PDF should be included.
-2. Confirm that generated working material remains excluded by `.gitignore`, including:
-
-   ~~~gitignore
-   graphify-out/
-   tmp/
-   __pycache__/
-   *.py[cod]
-   .venv/
-   ~~~
-
-3. Keep the professor-provided PDF and proposal source documents unless the team intentionally relocates them.
-4. Make the hardening commit describe documentation and fixtures only; do not imply that lexer or parser implementation exists.
-
-No commit or push is performed merely by completing this audit; those remain explicit follow-up actions.
+The canonical branch is `main`, with `origin` at `5kappa/Standard-Measurement-Language`. Generated working material remains excluded by `.gitignore`, including `graphify-out/`, `tmp/`, `__pycache__/`, `*.py[cod]`, and `.venv/`. Keep the professor-provided PDF and proposal source documents unless the team intentionally relocates them.
 
 ## Known unfinished work
 
-- The fixture suite and traceability registry are complete but have not yet been executed against an implementation.
-- The implementation baseline is accepted, but no lexer or parser code exists yet.
+- Parser and AST fixture records are accepted but have not yet been executed against a parser implementation.
+- Parser modules, source AST construction, and syntax-diagnostic execution do not exist yet.
+- Semantic analysis, unit resolution, dimensional checking, evaluation, and runtime behavior remain outside the project boundary.
 
 ## Safe continuation rule
 
-Keep each hardening change small and reviewable. If a new implementation-facing document conflicts with `LANGUAGE-SPECIFICATION.md`, stop at the conflict. Either follow the normative specification or deliberately amend it; do not let an implementation convenience silently redefine SML.
+Keep each parser change small and reviewable. If a new implementation-facing document or parser decision conflicts with `LANGUAGE-SPECIFICATION.md` or the accepted lexer contract, stop at the conflict. Either follow the normative specification or deliberately amend it; do not let an implementation convenience silently redefine SML.
