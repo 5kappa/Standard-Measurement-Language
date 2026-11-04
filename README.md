@@ -6,7 +6,7 @@ Standard Measurement Language (SML) is an educational, unit-aware programming-la
 
 ## Current status
 
-The **front-end documentation-hardening phase and version 0.1 lexer are complete**. Lexer roadmap milestones R0 through R10 and the lexer-only conformance gate pass under Python 3.11.9; parser implementation has not started.
+The **front-end documentation-hardening phase and version 0.1 lexer are complete**. Lexer roadmap milestones R0 through R10, the lexer-only conformance gate, and the lexer command-line interface pass under Python 3.11.9; parser implementation has not started.
 
 The final implementation boundary is:
 
@@ -54,10 +54,25 @@ The machine-readable fixture format and complete 93-case conformance suite are a
 
 The initial engineering stack is accepted in [`docs/frontend/IMPLEMENTATION.md`](docs/frontend/IMPLEMENTATION.md): Python 3.11.9, a handwritten byte-oriented lexer, standard-library fixtures and tests, and a handwritten recursive-descent parser later.
 
+Run the lexer on a source file and write its deterministic text report to standard output:
+
+~~~powershell
+.venv\Scripts\python.exe -m sml_frontend input.sml
+~~~
+
+Use `--output` to write the report to a file instead:
+
+~~~powershell
+.venv\Scripts\python.exe -m sml_frontend input.sml --output output.txt
+~~~
+
+The report includes every valid token, its half-open byte span, and a JSON-quoted lexeme. Lexical failures additionally include valid partial tokens, structured diagnostics, secondary labels, and the diagnostic-truncation flag. The command exits with status `0` for lexical success, `1` for lexical failure, `2` for argument or file-I/O failure, and `3` for an unexpected internal frontend failure. An input/output path collision is rejected so the source file cannot be overwritten.
+
 Run the completed lexer gate from the repository root with the exact project interpreter:
 
 ~~~powershell
 .venv\Scripts\python.exe --version
+.venv\Scripts\python.exe -m unittest tests.test_cli
 .venv\Scripts\python.exe -m unittest tests.test_source tests.test_lexer tests.test_fixtures
 .venv\Scripts\python.exe -m unittest discover
 .venv\Scripts\python.exe -m compileall sml_frontend tests
