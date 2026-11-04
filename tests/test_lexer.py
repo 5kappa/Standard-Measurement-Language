@@ -277,11 +277,110 @@ class PilotScannerTests(unittest.TestCase):
             ),
         )
 
-    def test_lone_logical_operators_remain_deferred_to_r9(self) -> None:
-        for source in (b"&", b"|"):
-            with self.subTest(source=source):
-                with self.assertRaisesRegex(NotImplementedError, "R9"):
-                    lex(source)
+    def test_lone_logical_operators_are_not_valid_tokens(self) -> None:
+        result = lex(b"&x |y")
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(
+            result.partial_tokens,
+            (
+                Token(TokenKind.IDENT, "x", SourceSpan(1, 2)),
+                Token(TokenKind.IDENT, "y", SourceSpan(4, 5)),
+                Token(TokenKind.EOF, "", SourceSpan(5, 5)),
+            ),
+        )
+        self.assertEqual(
+            [diagnostic.code for diagnostic in result.diagnostics],
+            [DiagnosticCode.LEX010, DiagnosticCode.LEX010],
+        )
+        self.assertEqual(
+            [diagnostic.primary.span for diagnostic in result.diagnostics],
+            [SourceSpan(0, 1), SourceSpan(3, 4)],
+        )
+        self.assertEqual(
+            [diagnostic.data for diagnostic in result.diagnostics],
+            [{"operator_lexeme": "&"}, {"operator_lexeme": "|"}],
+        )
+
+
+class DiagnosticOrderingAndLimitTests(unittest.TestCase):
+    def test_diagnostics_order_by_start_then_end_then_code(self) -> None:
+        scanner = _Scanner(b"xxx")
+        diagnostics = (
+            Diagnostic(
+                DiagnosticCode.LEX002,
+                DiagnosticLabel(LabelRole.PRIMARY, SourceSpan(2, 3)),
+            ),
+            Diagnostic(
+                DiagnosticCode.LEX010,
+                DiagnosticLabel(LabelRole.PRIMARY, SourceSpan(0, 2)),
+            ),
+            Diagnostic(
+                DiagnosticCode.LEX008,
+                DiagnosticLabel(LabelRole.PRIMARY, SourceSpan(0, 1)),
+            ),
+            Diagnostic(
+                DiagnosticCode.LEX001,
+                DiagnosticLabel(LabelRole.PRIMARY, SourceSpan(0, 1)),
+            ),
+        )
+
+        for diagnostic in diagnostics:
+            scanner._record_diagnostic(diagnostic)
+
+        self.assertEqual(
+            [diagnostic.code for diagnostic in scanner.diagnostics],
+            [
+                DiagnosticCode.LEX001,
+                DiagnosticCode.LEX008,
+                DiagnosticCode.LEX010,
+                DiagnosticCode.LEX002,
+            ],
+        )
+
+    def test_exactly_twenty_failures_are_not_truncated(self) -> None:
+        result = lex(b" ".join([b"_"] * 20))
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(len(result.diagnostics), 20)
+        self.assertFalse(result.diagnostics_truncated)
+        self.assertEqual(
+            result.partial_tokens,
+            (Token(TokenKind.EOF, "", SourceSpan(39, 39)),),
+        )
+
+    def test_twenty_first_failure_is_truncated_but_scanning_continues(self) -> None:
+        source = b" ".join([b"_"] * 21) + b" ok"
+        result = lex(source)
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(len(result.diagnostics), 20)
+        self.assertTrue(result.diagnostics_truncated)
+        self.assertEqual(
+            result.partial_tokens,
+            (
+                Token(TokenKind.IDENT, "ok", SourceSpan(42, 44)),
+                Token(TokenKind.EOF, "", SourceSpan(44, 44)),
+            ),
+        )
+
+    def test_late_earlier_diagnostic_displaces_later_record_at_cap(self) -> None:
+        source = b'"' + (b"\\" * 20)
+        result = lex(source)
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(len(result.diagnostics), 20)
+        self.assertTrue(result.diagnostics_truncated)
+        self.assertEqual(result.diagnostics[0].code, DiagnosticCode.LEX008)
+        self.assertEqual(result.diagnostics[0].primary.span, SourceSpan(0, 21))
+        self.assertEqual(
+            [diagnostic.primary.span for diagnostic in result.diagnostics[1:]],
+            [SourceSpan(offset, offset + 1) for offset in range(1, 20)],
+        )
+        self.assertEqual(
+            result.partial_tokens,
+            (Token(TokenKind.EOF, "", SourceSpan(21, 21)),),
+        )
 
 
 class StringCommentFailureTests(unittest.TestCase):

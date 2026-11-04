@@ -88,6 +88,7 @@ _DELIMITER_KINDS = {
 
 _CANONICAL_SYMBOL_BYTES = b".+-*/%^<>=!&|(){}[];:,\"_"
 _WHITESPACE_BYTES = b" \t\r\n"
+_DIAGNOSTIC_LIMIT = 20
 
 
 @dataclass(frozen=True, slots=True)
@@ -339,7 +340,7 @@ class _Scanner:
         start_position: SourcePosition,
     ) -> None:
         end = self.cursor.offset
-        self.diagnostics.append(
+        self._record_diagnostic(
             Diagnostic(
                 code,
                 DiagnosticLabel(
@@ -365,7 +366,6 @@ class _Scanner:
     def _scan_string(self) -> None:
         start = self.cursor.offset
         start_position = self.cursor.position
-        first_string_diagnostic = len(self.diagnostics)
         had_lexical_failure = False
         self.advance_one()
         while (byte := self.cursor.peek_byte()) != 0x22:
@@ -378,8 +378,7 @@ class _Scanner:
                     termination = "CRLF"
                 else:
                     termination = "CR"
-                self.diagnostics.insert(
-                    first_string_diagnostic,
+                self._record_diagnostic(
                     Diagnostic(
                         DiagnosticCode.LEX008,
                         DiagnosticLabel(
@@ -422,7 +421,6 @@ class _Scanner:
     def _skip_block_comment(self) -> None:
         start = self.cursor.offset
         start_position = self.cursor.position
-        first_comment_diagnostic = len(self.diagnostics)
         self.advance_one()
         self.advance_one()
         opener_end_position = self.cursor.position
@@ -434,8 +432,7 @@ class _Scanner:
             self._advance_comment_content()
         eof_offset = self.cursor.offset
         eof_position = self.cursor.position
-        self.diagnostics.insert(
-            first_comment_diagnostic,
+        self._record_diagnostic(
             Diagnostic(
                 DiagnosticCode.LEX009,
                 DiagnosticLabel(
@@ -468,7 +465,7 @@ class _Scanner:
         unit = self.advance_one()
         if unit.kind is not SourceUnitKind.INVALID_UTF8:
             raise RuntimeError("LEX001 must consume exactly one invalid UTF-8 byte")
-        self.diagnostics.append(
+        self._record_diagnostic(
             Diagnostic(
                 DiagnosticCode.LEX001,
                 DiagnosticLabel(
@@ -484,7 +481,7 @@ class _Scanner:
         unit = self.advance_one()
         if unit.kind is SourceUnitKind.INVALID_UTF8:
             raise RuntimeError("LEX002 requires a complete well-formed UTF-8 scalar")
-        self.diagnostics.append(
+        self._record_diagnostic(
             Diagnostic(
                 DiagnosticCode.LEX002,
                 DiagnosticLabel(
@@ -509,9 +506,33 @@ class _Scanner:
         byte = self.cursor.peek_byte()
         kind = _ONE_BYTE_OPERATOR_KINDS.get(byte)
         if kind is None:
-            raise NotImplementedError("lone logical operators begin in R9")
+            unit = self.advance_one()
+            self._record_diagnostic(
+                Diagnostic(
+                    DiagnosticCode.LEX010,
+                    DiagnosticLabel(
+                        LabelRole.PRIMARY,
+                        unit.span,
+                        unit.positions,
+                    ),
+                    data={"operator_lexeme": unit.source_bytes.decode("ascii")},
+                )
+            )
+            return
         self.advance_one()
         self._emit_ascii_token(kind, start)
+
+    def _record_diagnostic(self, diagnostic: Diagnostic) -> None:
+        key = _diagnostic_sort_key(diagnostic)
+        if len(self.diagnostics) < _DIAGNOSTIC_LIMIT:
+            self.diagnostics.append(diagnostic)
+            self.diagnostics.sort(key=_diagnostic_sort_key)
+            return
+
+        self.diagnostics_truncated = True
+        if key < _diagnostic_sort_key(self.diagnostics[-1]):
+            self.diagnostics[-1] = diagnostic
+            self.diagnostics.sort(key=_diagnostic_sort_key)
 
     def _scan_delimiter(self) -> None:
         start = self.cursor.offset
@@ -566,3 +587,8 @@ def _is_canonical_ascii(value: int) -> bool:
         or value in _WHITESPACE_BYTES
         or value in _CANONICAL_SYMBOL_BYTES
     )
+
+
+def _diagnostic_sort_key(diagnostic: Diagnostic) -> tuple[int, int, str]:
+    span = diagnostic.primary.span
+    return span.start_byte, span.end_byte, diagnostic.code.value
