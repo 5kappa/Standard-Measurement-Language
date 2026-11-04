@@ -207,11 +207,62 @@ class PilotScannerTests(unittest.TestCase):
                 self.assertIsInstance(result, LexSuccess)
                 self.assertEqual(result.tokens[0].kind, expected_kind)
 
-    def test_slash_comment_prefixes_are_recognized_before_slash_tokens(self) -> None:
-        for source in (b"//comment", b"/*comment*/"):
-            with self.subTest(source=source):
-                with self.assertRaisesRegex(NotImplementedError, "R5"):
-                    lex(source)
+    def test_comments_are_skipped_and_leave_physical_span_gaps(self) -> None:
+        result = lex(b"10/*note*/m 20//line\r\nkg")
+
+        self.assertEqual(
+            result,
+            LexSuccess(
+                (
+                    Token(TokenKind.NUMBER, "10", SourceSpan(0, 2)),
+                    Token(TokenKind.IDENT, "m", SourceSpan(10, 11)),
+                    Token(TokenKind.NUMBER, "20", SourceSpan(12, 14)),
+                    Token(TokenKind.IDENT, "kg", SourceSpan(22, 24)),
+                    Token(TokenKind.EOF, "", SourceSpan(24, 24)),
+                )
+            ),
+        )
+
+    def test_block_comment_closes_at_first_terminator_without_nesting(self) -> None:
+        result = lex(b"/* outer /* inner */ x")
+
+        self.assertEqual(
+            result,
+            LexSuccess(
+                (
+                    Token(TokenKind.IDENT, "x", SourceSpan(21, 22)),
+                    Token(TokenKind.EOF, "", SourceSpan(22, 22)),
+                )
+            ),
+        )
+
+    def test_lf_cr_crlf_and_tabs_are_skipped_as_trivia(self) -> None:
+        result = lex(b"a\nb\rc\r\n\td\te")
+
+        self.assertEqual(
+            [token.span for token in result.tokens],
+            [
+                SourceSpan(0, 1),
+                SourceSpan(2, 3),
+                SourceSpan(4, 5),
+                SourceSpan(8, 9),
+                SourceSpan(10, 11),
+                SourceSpan(11, 11),
+            ],
+        )
+
+    def test_trailing_whitespace_reaches_physical_eof(self) -> None:
+        result = lex(b"x \t\r\n")
+
+        self.assertEqual(
+            result,
+            LexSuccess(
+                (
+                    Token(TokenKind.IDENT, "x", SourceSpan(0, 1)),
+                    Token(TokenKind.EOF, "", SourceSpan(5, 5)),
+                )
+            ),
+        )
 
     def test_closed_ascii_string_is_constructible_for_the_r4_inventory(self) -> None:
         result = lex(b'"x"')
@@ -225,6 +276,18 @@ class PilotScannerTests(unittest.TestCase):
                 )
             ),
         )
+
+    def test_invalid_string_and_comment_characters_remain_deferred_to_r6(self) -> None:
+        for source in (b'"bad\\character"', b"//bad\\character"):
+            with self.subTest(source=source):
+                with self.assertRaisesRegex(NotImplementedError, "R6"):
+                    lex(source)
+
+    def test_unclosed_string_and_block_comment_remain_deferred_to_r8(self) -> None:
+        for source in (b'"unclosed', b"/*unclosed"):
+            with self.subTest(source=source):
+                with self.assertRaisesRegex(NotImplementedError, "R8"):
+                    lex(source)
 
     def test_unimplemented_surface_fails_loudly(self) -> None:
         deferred_sources = (b"0123", b"2.5e3", b"0x10")

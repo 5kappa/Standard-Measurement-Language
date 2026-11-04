@@ -1,6 +1,6 @@
 # Standard Measurement Language Lexer Development Roadmap
 
-Status: active; R0 through R4 complete
+Status: active; R0 through R5 complete
 
 Applies to: initial SML version 0.1 lexer implementation only
 
@@ -21,7 +21,7 @@ The accepted contracts and indexed fixtures remain authoritative. This document 
 - [x] R2 — Pass the `10m` lexer pilot
 - [x] R3 — Complete ordinary names, numbers, signs, EOF, and basic adjacency
 - [x] R4 — Complete token inventory, delimiters, and maximal-munch operators
-- [ ] R5 — Complete strings, trivia, newlines, tabs, and comment adjacency
+- [x] R5 — Complete strings, trivia, newlines, tabs, and comment adjacency
 - [ ] R6 — Complete UTF-8 and canonical-character diagnostics
 - [ ] R7 — Complete malformed-number diagnostics and continuation
 - [ ] R8 — Complete unclosed strings and unterminated block comments
@@ -251,6 +251,8 @@ Completion criteria:
 - context-sensitive validity remains a later parser concern.
 
 ### R5 — Complete strings, trivia, newlines, tabs, and comment adjacency
+
+Status: complete; passing under the exact Python 3.11.9 reference interpreter.
 
 Purpose: finish successful scanning while proving that skipped bytes still control positions and attachment.
 

@@ -8,7 +8,12 @@ import json
 from pathlib import Path
 
 from sml_frontend.lexer import LexSuccess
-from sml_frontend.source import SourceSpan
+from sml_frontend.source import (
+    PositionRange,
+    SourceCursor,
+    SourcePosition,
+    SourceSpan,
+)
 from sml_frontend.token import Token, TokenKind
 
 
@@ -17,6 +22,7 @@ class LexerFixture:
     fixture_id: str
     source: bytes
     expected: LexSuccess
+    expected_positions: tuple[PositionRange | None, ...]
 
 
 def load_lexer_success_fixtures(
@@ -45,16 +51,30 @@ def load_lexer_success_fixtures(
         if lex_result["status"] != "success":
             raise ValueError("this loader currently supports only lexer success fixtures")
 
-        tokens = tuple(
-            Token(
-                TokenKind(token["kind"]),
-                token["lexeme"],
-                SourceSpan(token["span"]["start_byte"], token["span"]["end_byte"]),
+        tokens = []
+        expected_positions = []
+        for token in lex_result["tokens"]:
+            tokens.append(
+                Token(
+                    TokenKind(token["kind"]),
+                    token["lexeme"],
+                    SourceSpan(
+                        token["span"]["start_byte"],
+                        token["span"]["end_byte"],
+                    ),
+                )
             )
-            for token in lex_result["tokens"]
-        )
+            positions = token.get("positions")
+            expected_positions.append(
+                None if positions is None else _decode_position_range(positions)
+            )
         fixtures.append(
-            LexerFixture(fixture["id"], source, LexSuccess(tokens))
+            LexerFixture(
+                fixture["id"],
+                source,
+                LexSuccess(tuple(tokens)),
+                tuple(expected_positions),
+            )
         )
 
     if selected_ids is not None:
@@ -64,3 +84,39 @@ def load_lexer_success_fixtures(
             raise ValueError(f"fixture IDs not found in {path}: {sorted(missing_ids)}")
 
     return tuple(fixtures)
+
+
+def locate_token_positions(
+    source: bytes, tokens: tuple[Token, ...]
+) -> tuple[PositionRange, ...]:
+    """Locate actual token-span boundaries without expanding the public token API."""
+
+    cursor = SourceCursor(source)
+    positions_by_offset = {0: cursor.position}
+    while not cursor.at_end:
+        cursor.advance()
+        positions_by_offset[cursor.offset] = cursor.position
+
+    return tuple(
+        PositionRange(
+            positions_by_offset[token.span.start_byte],
+            positions_by_offset[token.span.end_byte],
+        )
+        for token in tokens
+    )
+
+
+def _decode_position_range(record: dict[str, object]) -> PositionRange:
+    start = record["start"]
+    end = record["end"]
+    if not isinstance(start, dict) or not isinstance(end, dict):
+        raise ValueError("fixture position boundaries must be records")
+    return PositionRange(_decode_position(start), _decode_position(end))
+
+
+def _decode_position(record: dict[str, object]) -> SourcePosition:
+    return SourcePosition(
+        int(record["byte_offset"]),
+        int(record["line"]),
+        int(record["column"]),
+    )

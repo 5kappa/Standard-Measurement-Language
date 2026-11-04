@@ -1,8 +1,12 @@
 from pathlib import Path
 import unittest
 
-from sml_frontend.lexer import lex
-from tests.fixture_loader import load_lexer_success_fixtures
+from sml_frontend.lexer import LexSuccess, lex
+from tests.fixture_loader import (
+    LexerFixture,
+    load_lexer_success_fixtures,
+    locate_token_positions,
+)
 
 
 FIXTURE_ROOT = Path(__file__).parents[1] / "docs" / "frontend" / "fixtures"
@@ -23,6 +27,17 @@ BASIC_LOCATION_FIXTURE_IDS = (
 TOKEN_INVENTORY_FIXTURE_IDS = (
     "lex-all-token-kinds",
     "lex-maximal-munch-boundaries",
+)
+
+TRIVIA_TOKEN_FIXTURE_IDS = (
+    "lex-complete-strings",
+    "lex-comments-adjacency-and-nonnesting",
+)
+
+TRIVIA_LOCATION_FIXTURE_IDS = (
+    "location-comment-detached-quantity-boundary",
+    "location-newline-and-tab-forms",
+    "location-multiline-block-comment",
 )
 
 
@@ -85,6 +100,36 @@ class TokenInventoryFixtureTests(unittest.TestCase):
         for fixture in fixtures:
             with self.subTest(fixture=fixture.fixture_id):
                 self.assertEqual(lex(fixture.source), fixture.expected)
+
+
+class TriviaAndPositionFixtureTests(unittest.TestCase):
+    def test_r5_successful_trivia_and_position_fixtures(self) -> None:
+        token_fixtures = load_lexer_success_fixtures(
+            FIXTURE_ROOT / "lexer" / "tokens.json",
+            TRIVIA_TOKEN_FIXTURE_IDS,
+        )
+        location_fixtures = load_lexer_success_fixtures(
+            FIXTURE_ROOT / "locations" / "source-locations.json",
+            TRIVIA_LOCATION_FIXTURE_IDS,
+        )
+        fixtures = token_fixtures + location_fixtures
+
+        self.assertEqual(
+            [fixture.fixture_id for fixture in fixtures],
+            list(TRIVIA_TOKEN_FIXTURE_IDS + TRIVIA_LOCATION_FIXTURE_IDS),
+        )
+        for fixture in fixtures:
+            with self.subTest(fixture=fixture.fixture_id):
+                self._assert_fixture(fixture)
+
+    def _assert_fixture(self, fixture: LexerFixture) -> None:
+        actual = lex(fixture.source)
+        self.assertEqual(actual, fixture.expected)
+        self.assertIsInstance(actual, LexSuccess)
+        actual_positions = locate_token_positions(fixture.source, actual.tokens)
+        for index, expected_positions in enumerate(fixture.expected_positions):
+            if expected_positions is not None:
+                self.assertEqual(actual_positions[index], expected_positions)
 
 
 if __name__ == "__main__":

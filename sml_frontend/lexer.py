@@ -80,6 +80,9 @@ _DELIMITER_KINDS = {
     0x2C: TokenKind.COMMA,
 }
 
+_CANONICAL_SYMBOL_BYTES = b".+-*/%^<>=!&|(){}[];:,\"_"
+_WHITESPACE_BYTES = b" \t\r\n"
+
 
 @dataclass(frozen=True, slots=True)
 class LexSuccess:
@@ -145,8 +148,8 @@ class _Scanner:
                 self._scan_operator()
             elif byte in _DELIMITER_KINDS:
                 self._scan_delimiter()
-            elif byte == 0x20:
-                self._skip_ascii_spaces()
+            elif byte in _WHITESPACE_BYTES:
+                self._skip_whitespace()
             else:
                 raise NotImplementedError(
                     "the current lexer subset does not recognize this source byte"
@@ -190,20 +193,47 @@ class _Scanner:
         self.advance_one()
         while (byte := self.cursor.peek_byte()) != 0x22:
             if byte is None or byte in b"\r\n":
-                raise NotImplementedError("string termination behavior begins in R5")
-            if byte == 0x5C or byte < 0x20 or byte > 0x7E:
-                raise NotImplementedError(
-                    "string character diagnostics begin after R4"
-                )
+                raise NotImplementedError("unclosed string diagnostics begin in R8")
+            if not _is_canonical_ascii(byte):
+                raise NotImplementedError("source character diagnostics begin in R6")
             self.advance_one()
         self.advance_one()
         self._emit_ascii_token(TokenKind.STRING, start)
 
     def _scan_slash_prefix(self) -> None:
         prefix = self.source[self.cursor.offset : self.cursor.offset + 2]
-        if prefix in (b"//", b"/*"):
-            raise NotImplementedError("comment bodies and trivia begin in R5")
+        if prefix == b"//":
+            self._skip_line_comment()
+            return
+        if prefix == b"/*":
+            self._skip_block_comment()
+            return
         self._scan_operator()
+
+    def _skip_line_comment(self) -> None:
+        self.advance_one()
+        self.advance_one()
+        while (byte := self.cursor.peek_byte()) is not None and byte not in b"\r\n":
+            self._advance_comment_content()
+
+    def _skip_block_comment(self) -> None:
+        self.advance_one()
+        self.advance_one()
+        while not self.cursor.at_end:
+            if self.source[self.cursor.offset : self.cursor.offset + 2] == b"*/":
+                self.advance_one()
+                self.advance_one()
+                return
+            self._advance_comment_content()
+        raise NotImplementedError("unterminated block-comment diagnostics begin in R8")
+
+    def _advance_comment_content(self) -> None:
+        byte = self.cursor.peek_byte()
+        if byte is None:
+            raise RuntimeError("comment content cannot advance beyond EOF")
+        if not _is_canonical_ascii(byte):
+            raise NotImplementedError("source character diagnostics begin in R6")
+        self.advance_one()
 
     def _scan_operator(self) -> None:
         start = self.cursor.offset
@@ -229,8 +259,11 @@ class _Scanner:
         self.advance_one()
         self._emit_ascii_token(kind, start)
 
-    def _skip_ascii_spaces(self) -> None:
-        while self.cursor.peek_byte() == 0x20:
+    def _skip_whitespace(self) -> None:
+        while (
+            (byte := self.cursor.peek_byte()) is not None
+            and byte in _WHITESPACE_BYTES
+        ):
             self.advance_one()
 
     def _reject_deferred_numeric_candidate(self, start: int) -> None:
@@ -278,3 +311,12 @@ def _is_ascii_digit(value: int) -> bool:
 
 def _is_ascii_letter(value: int) -> bool:
     return 0x41 <= value <= 0x5A or 0x61 <= value <= 0x7A
+
+
+def _is_canonical_ascii(value: int) -> bool:
+    return (
+        _is_ascii_letter(value)
+        or _is_ascii_digit(value)
+        or value in _WHITESPACE_BYTES
+        or value in _CANONICAL_SYMBOL_BYTES
+    )
