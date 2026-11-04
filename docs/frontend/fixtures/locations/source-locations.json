@@ -575,12 +575,12 @@
                 "start": {
                   "byte_offset": 3,
                   "line": 1,
-                  "column": 4
+                  "column": 3
                 },
                 "end": {
                   "byte_offset": 4,
                   "line": 1,
-                  "column": 5
+                  "column": 4
                 }
               }
             },
@@ -595,12 +595,12 @@
                 "start": {
                   "byte_offset": 4,
                   "line": 1,
-                  "column": 5
+                  "column": 4
                 },
                 "end": {
                   "byte_offset": 4,
                   "line": 1,
-                  "column": 5
+                  "column": 4
                 }
               }
             }
@@ -625,7 +625,7 @@
                   "end": {
                     "byte_offset": 3,
                     "line": 1,
-                    "column": 4
+                    "column": 3
                   }
                 }
               },

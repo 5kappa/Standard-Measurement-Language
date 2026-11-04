@@ -1391,7 +1391,7 @@
                   "end": {
                     "byte_offset": 4,
                     "line": 1,
-                    "column": 5
+                    "column": 4
                   }
                 }
               },
@@ -1453,12 +1453,12 @@
                 "start": {
                   "byte_offset": 6,
                   "line": 1,
-                  "column": 7
+                  "column": 6
                 },
                 "end": {
                   "byte_offset": 7,
                   "line": 1,
-                  "column": 8
+                  "column": 7
                 }
               }
             },
@@ -1473,12 +1473,12 @@
                 "start": {
                   "byte_offset": 7,
                   "line": 1,
-                  "column": 8
+                  "column": 7
                 },
                 "end": {
                   "byte_offset": 7,
                   "line": 1,
-                  "column": 8
+                  "column": 7
                 }
               }
             }
@@ -1503,7 +1503,7 @@
                   "end": {
                     "byte_offset": 4,
                     "line": 1,
-                    "column": 5
+                    "column": 4
                   }
                 }
               },
