@@ -111,6 +111,29 @@ Required invariants:
 
 File access errors are reported by the CLI before calling `lex`. Unexpected invariant violations are internal implementation failures; they are not converted into lexical source diagnostics. The application boundary may report them as `ICE001` while preserving debugging information.
 
+## Command-line boundary
+
+The completed command-line entry point is intentionally smaller than the lexer:
+
+```powershell
+.venv\Scripts\python.exe -m sml_frontend INPUT [--output PATH]
+```
+
+It reads `INPUT` with `Path.read_bytes()`, passes the unchanged bytes to `lex`, and writes a deterministic human-readable report to standard output unless `--output` names a file. It does not pre-decode the complete source. Existing explicitly named output files may be overwritten; a resolved input/output path collision is rejected before reading or writing so the source cannot be overwritten.
+
+Every token line contains the token kind, zero-based half-open byte span, and JSON-quoted lexeme. A failure report contains the valid partial token collection followed by each diagnostic code, primary span, stable JSON diagnostic data, any secondary label roles and spans, and the lowercase `diagnostics_truncated` state. JSON quoting uses ASCII escapes and sorted object keys so report text is stable across output environments. English diagnostic prose remains non-normative and is not synthesized by this boundary.
+
+Process exit statuses are:
+
+| Status | Meaning |
+| --- | --- |
+| `0` | Lexical success; the complete token collection was reported |
+| `1` | Lexical failure; valid partial tokens and diagnostics were reported |
+| `2` | Argument parsing, path resolution, input read, or output write failure |
+| `3` | Unexpected internal frontend failure, reported as `ICE001` |
+
+The boundary never calls a parser. `tests/test_cli.py` covers direct `main(argv)` behavior and a real `python -m sml_frontend` subprocess invocation using only the standard library.
+
 ## Lexer architecture
 
 One scanner instance owns:
@@ -167,6 +190,7 @@ sml_frontend/
     lexer.py
 tests/
     fixture_loader.py
+    test_cli.py
     test_source.py
     test_lexer.py
     test_fixtures.py

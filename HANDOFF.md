@@ -2,8 +2,8 @@
 
 Handoff date: 2026-11-04
 Project name: Standard Measurement Language (SML)  
-Current phase: lexer complete through R10; parser planning is next
-Implementation status: lexer-only conformance gate passes under Python 3.11.9; parser not started
+Current phase: lexer and lexer CLI complete; parser planning is next
+Implementation status: lexer-only conformance gate and CLI tests pass under Python 3.11.9; parser not started
 
 ## Resume here
 
@@ -221,6 +221,19 @@ Parser recovery starting points previously discussed are deferred guidance only.
 [`docs/frontend/IMPLEMENTATION.md`](docs/frontend/IMPLEMENTATION.md) and [decision 089](decisions/089-python-frontend-implementation.md) are accepted. The initial frontend uses Python 3.11.9 as its exact reference interpreter, no runtime dependencies, a handwritten deterministic lexer over original bytes, immutable returned records, standard-library JSON and `unittest`, and a small `argparse` CLI. The later parser will use handwritten recursive descent without a parser generator or external parsing library.
 
 `LexFailure` is one failed-scan result rather than a hierarchy of error subclasses. Its ordered structured diagnostics, each carrying a code from `LEX001` through `LEX010`, identify the possibly heterogeneous source-failure causes. In Python, each diagnostic stores its code-specific stable data in a small dictionary whose required keys are determined by the diagnostic code. File I/O errors remain outside the lexer; internal defects are not lexical source failures.
+
+### Lexer command-line interface
+
+`sml_frontend/__main__.py` provides the completed standard-library CLI:
+
+```powershell
+.venv\Scripts\python.exe -m sml_frontend input.sml
+.venv\Scripts\python.exe -m sml_frontend input.sml --output output.txt
+```
+
+It reads the original file with `Path.read_bytes()` and never pre-decodes the complete source. Its deterministic human-readable report includes token kinds, half-open byte spans, JSON-quoted lexemes, and, for `LexFailure`, ordered structured diagnostics, stable diagnostic data, secondary labels, and `diagnostics_truncated`. Standard output is the default destination; an explicitly named existing output file may be overwritten, but an input/output path collision is rejected.
+
+Exit statuses preserve the accepted failure boundary: `0` means lexical success, `1` means lexical failure, `2` means an argument or file-I/O failure, and `3` means an unexpected internal frontend failure. CLI coverage lives in `tests/test_cli.py` and includes a real `python -m sml_frontend` subprocess path.
 
 ### Traceability registry
 
