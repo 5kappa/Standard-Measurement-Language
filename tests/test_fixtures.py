@@ -58,6 +58,24 @@ SOURCE_CHARACTER_FRONTEND_FIXTURE_IDS = (
     "frontend-pilot-invalid-utf8-phase-gate",
 )
 
+MALFORMED_NUMBER_FIXTURE_IDS = (
+    "lex-leading-zero",
+    "lex-malformed-leading-decimal",
+    "lex-malformed-trailing-decimal",
+    "lex-malformed-repeated-decimal",
+    "lex-numeric-separator",
+    "lex-numeric-separator-exact-boundary",
+    "lex-scientific-boundary",
+    "lex-scientific-notation",
+    "lex-scientific-incomplete-sign",
+    "lex-alternate-base-empty",
+    "lex-hex-notation",
+    "lex-hex-boundary",
+    "lex-hex-invalid-digit-exact-boundary",
+    "lex-binary-notation",
+    "lex-repeated-decimal-exact-boundary",
+)
+
 
 class PilotLexerFixtureTests(unittest.TestCase):
     def test_authoritative_pilot_fixture(self) -> None:
@@ -246,6 +264,44 @@ class SourceCharacterFixtureTests(unittest.TestCase):
         self.assertEqual(actual.span, expected.span)
         if expected.positions is not None:
             self.assertEqual(actual.positions, expected.positions)
+
+
+class MalformedNumberFixtureTests(unittest.TestCase):
+    def test_r7_malformed_number_fixtures(self) -> None:
+        fixtures = load_lexer_failure_fixtures(
+            FIXTURE_ROOT / "lexer" / "lexical-failures.json",
+            MALFORMED_NUMBER_FIXTURE_IDS,
+        )
+
+        self.assertEqual(
+            [fixture.fixture_id for fixture in fixtures],
+            list(MALFORMED_NUMBER_FIXTURE_IDS),
+        )
+        for fixture in fixtures:
+            with self.subTest(fixture=fixture.fixture_id):
+                actual = lex(fixture.source)
+                self.assertIsInstance(actual, LexFailure)
+                self.assertTrue(fixture.expects_parse_not_run)
+                self.assertEqual(
+                    actual.partial_tokens,
+                    fixture.expected.partial_tokens,
+                )
+                self.assertEqual(
+                    actual.diagnostics_truncated,
+                    fixture.expected.diagnostics_truncated,
+                )
+                self.assertEqual(len(actual.diagnostics), 1)
+                actual_diagnostic = actual.diagnostics[0]
+                expected_diagnostic = fixture.expected.diagnostics[0]
+                self.assertEqual(actual_diagnostic.code, expected_diagnostic.code)
+                self.assertEqual(
+                    actual_diagnostic.primary.span,
+                    expected_diagnostic.primary.span,
+                )
+                self.assertEqual(
+                    actual_diagnostic.data,
+                    expected_diagnostic.data,
+                )
 
 
 if __name__ == "__main__":

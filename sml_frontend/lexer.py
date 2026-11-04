@@ -5,8 +5,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from .diagnostic import Diagnostic, DiagnosticCode, DiagnosticLabel, LabelRole
-from .source import SourceCursor, SourceUnit, SourceUnitKind
-from .source import SourceSpan
+from .source import (
+    PositionRange,
+    SourceCursor,
+    SourcePosition,
+    SourceSpan,
+    SourceUnit,
+    SourceUnitKind,
+)
 from .token import Token, TokenKind
 
 
@@ -141,7 +147,7 @@ class _Scanner:
             elif byte is not None and byte >= 0x80:
                 self._report_invalid_source_character()
             elif byte is not None and _is_ascii_digit(byte):
-                self._scan_decimal_number()
+                self._scan_numeric_candidate()
             elif byte is not None and _is_ascii_letter(byte):
                 self._scan_identifier()
             elif byte == 0x22:
@@ -155,7 +161,7 @@ class _Scanner:
             elif byte in _WHITESPACE_BYTES:
                 self._skip_whitespace()
             elif byte == 0x2E:
-                raise NotImplementedError("malformed numeric candidates begin in R7")
+                self._scan_leading_decimal_candidate()
             else:
                 self._report_invalid_source_character()
 
@@ -171,21 +177,154 @@ class _Scanner:
             )
         return LexSuccess(tuple(self.tokens))
 
-    def _scan_decimal_number(self) -> None:
+    def _scan_numeric_candidate(self) -> None:
         start = self.cursor.offset
+        start_position = self.cursor.position
         while (byte := self.cursor.peek_byte()) is not None and _is_ascii_digit(byte):
             self.advance_one()
-        if self.cursor.peek_byte() == 0x2E and (
-            (following_byte := self.cursor.peek_byte(1)) is not None
-            and _is_ascii_digit(following_byte)
+
+        integer_end = self.cursor.offset
+        integer_spelling = self.source[start:integer_end]
+        next_byte = self.cursor.peek_byte()
+        if (
+            integer_spelling == b"0"
+            and next_byte is not None
+            and next_byte in b"xXbB"
         ):
+            self._scan_alternate_base_candidate(start, start_position)
+            return
+
+        dot_count = 0
+        while (byte := self.cursor.peek_byte()) is not None and (
+            _is_ascii_digit(byte) or byte == 0x2E
+        ):
+            if byte == 0x2E:
+                dot_count += 1
             self.advance_one()
+
+        if self.cursor.peek_byte() == 0x5F:
+            while (byte := self.cursor.peek_byte()) is not None and (
+                _is_ascii_digit(byte) or byte in b"._"
+            ):
+                self.advance_one()
+            self._report_numeric_failure(
+                DiagnosticCode.LEX005,
+                start,
+                start_position,
+            )
+            return
+
+        has_leading_zero = len(integer_spelling) > 1 and integer_spelling.startswith(
+            b"0"
+        )
+        decimal_spelling = self.source[start : self.cursor.offset]
+        has_malformed_decimal = dot_count > 1 or (
+            dot_count == 1 and decimal_spelling.endswith(b".")
+        )
+
+        next_byte = self.cursor.peek_byte()
+        following_byte = self.cursor.peek_byte(1)
+        has_exponent_prefix = (
+            not has_leading_zero
+            and not has_malformed_decimal
+            and next_byte is not None
+            and next_byte in b"eE"
+            and following_byte is not None
+            and (_is_ascii_digit(following_byte) or following_byte in b"+-")
+        )
+        if has_exponent_prefix:
+            self.advance_one()
+            sign = self.cursor.peek_byte()
+            if sign is not None and sign in b"+-":
+                self.advance_one()
             while (byte := self.cursor.peek_byte()) is not None and _is_ascii_digit(
                 byte
             ):
                 self.advance_one()
-        self._reject_deferred_numeric_candidate(start)
+            self._report_numeric_failure(
+                DiagnosticCode.LEX006,
+                start,
+                start_position,
+            )
+            return
+
+        if has_leading_zero:
+            self._report_numeric_failure(
+                DiagnosticCode.LEX003,
+                start,
+                start_position,
+            )
+            return
+        if has_malformed_decimal:
+            self._report_numeric_failure(
+                DiagnosticCode.LEX004,
+                start,
+                start_position,
+            )
+            return
         self._emit_ascii_token(TokenKind.NUMBER, start)
+
+    def _scan_leading_decimal_candidate(self) -> None:
+        start = self.cursor.offset
+        start_position = self.cursor.position
+        self.advance_one()
+        while (byte := self.cursor.peek_byte()) is not None and (
+            _is_ascii_digit(byte) or byte == 0x2E
+        ):
+            self.advance_one()
+        self._report_numeric_failure(
+            DiagnosticCode.LEX004,
+            start,
+            start_position,
+        )
+
+    def _scan_alternate_base_candidate(
+        self,
+        start: int,
+        start_position: SourcePosition,
+    ) -> None:
+        prefix = self.cursor.peek_byte()
+        self.advance_one()
+        payload_start = self.cursor.offset
+        if prefix in b"xX":
+            while (byte := self.cursor.peek_byte()) is not None and _is_ascii_hex_digit(
+                byte
+            ):
+                self.advance_one()
+        else:
+            while (byte := self.cursor.peek_byte()) is not None and byte in b"01":
+                self.advance_one()
+
+        byte = self.cursor.peek_byte()
+        if self.cursor.offset == payload_start and byte is not None and (
+            _is_ascii_letter(byte) or _is_ascii_digit(byte)
+        ):
+            self.advance_one()
+
+        self._report_numeric_failure(
+            DiagnosticCode.LEX007,
+            start,
+            start_position,
+        )
+
+    def _report_numeric_failure(
+        self,
+        code: DiagnosticCode,
+        start: int,
+        start_position: SourcePosition,
+    ) -> None:
+        end = self.cursor.offset
+        self.diagnostics.append(
+            Diagnostic(
+                code,
+                DiagnosticLabel(
+                    LabelRole.PRIMARY,
+                    SourceSpan(start, end),
+                    PositionRange(start_position, self.cursor.position),
+                ),
+                data={"candidate_lexeme": self.source[start:end].decode("ascii")},
+            )
+        )
 
     def _scan_identifier(self) -> None:
         start = self.cursor.offset
@@ -318,29 +457,6 @@ class _Scanner:
         ):
             self.advance_one()
 
-    def _reject_deferred_numeric_candidate(self, start: int) -> None:
-        spelling = self.source[start : self.cursor.offset]
-        integer_spelling = spelling.split(b".", 1)[0]
-        next_byte = self.cursor.peek_byte()
-        following_byte = self.cursor.peek_byte(1)
-        has_leading_zero = len(integer_spelling) > 1 and integer_spelling.startswith(
-            b"0"
-        )
-        has_base_prefix = (
-            spelling == b"0" and next_byte is not None and next_byte in b"xXbB"
-        )
-        has_exponent_prefix = next_byte is not None and next_byte in b"eE" and (
-            following_byte is not None
-            and (_is_ascii_digit(following_byte) or following_byte in b"+-")
-        )
-        if (
-            has_leading_zero
-            or has_base_prefix
-            or has_exponent_prefix
-            or next_byte in (0x2E, 0x5F)
-        ):
-            raise NotImplementedError("malformed numeric candidates begin in R7")
-
     def _emit_ascii_token(self, kind: TokenKind, start: int) -> None:
         end = self.cursor.offset
         lexeme = self.source[start:end].decode("ascii")
@@ -363,6 +479,14 @@ def _is_ascii_digit(value: int) -> bool:
 
 def _is_ascii_letter(value: int) -> bool:
     return 0x41 <= value <= 0x5A or 0x61 <= value <= 0x7A
+
+
+def _is_ascii_hex_digit(value: int) -> bool:
+    return (
+        _is_ascii_digit(value)
+        or 0x41 <= value <= 0x46
+        or 0x61 <= value <= 0x66
+    )
 
 
 def _is_canonical_ascii(value: int) -> bool:

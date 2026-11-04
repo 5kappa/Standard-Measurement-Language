@@ -283,13 +283,102 @@ class PilotScannerTests(unittest.TestCase):
                 with self.assertRaisesRegex(NotImplementedError, "R8"):
                     lex(source)
 
-    def test_unimplemented_surface_fails_loudly(self) -> None:
-        deferred_sources = (b"0123", b"2.5e3", b"0x10")
-
-        for source in deferred_sources:
+    def test_lone_logical_operators_remain_deferred_to_r9(self) -> None:
+        for source in (b"&", b"|"):
             with self.subTest(source=source):
-                with self.assertRaises(NotImplementedError):
+                with self.assertRaisesRegex(NotImplementedError, "R9"):
                     lex(source)
+
+
+class NumericCandidateTests(unittest.TestCase):
+    def test_malformed_candidates_own_their_complete_ranges(self) -> None:
+        cases = (
+            (b"0123x", DiagnosticCode.LEX003, "0123", "x"),
+            (b".5x", DiagnosticCode.LEX004, ".5", "x"),
+            (b"5.x", DiagnosticCode.LEX004, "5.", "x"),
+            (b"5..2x", DiagnosticCode.LEX004, "5..2", "x"),
+            (b"1__0x", DiagnosticCode.LEX005, "1__0", "x"),
+            (b"2.5e3foo", DiagnosticCode.LEX006, "2.5e3", "foo"),
+            (b"3e+", DiagnosticCode.LEX006, "3e+", None),
+            (b"0xGz", DiagnosticCode.LEX007, "0xG", "z"),
+            (b"0b1010", DiagnosticCode.LEX007, "0b1010", None),
+        )
+
+        for source, code, candidate, later_ident in cases:
+            with self.subTest(source=source):
+                result = lex(source)
+
+                self.assertIsInstance(result, LexFailure)
+                diagnostic = result.diagnostics[0]
+                candidate_end = len(candidate.encode("ascii"))
+                self.assertEqual(diagnostic.code, code)
+                self.assertEqual(
+                    diagnostic.primary.span,
+                    SourceSpan(0, candidate_end),
+                )
+                self.assertEqual(
+                    diagnostic.data,
+                    {"candidate_lexeme": candidate},
+                )
+                expected_partial_kinds = (
+                    [TokenKind.IDENT, TokenKind.EOF]
+                    if later_ident is not None
+                    else [TokenKind.EOF]
+                )
+                self.assertEqual(
+                    [token.kind for token in result.partial_tokens],
+                    expected_partial_kinds,
+                )
+                if later_ident is not None:
+                    self.assertEqual(result.partial_tokens[0].lexeme, later_ident)
+
+    def test_contract_numeric_spelling_variants_are_classified(self) -> None:
+        cases = (
+            (b"01.5", DiagnosticCode.LEX003),
+            (b"1E6", DiagnosticCode.LEX006),
+            (b"3e-2", DiagnosticCode.LEX006),
+            (b"4E+9", DiagnosticCode.LEX006),
+            (b"0XFF", DiagnosticCode.LEX007),
+            (b"0B11", DiagnosticCode.LEX007),
+        )
+
+        for source, code in cases:
+            with self.subTest(source=source):
+                result = lex(source)
+
+                self.assertIsInstance(result, LexFailure)
+                self.assertEqual(result.diagnostics[0].code, code)
+                self.assertEqual(
+                    result.diagnostics[0].data,
+                    {"candidate_lexeme": source.decode("ascii")},
+                )
+                self.assertEqual(
+                    result.partial_tokens,
+                    (Token(TokenKind.EOF, "", SourceSpan(len(source), len(source))),),
+                )
+
+    def test_ordinary_attached_e_remains_number_then_identifier(self) -> None:
+        result = lex(b"5e")
+
+        self.assertEqual(
+            result,
+            LexSuccess(
+                (
+                    Token(TokenKind.NUMBER, "5", SourceSpan(0, 1)),
+                    Token(TokenKind.IDENT, "e", SourceSpan(1, 2)),
+                    Token(TokenKind.EOF, "", SourceSpan(2, 2)),
+                )
+            ),
+        )
+
+    def test_comma_is_never_absorbed_into_numeric_candidates(self) -> None:
+        result = lex(b"1,2")
+
+        self.assertIsInstance(result, LexSuccess)
+        self.assertEqual(
+            [token.kind for token in result.tokens],
+            [TokenKind.NUMBER, TokenKind.COMMA, TokenKind.NUMBER, TokenKind.EOF],
+        )
 
 
 class InvalidUtf8Tests(unittest.TestCase):
