@@ -374,6 +374,46 @@ class NumericCandidateTests(unittest.TestCase):
             ),
         )
 
+    def test_unsupported_notation_owns_separator_continuations(self) -> None:
+        cases = (
+            (b"1e3_0foo", DiagnosticCode.LEX006, "1e3_0"),
+            (b"0x1_0foo", DiagnosticCode.LEX007, "0x1_0"),
+            (b"0b1_0foo", DiagnosticCode.LEX007, "0b1_0"),
+        )
+
+        for source, code, candidate in cases:
+            with self.subTest(source=source):
+                result = lex(source)
+
+                self.assertIsInstance(result, LexFailure)
+                self.assertEqual(len(result.diagnostics), 1)
+                diagnostic = result.diagnostics[0]
+                candidate_end = len(candidate)
+                self.assertEqual(diagnostic.code, code)
+                self.assertEqual(
+                    diagnostic.primary.span,
+                    SourceSpan(0, candidate_end),
+                )
+                self.assertEqual(
+                    diagnostic.data,
+                    {"candidate_lexeme": candidate},
+                )
+                self.assertEqual(
+                    result.partial_tokens,
+                    (
+                        Token(
+                            TokenKind.IDENT,
+                            "foo",
+                            SourceSpan(candidate_end, candidate_end + 3),
+                        ),
+                        Token(
+                            TokenKind.EOF,
+                            "",
+                            SourceSpan(candidate_end + 3, candidate_end + 3),
+                        ),
+                    ),
+                )
+
     def test_ordinary_attached_e_remains_number_then_identifier(self) -> None:
         result = lex(b"5e")
 

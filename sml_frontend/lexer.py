@@ -202,11 +202,7 @@ class _Scanner:
                 dot_count += 1
             self.advance_one()
 
-        if self.cursor.peek_byte() == 0x5F:
-            while (byte := self.cursor.peek_byte()) is not None and (
-                _is_ascii_digit(byte) or byte in b"._"
-            ):
-                self.advance_one()
+        if self._consume_numeric_separator_continuation():
             self._report_numeric_failure(
                 DiagnosticCode.LEX005,
                 start,
@@ -241,6 +237,7 @@ class _Scanner:
                 byte
             ):
                 self.advance_one()
+            self._consume_numeric_separator_continuation()
             self._report_numeric_failure(
                 DiagnosticCode.LEX006,
                 start,
@@ -272,11 +269,7 @@ class _Scanner:
             _is_ascii_digit(byte) or byte == 0x2E
         ):
             self.advance_one()
-        if self.cursor.peek_byte() == 0x5F:
-            while (byte := self.cursor.peek_byte()) is not None and (
-                _is_ascii_digit(byte) or byte in b"._"
-            ):
-                self.advance_one()
+        if self._consume_numeric_separator_continuation():
             self._report_numeric_failure(
                 DiagnosticCode.LEX005,
                 start,
@@ -312,11 +305,21 @@ class _Scanner:
         ):
             self.advance_one()
 
+        self._consume_numeric_separator_continuation()
         self._report_numeric_failure(
             DiagnosticCode.LEX007,
             start,
             start_position,
         )
+
+    def _consume_numeric_separator_continuation(self) -> bool:
+        if self.cursor.peek_byte() != 0x5F:
+            return False
+        while (byte := self.cursor.peek_byte()) is not None and (
+            _is_ascii_digit(byte) or byte in b"._"
+        ):
+            self.advance_one()
+        return True
 
     def _report_numeric_failure(
         self,
