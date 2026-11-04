@@ -357,6 +357,23 @@ class NumericCandidateTests(unittest.TestCase):
                     (Token(TokenKind.EOF, "", SourceSpan(len(source), len(source))),),
                 )
 
+    def test_leading_decimal_separator_owns_the_complete_candidate(self) -> None:
+        result = lex(b".5_0foo")
+
+        self.assertIsInstance(result, LexFailure)
+        self.assertEqual(len(result.diagnostics), 1)
+        diagnostic = result.diagnostics[0]
+        self.assertEqual(diagnostic.code, DiagnosticCode.LEX005)
+        self.assertEqual(diagnostic.primary.span, SourceSpan(0, 4))
+        self.assertEqual(diagnostic.data, {"candidate_lexeme": ".5_0"})
+        self.assertEqual(
+            result.partial_tokens,
+            (
+                Token(TokenKind.IDENT, "foo", SourceSpan(4, 7)),
+                Token(TokenKind.EOF, "", SourceSpan(7, 7)),
+            ),
+        )
+
     def test_ordinary_attached_e_remains_number_then_identifier(self) -> None:
         result = lex(b"5e")
 

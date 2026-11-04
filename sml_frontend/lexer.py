@@ -272,6 +272,17 @@ class _Scanner:
             _is_ascii_digit(byte) or byte == 0x2E
         ):
             self.advance_one()
+        if self.cursor.peek_byte() == 0x5F:
+            while (byte := self.cursor.peek_byte()) is not None and (
+                _is_ascii_digit(byte) or byte in b"._"
+            ):
+                self.advance_one()
+            self._report_numeric_failure(
+                DiagnosticCode.LEX005,
+                start,
+                start_position,
+            )
+            return
         self._report_numeric_failure(
             DiagnosticCode.LEX004,
             start,
